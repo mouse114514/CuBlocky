@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>CuBlocky.Server</RootNamespace>
+    <AssemblyName>CuBlocky.Server</AssemblyName>
+    <Version>0.1.0</Version>
+    <!-- Single-file self-contained publish for distribution -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
+  <!-- Frontend (web/) builds into server/wwwroot via vite.config.ts outDir -->
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <!-- Exclude generated build output from compilation -->
+  <ItemGroup>
+    <Compile Remove="builds\**" />
+    <Content Remove="builds\**" />
+    <None Remove="builds\**" />
+  </ItemGroup>
+
+</Project>
