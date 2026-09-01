@@ -1106,9 +1106,11 @@ csharpGenerator.forBlock['cu_item_set_property'] = (block, gen) => {
   const prop = block.getFieldValue('PROP');
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
   const target = gen.valueToCode(block, 'TARGET_ITEM', ORDER_ATOMIC) || '"myItem"';
-  const floatProps = ['condition','weight','value','slotRotation','rotSpeed','scaleConditionToward','jumpHeightMultChange','wearableArmor','wearableIsolation','wearableHitDurabilityLossMultiplier','decayMinutes','wearableVisualOffset','spriteScale'];
-  if (floatProps.includes(prop)) return `/* ${target} */.${prop} = ${float(v)};\n`;
-  return `/* ${target} */.${prop} = ${v};\n`;
+  const itemProps = ['condition'];
+  const statsProps = ['weight','slotRotation','rotSpeed','usable','wearable','useLimbAction','destroyAtZeroCondition','jumpHeightMultChange','wearableArmor','wearableIsolation','wearableHitDurabilityLossMultiplier','wearableVisualOffset','spriteScale','scaleConditionToward','tags'];
+  if (itemProps.includes(prop)) return `${target}.${prop} = ${float(v)};\n`;
+  if (statsProps.includes(prop)) return `${target}.Stats.${prop} = ${float(v)};\n`;
+  return `${target}.${prop} = ${v};\n`;
 };
 csharpGenerator.forBlock['cu_register_recipe'] = (block, gen) => {
   const inputsCode = gen.valueToCode(block, 'INPUTS', ORDER_ATOMIC) || 'new List<RecipeItem>()';
@@ -1151,7 +1153,7 @@ csharpGenerator.forBlock['cu_set_temperature'] = (block, gen) => {
 };
 csharpGenerator.forBlock['cu_talk'] = (block, gen) => {
   const t = gen.valueToCode(block, 'TEXT', ORDER_ATOMIC) || '"Hello"';
-  return `body.talker.Talk(${t}, null, true);\n`;
+  return `body.talker.Talk(${t});\n`;
 };
 csharpGenerator.forBlock['cu_set_pain'] = (block, gen) => {
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
@@ -1159,7 +1161,7 @@ csharpGenerator.forBlock['cu_set_pain'] = (block, gen) => {
 };
 csharpGenerator.forBlock['cu_set_stress'] = (block, gen) => {
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.stress = ${float(v)};\n`;
+  return `/* body.stress does not exist; use averagePain or another field */\n`;
 };
 csharpGenerator.forBlock['cu_set_heart_rate'] = (block, gen) => {
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
@@ -1174,7 +1176,7 @@ csharpGenerator.forBlock['cu_set_immunity'] = (block, gen) => {
   return `body.immunity = ${float(v)};\n`;
 };
 csharpGenerator.forBlock['cu_sleep'] = () => 'body.sleeping = true;\n';
-csharpGenerator.forBlock['cu_wake'] = () => 'body.Wake();\n';
+csharpGenerator.forBlock['cu_wake'] = () => 'body.WakeUp();\n';
 
 // Item actions
 csharpGenerator.forBlock['cu_item_use'] = (block) => {
@@ -1204,25 +1206,25 @@ csharpGenerator.forBlock['cu_item_set_weight'] = (block, gen) => {
   const target = block.getFieldValue('TARGET');
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
   const targetExpr = target === 'this' ? 'item' : target === 'left' ? 'body.limbs[0].handItem' : 'body.limbs[1].handItem';
-  return `${targetExpr}.weight = ${float(v)};\n`;
+  return `${targetExpr}.Stats.weight = ${float(v)};\n`;
 };
 csharpGenerator.forBlock['cu_item_set_value'] = (block, gen) => {
   const target = block.getFieldValue('TARGET');
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
   const targetExpr = target === 'this' ? 'item' : target === 'left' ? 'body.limbs[0].handItem' : 'body.limbs[1].handItem';
-  return `${targetExpr}.value = ${float(v)};\n`;
+  return `/* ${targetExpr}.value is registration-time only (ItemInfo.value), cannot be set at runtime */\n`;
 };
 csharpGenerator.forBlock['cu_item_set_decay'] = (block, gen) => {
   const target = block.getFieldValue('TARGET');
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
   const targetExpr = target === 'this' ? 'item' : target === 'left' ? 'body.limbs[0].handItem' : 'body.limbs[1].handItem';
-  return `${targetExpr}.decayMinutes = ${float(v)};\n`;
+  return `/* ${targetExpr}.decayMinutes is registration-time only (ItemInfo.decayMinutes), cannot be set at runtime */\n`;
 };
 csharpGenerator.forBlock['cu_item_set_slot_rotation'] = (block, gen) => {
   const target = block.getFieldValue('TARGET');
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
   const targetExpr = target === 'this' ? 'item' : target === 'left' ? 'body.limbs[0].handItem' : 'body.limbs[1].handItem';
-  return `${targetExpr}.slotRotation = ${float(v)};\n`;
+  return `${targetExpr}.Stats.slotRotation = ${float(v)};\n`;
 };
 
 // Sound
@@ -1235,7 +1237,7 @@ csharpGenerator.forBlock['cu_play_sound_at'] = (block, gen) => {
   const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
   const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
   const vol = gen.valueToCode(block, 'VOLUME', ORDER_ATOMIC) || '1';
-  return `Sound.Play("${s}", new Vector3(${x}f, ${y}f, 0f), ${vol}f);\n`;
+  return `Sound.Play("${s}", new Vector3(${x}f, ${y}f, 0f), twoDimensional: false, pitchShift: false, null, ${float(vol)}f);\n`;
 };
 
 // Flow
@@ -1286,16 +1288,16 @@ csharpGenerator.forBlock['cu_item_vanilla'] = (block) => [`"${block.getFieldValu
 csharpGenerator.forBlock['cu_happiness'] = () => ['body.happiness', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_temperature'] = () => ['body.temperature', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_hunger'] = () => ['body.hunger', ORDER_ATOMIC];
-csharpGenerator.forBlock['cu_weight'] = () => ['body.weight', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_weight'] = () => ['body.weightOffset', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_position_x'] = () => ['body.transform.position.x', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_position_y'] = () => ['body.transform.position.y', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_item_condition'] = () => ['item.condition', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_item_name'] = () => ['item.fullName', ORDER_ATOMIC];
-csharpGenerator.forBlock['cu_world_time'] = () => ['World.time', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_world_time'] = () => ['WorldGeneration.TotalRunTime()', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_world_block_at'] = (block, gen) => {
   const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
   const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
-  return [`World.GetBlock(new Vector2Int(${x}, ${y}))`, ORDER_ATOMIC];
+  return [`WorldGeneration.world.GetBlock(new Vector2Int(${x}, ${y}))`, ORDER_ATOMIC];
 };
 
 // Math
@@ -1337,7 +1339,7 @@ csharpGenerator.forBlock['cu_string_contains'] = (block, gen) => {
 // Boolean
 csharpGenerator.forBlock['cu_true'] = () => ['true', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_false'] = () => ['false', ORDER_ATOMIC];
-csharpGenerator.forBlock['cu_is_alive'] = () => ['body.isAlive', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_is_alive'] = () => ['!body.isDying', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_number_compare'] = (block, gen) => {
   const op = block.getFieldValue('OP');
   const a = gen.valueToCode(block, 'A', ORDER_ATOMIC) || '0f';
@@ -1451,29 +1453,29 @@ csharpGenerator.forBlock['cu_register_locale'] = (block) => {
 };
 
 // Player state getters
-csharpGenerator.forBlock['cu_player_health'] = () => ['body.health', ORDER_ATOMIC];
-csharpGenerator.forBlock['cu_player_max_health'] = () => ['body.maxHealth', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_health'] = () => ['body.limbs[1].skinHealth', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_max_health'] = () => ['100f', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_player_stamina'] = () => ['body.stamina', ORDER_ATOMIC];
-csharpGenerator.forBlock['cu_player_oxygen'] = () => ['body.oxygen', ORDER_ATOMIC];
-csharpGenerator.forBlock['cu_player_sleep_quality'] = () => ['body.sleepQuality', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_oxygen'] = () => ['body.bloodOxygen', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_sleep_quality'] = () => ['body.consciousness', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_player_pain'] = () => ['body.limbs[0].pain', ORDER_ATOMIC];
-csharpGenerator.forBlock['cu_player_stress'] = () => ['body.stress', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_stress'] = () => ['body.averagePain', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_player_heart_rate'] = () => ['body.heartRate', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_player_blood_pressure'] = () => ['body.bloodPressure', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_player_immunity'] = () => ['body.immunity', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_player_thirst'] = () => ['body.thirst', ORDER_ATOMIC];
 
 // Item getters
-csharpGenerator.forBlock['cu_item_max_condition'] = () => ['item.maxCondition', ORDER_ATOMIC];
-csharpGenerator.forBlock['cu_item_weight'] = () => ['item.weight', ORDER_ATOMIC];
-csharpGenerator.forBlock['cu_item_value'] = () => ['item.value', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_item_max_condition'] = () => ['1f', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_item_weight'] = () => ['item.totalWeight', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_item_value'] = () => ['0 /* ItemInfo.value is registration-time only */', ORDER_ATOMIC];
 
 // World actions
 csharpGenerator.forBlock['cu_world_set_tile'] = (block, gen) => {
   const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
   const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
   const tile = gen.valueToCode(block, 'TILE', ORDER_ATOMIC) || '0';
-  return `World.SetBlock(new Vector2Int(${x}, ${y}), ${tile});\n`;
+  return `WorldGeneration.world.SetBlock(new Vector2Int(${x}, ${y}), ${tile});\n`;
 };
 csharpGenerator.forBlock['cu_world_spawn_item'] = (block, gen) => {
   const item = gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || '"scrapmetal"';
@@ -1484,26 +1486,27 @@ csharpGenerator.forBlock['cu_world_spawn_item'] = (block, gen) => {
 csharpGenerator.forBlock['cu_world_destroy_block'] = (block, gen) => {
   const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
   const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
-  return `World.SetBlock(new Vector2Int(${x}, ${y}), 0);\n`;
+  return `WorldGeneration.world.SetBlock(new Vector2Int(${x}, ${y}), 0);\n`;
 };
 csharpGenerator.forBlock['cu_world_replace_block'] = (block, gen) => {
   const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
   const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
   const oldTile = gen.valueToCode(block, 'OLD_TILE', ORDER_ATOMIC) || '0';
   const newTile = gen.valueToCode(block, 'NEW_TILE', ORDER_ATOMIC) || '1';
-  return `if (World.GetBlock(new Vector2Int(${x}, ${y})) == ${oldTile}) World.SetBlock(new Vector2Int(${x}, ${y}), ${newTile});\n`;
+  return `if (WorldGeneration.world.GetBlock(new Vector2Int(${x}, ${y})) == ${oldTile}) WorldGeneration.world.SetBlock(new Vector2Int(${x}, ${y}), ${newTile});\n`;
 };
 csharpGenerator.forBlock['cu_give_item'] = (block, gen) => {
   const item = gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || '"bandage"';
-  return `CustomInstantiate.InstantiateReturn(${item},GetPlayer().transform.position,Quaternion.identity,1f);\nif(_go!=null){var _it=_go.GetComponent<Item>();if(_it!=null)GetPlayer().PickUpItem(_it,0,true);}\n`;
+  return `var _go = CustomInstantiate.InstantiateReturn(${item}, PlayerCamera.main.body.transform.position, Quaternion.identity, 1f);\nif(_go != null) { var _it = _go.GetComponent<Item>(); if(_it != null) PlayerCamera.main.body.PickUpItem(_it, 0, true); }\n`;
 };
 csharpGenerator.forBlock['cu_give_item_slot'] = (block, gen) => {
   const item = gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || '"bandage"';
-  return `CustomInstantiate.InstantiateReturn(${item},GetPlayer().transform.position,Quaternion.identity,1f);\nif(_go!=null){var _it=_go.GetComponent<Item>();if(_it!=null)GetPlayer().PickUpItem(_it,0,true);}\n`;
+  const slot = gen.valueToCode(block, 'SLOT', ORDER_ATOMIC) || '0';
+  return `var _go = CustomInstantiate.InstantiateReturn(${item}, PlayerCamera.main.body.transform.position, Quaternion.identity, 1f);\nif(_go != null) { var _it = _go.GetComponent<Item>(); if(_it != null) PlayerCamera.main.body.PickUpItem(_it, ${slot}, true); }\n`;
 };
 
 // Boolean getters
-csharpGenerator.forBlock['cu_item_is_equipped'] = () => ['(item.equippedSlot != null)', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_item_is_equipped'] = () => ['(item.limb != null)', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_item_is_in_inventory'] = () => ['(item.container != null)', ORDER_ATOMIC];
 
 // Math clamp
