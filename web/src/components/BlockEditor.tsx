@@ -334,6 +334,39 @@ const TOOLBOX = `
     <sep></sep>
     <block type="cu_world_time"></block>
     <block type="cu_world_block_at"></block>
+    <block type="cu_world_depth"></block>
+    <sep></sep>
+    <block type="cu_player_energy"></block>
+    <block type="cu_player_brain_health"></block>
+    <block type="cu_player_shock"></block>
+    <block type="cu_player_blood_volume"></block>
+    <block type="cu_player_respiratory_rate"></block>
+    <block type="cu_player_sickness"></block>
+    <block type="cu_player_adrenaline"></block>
+    <block type="cu_player_radiation"></block>
+    <block type="cu_player_wetness"></block>
+    <block type="cu_player_clothing_temp"></block>
+    <block type="cu_player_encumbrance"></block>
+    <block type="cu_player_bleed_speed"></block>
+    <sep></sep>
+    <block type="cu_limb_index"></block>
+    <block type="cu_limb_skin_health">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
+    <block type="cu_limb_muscle_health">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
+    <block type="cu_limb_pain">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
+    <block type="cu_limb_bleed">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
+    <block type="cu_limb_infection">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
+    <block type="cu_item_id"></block>
+    <block type="cu_item_category"></block>
     <sep></sep>
     <block type="cu_math_op">
       <value name="A"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
@@ -365,6 +398,26 @@ const TOOLBOX = `
     <block type="cu_is_alive"></block>
     <block type="cu_item_is_equipped"></block>
     <block type="cu_item_is_in_inventory"></block>
+    <sep></sep>
+    <block type="cu_player_conscious"></block>
+    <block type="cu_player_standing"></block>
+    <block type="cu_player_grounded"></block>
+    <block type="cu_player_in_water"></block>
+    <block type="cu_player_breathing"></block>
+    <block type="cu_player_crouching"></block>
+    <sep></sep>
+    <block type="cu_limb_broken">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
+    <block type="cu_limb_dislocated">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
+    <block type="cu_limb_infected_bool">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
+    <block type="cu_limb_dismembered">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
     <sep></sep>
     <block type="cu_number_compare">
       <value name="A"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
