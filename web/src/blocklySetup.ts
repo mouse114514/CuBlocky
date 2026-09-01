@@ -1183,7 +1183,7 @@ csharpGenerator.forBlock['cu_item_use'] = (block) => {
   const target = block.getFieldValue('TARGET');
   const action = block.getFieldValue('ACTION');
   const targetExpr = target === 'this' ? 'item' : target === 'left' ? 'body.limbs[0].handItem' : 'body.limbs[1].handItem';
-  if (action === 'use') return `${targetExpr}.useAction?.Invoke(body, ${targetExpr});\n`;
+  if (action === 'use') return `${targetExpr}.Stats.useAction?.Invoke(body, ${targetExpr});\n`;
   if (action === 'drop') return `body.DropItem(${targetExpr});\n`;
   return `body.WearWearable(${targetExpr});\n`;
 };
@@ -1506,8 +1506,8 @@ csharpGenerator.forBlock['cu_give_item_slot'] = (block, gen) => {
 };
 
 // Boolean getters
-csharpGenerator.forBlock['cu_item_is_equipped'] = () => ['(item.limb != null)', ORDER_ATOMIC];
-csharpGenerator.forBlock['cu_item_is_in_inventory'] = () => ['(item.container != null)', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_item_is_equipped'] = () => ['PlayerCamera.main.body.HasWearable(item.id)', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_item_is_in_inventory'] = () => ['(bool)item.ParentContainer()', ORDER_ATOMIC];
 
 // Math clamp
 csharpGenerator.forBlock['cu_math_clamp'] = (block, gen) => {
