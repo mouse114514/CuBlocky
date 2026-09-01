@@ -812,6 +812,193 @@ const BLOCK_JSON: any[] = [
     ],
     colour: C.WORLD, previousStatement: null, nextStatement: null, inputsInline: true,
   },
+
+  // ═══ Extended Body getters (green) ═══════════════════════════
+  { type: 'cu_player_energy', message0: '%{BKY_CU_PLAYER_ENERGY}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_brain_health', message0: '%{BKY_CU_PLAYER_BRAIN_HEALTH}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_shock', message0: '%{BKY_CU_PLAYER_SHOCK}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_blood_volume', message0: '%{BKY_CU_PLAYER_BLOOD_VOLUME}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_respiratory_rate', message0: '%{BKY_CU_PLAYER_RESPIRATORY_RATE}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_sickness', message0: '%{BKY_CU_PLAYER_SICKNESS}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_adrenaline', message0: '%{BKY_CU_PLAYER_ADRENALINE}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_radiation', message0: '%{BKY_CU_PLAYER_RADIATION}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_wetness', message0: '%{BKY_CU_PLAYER_WETNESS}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_clothing_temp', message0: '%{BKY_CU_PLAYER_CLOTHING_TEMP}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_encumbrance', message0: '%{BKY_CU_PLAYER_ENCUMBRANCE}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_bleed_speed', message0: '%{BKY_CU_PLAYER_BLEED_SPEED}', output: 'Number', colour: C.BODY },
+
+  // ═══ Extended Body booleans (dark purple) ════════════════════
+  { type: 'cu_player_conscious', message0: '%{BKY_CU_PLAYER_CONSCIOUS}', output: 'Boolean', colour: C.BOOL },
+  { type: 'cu_player_standing', message0: '%{BKY_CU_PLAYER_STANDING}', output: 'Boolean', colour: C.BOOL },
+  { type: 'cu_player_grounded', message0: '%{BKY_CU_PLAYER_GROUNDED}', output: 'Boolean', colour: C.BOOL },
+  { type: 'cu_player_in_water', message0: '%{BKY_CU_PLAYER_IN_WATER}', output: 'Boolean', colour: C.BOOL },
+  { type: 'cu_player_breathing', message0: '%{BKY_CU_PLAYER_BREATHING}', output: 'Boolean', colour: C.BOOL },
+  { type: 'cu_player_crouching', message0: '%{BKY_CU_PLAYER_CROUCHING}', output: 'Boolean', colour: C.BOOL },
+
+  // ═══ Extended Body setters (green) ═══════════════════════════
+  {
+    type: 'cu_set_energy', message0: '%{BKY_CU_SET_ENERGY}',
+    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
+    colour: C.BODY, previousStatement: null, nextStatement: null,
+  },
+  {
+    type: 'cu_set_brain_health', message0: '%{BKY_CU_SET_BRAIN_HEALTH}',
+    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
+    colour: C.BODY, previousStatement: null, nextStatement: null,
+  },
+  {
+    type: 'cu_set_shock', message0: '%{BKY_CU_SET_SHOCK}',
+    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
+    colour: C.BODY, previousStatement: null, nextStatement: null,
+  },
+  {
+    type: 'cu_set_blood_volume', message0: '%{BKY_CU_SET_BLOOD_VOLUME}',
+    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
+    colour: C.BODY, previousStatement: null, nextStatement: null,
+  },
+  {
+    type: 'cu_set_sickness', message0: '%{BKY_CU_SET_SICKNESS}',
+    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
+    colour: C.BODY, previousStatement: null, nextStatement: null,
+  },
+  {
+    type: 'cu_set_wetness', message0: '%{BKY_CU_SET_WETNESS}',
+    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
+    colour: C.BODY, previousStatement: null, nextStatement: null,
+  },
+  {
+    type: 'cu_set_radiation', message0: '%{BKY_CU_SET_RADIATION}',
+    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
+    colour: C.BODY, previousStatement: null, nextStatement: null,
+  },
+
+  // ═══ Extended Body actions (green) ═══════════════════════════
+  { type: 'cu_ragdoll', message0: '%{BKY_CU_RAGDOLL}', colour: C.BODY, previousStatement: null, nextStatement: null },
+  { type: 'cu_jump', message0: '%{BKY_CU_JUMP}', colour: C.BODY, previousStatement: null, nextStatement: null },
+  { type: 'cu_switch_hands', message0: '%{BKY_CU_SWITCH_HANDS}', colour: C.BODY, previousStatement: null, nextStatement: null },
+  { type: 'cu_throw_item', message0: '%{BKY_CU_THROW_ITEM}', colour: C.BODY, previousStatement: null, nextStatement: null },
+
+  // ═══ Limb getters (teal) ════════════════════════════════════
+  {
+    type: 'cu_limb_index', message0: '肢体 %1',
+    args0: [{ type: 'field_dropdown', name: 'LIMB', options: [['头部','0'],['躯干','1'],['左臂','2'],['右臂','3'],['左腿','4'],['右腿','5']], SERIALIZABLE: true }],
+    output: 'Number', colour: C.BODY,
+  },
+  {
+    type: 'cu_limb_skin_health', message0: '%{BKY_CU_LIMB_SKIN_HEALTH} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    output: 'Number', colour: C.BODY,
+  },
+  {
+    type: 'cu_limb_muscle_health', message0: '%{BKY_CU_LIMB_MUSCLE_HEALTH} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    output: 'Number', colour: C.BODY,
+  },
+  {
+    type: 'cu_limb_pain', message0: '%{BKY_CU_LIMB_PAIN} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    output: 'Number', colour: C.BODY,
+  },
+  {
+    type: 'cu_limb_bleed', message0: '%{BKY_CU_LIMB_BLEED} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    output: 'Number', colour: C.BODY,
+  },
+  {
+    type: 'cu_limb_infection', message0: '%{BKY_CU_LIMB_INFECTION} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    output: 'Number', colour: C.BODY,
+  },
+
+  // ═══ Limb booleans (dark purple) ════════════════════════════
+  {
+    type: 'cu_limb_broken', message0: '%{BKY_CU_LIMB_BROKEN} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    output: 'Boolean', colour: C.BOOL,
+  },
+  {
+    type: 'cu_limb_dislocated', message0: '%{BKY_CU_LIMB_DISLOCATED} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    output: 'Boolean', colour: C.BOOL,
+  },
+  {
+    type: 'cu_limb_infected_bool', message0: '%{BKY_CU_LIMB_INFECTED} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    output: 'Boolean', colour: C.BOOL,
+  },
+  {
+    type: 'cu_limb_dismembered', message0: '%{BKY_CU_LIMB_DISMEMBERED} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    output: 'Boolean', colour: C.BOOL,
+  },
+
+  // ═══ Limb setters (teal) ════════════════════════════════════
+  {
+    type: 'cu_set_limb_skin_health', message0: '%{BKY_CU_SET_LIMB_SKIN_HEALTH} %1 %2',
+    args0: [
+      { type: 'input_value', name: 'LIMB', check: 'Number' },
+      { type: 'input_value', name: 'VALUE', check: 'Number' },
+    ],
+    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_set_limb_muscle_health', message0: '%{BKY_CU_SET_LIMB_MUSCLE_HEALTH} %1 %2',
+    args0: [
+      { type: 'input_value', name: 'LIMB', check: 'Number' },
+      { type: 'input_value', name: 'VALUE', check: 'Number' },
+    ],
+    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_set_limb_pain', message0: '%{BKY_CU_SET_LIMB_PAIN} %1 %2',
+    args0: [
+      { type: 'input_value', name: 'LIMB', check: 'Number' },
+      { type: 'input_value', name: 'VALUE', check: 'Number' },
+    ],
+    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_set_limb_bleed', message0: '%{BKY_CU_SET_LIMB_BLEED} %1 %2',
+    args0: [
+      { type: 'input_value', name: 'LIMB', check: 'Number' },
+      { type: 'input_value', name: 'VALUE', check: 'Number' },
+    ],
+    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+
+  // ═══ Limb actions (teal) ════════════════════════════════════
+  {
+    type: 'cu_limb_break', message0: '%{BKY_CU_LIMB_BREAK} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    colour: C.BODY, previousStatement: null, nextStatement: null,
+  },
+  {
+    type: 'cu_limb_mend', message0: '%{BKY_CU_LIMB_MEND} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    colour: C.BODY, previousStatement: null, nextStatement: null,
+  },
+  {
+    type: 'cu_limb_dislocate_action', message0: '%{BKY_CU_LIMB_DISLOCATE} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    colour: C.BODY, previousStatement: null, nextStatement: null,
+  },
+  {
+    type: 'cu_limb_undislocate', message0: '%{BKY_CU_LIMB_UNDISLOCATE} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    colour: C.BODY, previousStatement: null, nextStatement: null,
+  },
+  {
+    type: 'cu_limb_dismember_action', message0: '%{BKY_CU_LIMB_DISMEMBER} %1',
+    args0: [{ type: 'input_value', name: 'LIMB', check: 'Number' }],
+    colour: C.BODY, previousStatement: null, nextStatement: null,
+  },
+
+  // ═══ Extended Item getters (blue) ════════════════════════════
+  { type: 'cu_item_id', message0: '%{BKY_CU_ITEM_ID}', output: 'String', colour: C.ITEM },
+  { type: 'cu_item_category', message0: '%{BKY_CU_ITEM_CATEGORY}', output: 'String', colour: C.ITEM },
+
+  // ═══ Extended World getters (cyan) ═══════════════════════════
+  { type: 'cu_world_depth', message0: '%{BKY_CU_WORLD_DEPTH}', output: 'Number', colour: C.WORLD },
 ];
 
 // ── Messages ──
@@ -910,6 +1097,63 @@ const MSG_ZH: Record<string, string> = {
   CU_MATH_CLAMP: '限制 %1 在 %2 到 %3 之间',
   CU_ITEM_IS_EQUIPPED: '物品是否装备中',
   CU_ITEM_IS_IN_INVENTORY: '物品是否在背包中',
+  // Extended Body getters
+  CU_PLAYER_ENERGY: '玩家体力值',
+  CU_PLAYER_BRAIN_HEALTH: '玩家脑部健康',
+  CU_PLAYER_SHOCK: '玩家休克值',
+  CU_PLAYER_BLOOD_VOLUME: '玩家血量',
+  CU_PLAYER_RESPIRATORY_RATE: '玩家呼吸频率',
+  CU_PLAYER_SICKNESS: '玩家生病值',
+  CU_PLAYER_ADRENALINE: '玩家肾上腺素',
+  CU_PLAYER_RADIATION: '玩家辐射值',
+  CU_PLAYER_WETNESS: '玩家湿度',
+  CU_PLAYER_CLOTHING_TEMP: '玩家衣物温度',
+  CU_PLAYER_ENCUMBRANCE: '玩家负重',
+  CU_PLAYER_BLEED_SPEED: '玩家出血速度',
+  // Extended Body booleans
+  CU_PLAYER_CONSCIOUS: '玩家是否清醒',
+  CU_PLAYER_STANDING: '玩家是否站立',
+  CU_PLAYER_GROUNDED: '玩家是否着地',
+  CU_PLAYER_IN_WATER: '玩家是否在水中',
+  CU_PLAYER_BREATHING: '玩家是否在呼吸',
+  CU_PLAYER_CROUCHING: '玩家是否蹲下',
+  // Extended Body setters
+  CU_SET_ENERGY: '设置体力值 %1',
+  CU_SET_BRAIN_HEALTH: '设置脑部健康 %1',
+  CU_SET_SHOCK: '设置休克值 %1',
+  CU_SET_BLOOD_VOLUME: '设置血量 %1',
+  CU_SET_SICKNESS: '设置生病值 %1',
+  CU_SET_WETNESS: '设置湿度 %1',
+  CU_SET_RADIATION: '设置辐射值 %1',
+  // Extended Body actions
+  CU_RAGDOLL: '触发布娃娃',
+  CU_JUMP: '跳跃',
+  CU_SWITCH_HANDS: '切换双手',
+  CU_THROW_ITEM: '投掷物品',
+  // Limb
+  CU_LIMB_SKIN_HEALTH: '肢体皮肤健康',
+  CU_LIMB_MUSCLE_HEALTH: '肢体肌肉健康',
+  CU_LIMB_PAIN: '肢体疼痛',
+  CU_LIMB_BLEED: '肢体出血量',
+  CU_LIMB_INFECTION: '肢体感染量',
+  CU_LIMB_BROKEN: '肢体是否骨折',
+  CU_LIMB_DISLOCATED: '肢体是否脱臼',
+  CU_LIMB_INFECTED: '肢体是否感染',
+  CU_LIMB_DISMEMBERED: '肢体是否截肢',
+  CU_SET_LIMB_SKIN_HEALTH: '设置肢体皮肤健康',
+  CU_SET_LIMB_MUSCLE_HEALTH: '设置肢体肌肉健康',
+  CU_SET_LIMB_PAIN: '设置肢体疼痛',
+  CU_SET_LIMB_BLEED: '设置肢体出血',
+  CU_LIMB_BREAK: '骨折肢体 %1',
+  CU_LIMB_MEND: '修复肢体 %1',
+  CU_LIMB_DISLOCATE: '脱臼肢体 %1',
+  CU_LIMB_UNDISLOCATE: '复位肢体 %1',
+  CU_LIMB_DISMEMBER: '截肢 %1',
+  // Item getters
+  CU_ITEM_ID: '物品ID',
+  CU_ITEM_CATEGORY: '物品分类',
+  // World
+  CU_WORLD_DEPTH: '玩家深度(米)',
 };
 
 const MSG_EN: Record<string, string> = {
@@ -1007,6 +1251,63 @@ const MSG_EN: Record<string, string> = {
   CU_MATH_CLAMP: 'clamp %1 between %2 and %3',
   CU_ITEM_IS_EQUIPPED: 'is item equipped',
   CU_ITEM_IS_IN_INVENTORY: 'is item in inventory',
+  // Extended Body getters
+  CU_PLAYER_ENERGY: 'player energy',
+  CU_PLAYER_BRAIN_HEALTH: 'player brain health',
+  CU_PLAYER_SHOCK: 'player shock',
+  CU_PLAYER_BLOOD_VOLUME: 'player blood volume',
+  CU_PLAYER_RESPIRATORY_RATE: 'player respiratory rate',
+  CU_PLAYER_SICKNESS: 'player sickness',
+  CU_PLAYER_ADRENALINE: 'player adrenaline',
+  CU_PLAYER_RADIATION: 'player radiation',
+  CU_PLAYER_WETNESS: 'player wetness',
+  CU_PLAYER_CLOTHING_TEMP: 'player clothing temp',
+  CU_PLAYER_ENCUMBRANCE: 'player encumbrance',
+  CU_PLAYER_BLEED_SPEED: 'player bleed speed',
+  // Extended Body booleans
+  CU_PLAYER_CONSCIOUS: 'player is conscious',
+  CU_PLAYER_STANDING: 'player is standing',
+  CU_PLAYER_GROUNDED: 'player is grounded',
+  CU_PLAYER_IN_WATER: 'player is in water',
+  CU_PLAYER_BREATHING: 'player is breathing',
+  CU_PLAYER_CROUCHING: 'player is crouching',
+  // Extended Body setters
+  CU_SET_ENERGY: 'set energy %1',
+  CU_SET_BRAIN_HEALTH: 'set brain health %1',
+  CU_SET_SHOCK: 'set shock %1',
+  CU_SET_BLOOD_VOLUME: 'set blood volume %1',
+  CU_SET_SICKNESS: 'set sickness %1',
+  CU_SET_WETNESS: 'set wetness %1',
+  CU_SET_RADIATION: 'set radiation %1',
+  // Extended Body actions
+  CU_RAGDOLL: 'ragdoll',
+  CU_JUMP: 'jump',
+  CU_SWITCH_HANDS: 'switch hands',
+  CU_THROW_ITEM: 'throw item',
+  // Limb
+  CU_LIMB_SKIN_HEALTH: 'limb skin health',
+  CU_LIMB_MUSCLE_HEALTH: 'limb muscle health',
+  CU_LIMB_PAIN: 'limb pain',
+  CU_LIMB_BLEED: 'limb bleed amount',
+  CU_LIMB_INFECTION: 'limb infection amount',
+  CU_LIMB_BROKEN: 'limb is broken',
+  CU_LIMB_DISLOCATED: 'limb is dislocated',
+  CU_LIMB_INFECTED: 'limb is infected',
+  CU_LIMB_DISMEMBERED: 'limb is dismembered',
+  CU_SET_LIMB_SKIN_HEALTH: 'set limb skin health',
+  CU_SET_LIMB_MUSCLE_HEALTH: 'set limb muscle health',
+  CU_SET_LIMB_PAIN: 'set limb pain',
+  CU_SET_LIMB_BLEED: 'set limb bleed',
+  CU_LIMB_BREAK: 'break limb %1',
+  CU_LIMB_MEND: 'mend limb %1',
+  CU_LIMB_DISLOCATE: 'dislocate limb %1',
+  CU_LIMB_UNDISLOCATE: 'undislocate limb %1',
+  CU_LIMB_DISMEMBER: 'dismember %1',
+  // Item getters
+  CU_ITEM_ID: 'item id',
+  CU_ITEM_CATEGORY: 'item category',
+  // World
+  CU_WORLD_DEPTH: 'player depth (meters)',
 };
 
 export function setMessages(lang: string) {
@@ -1516,5 +1817,158 @@ csharpGenerator.forBlock['cu_math_clamp'] = (block, gen) => {
   const max = gen.valueToCode(block, 'MAX', ORDER_ATOMIC) || '100';
   return [`Mathf.Clamp(${v}, ${min}, ${max})`, ORDER_ATOMIC];
 };
+
+// ═══ Extended Body getters ═══════════════════════════════════
+csharpGenerator.forBlock['cu_player_energy'] = () => ['body.energy', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_brain_health'] = () => ['body.brainHealth', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_shock'] = () => ['body.shock', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_blood_volume'] = () => ['body.bloodVolume', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_respiratory_rate'] = () => ['body.respiratoryRate', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_sickness'] = () => ['body.sicknessAmount', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_adrenaline'] = () => ['body.curAdrenaline', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_radiation'] = () => ['body.radiationSickness', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_wetness'] = () => ['body.wetness', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_clothing_temp'] = () => ['body.clothingTemperature', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_encumbrance'] = () => ['body.totalEncumberance', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_bleed_speed'] = () => ['body.totalBleedSpeed', ORDER_ATOMIC];
+
+// ═══ Extended Body booleans ══════════════════════════════════
+csharpGenerator.forBlock['cu_player_conscious'] = () => ['body.conscious', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_standing'] = () => ['body.standing', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_grounded'] = () => ['body.grounded', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_in_water'] = () => ['body.inWater', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_breathing'] = () => ['body.breathing', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_crouching'] = () => ['body.crouching', ORDER_ATOMIC];
+
+// ═══ Extended Body setters ═══════════════════════════════════
+csharpGenerator.forBlock['cu_set_energy'] = (block, gen) => {
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  return `body.energy = ${float(v)};\n`;
+};
+csharpGenerator.forBlock['cu_set_brain_health'] = (block, gen) => {
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  return `body.brainHealth = ${float(v)};\n`;
+};
+csharpGenerator.forBlock['cu_set_shock'] = (block, gen) => {
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  return `body.shock = ${float(v)};\n`;
+};
+csharpGenerator.forBlock['cu_set_blood_volume'] = (block, gen) => {
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  return `body.bloodVolume = ${float(v)};\n`;
+};
+csharpGenerator.forBlock['cu_set_sickness'] = (block, gen) => {
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  return `body.sicknessAmount = ${float(v)};\n`;
+};
+csharpGenerator.forBlock['cu_set_wetness'] = (block, gen) => {
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  return `body.wetness = ${float(v)};\n`;
+};
+csharpGenerator.forBlock['cu_set_radiation'] = (block, gen) => {
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  return `body.radiationSickness = ${float(v)};\n`;
+};
+
+// ═══ Extended Body actions ═══════════════════════════════════
+csharpGenerator.forBlock['cu_ragdoll'] = () => 'body.Ragdoll();\n';
+csharpGenerator.forBlock['cu_jump'] = () => 'body.Jump();\n';
+csharpGenerator.forBlock['cu_switch_hands'] = () => 'body.SwitchHands();\n';
+csharpGenerator.forBlock['cu_throw_item'] = () => 'body.ThrowItem();\n';
+
+// ═══ Limb getters ═══════════════════════════════════════════
+csharpGenerator.forBlock['cu_limb_index'] = (block) => {
+  const idx = block.getFieldValue('LIMB') || '0';
+  return [`body.limbs[${idx}]`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_limb_skin_health'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return [`${limb}.skinHealth`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_limb_muscle_health'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return [`${limb}.muscleHealth`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_limb_pain'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return [`${limb}.pain`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_limb_bleed'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return [`${limb}.bleedAmount`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_limb_infection'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return [`${limb}.infectionAmount`, ORDER_ATOMIC];
+};
+
+// ═══ Limb booleans ══════════════════════════════════════════
+csharpGenerator.forBlock['cu_limb_broken'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return [`${limb}.broken`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_limb_dislocated'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return [`${limb}.dislocated`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_limb_infected_bool'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return [`${limb}.infected`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_limb_dismembered'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return [`${limb}.dismembered`, ORDER_ATOMIC];
+};
+
+// ═══ Limb setters ═══════════════════════════════════════════
+csharpGenerator.forBlock['cu_set_limb_skin_health'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  return `${limb}.skinHealth = ${float(v)};\n`;
+};
+csharpGenerator.forBlock['cu_set_limb_muscle_health'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  return `${limb}.muscleHealth = ${float(v)};\n`;
+};
+csharpGenerator.forBlock['cu_set_limb_pain'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  return `${limb}.pain = ${float(v)};\n`;
+};
+csharpGenerator.forBlock['cu_set_limb_bleed'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  return `${limb}.bleedAmount = ${float(v)};\n`;
+};
+
+// ═══ Limb actions ═══════════════════════════════════════════
+csharpGenerator.forBlock['cu_limb_break'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return `${limb}.BreakBone();\n`;
+};
+csharpGenerator.forBlock['cu_limb_mend'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return `${limb}.MendBone();\n`;
+};
+csharpGenerator.forBlock['cu_limb_dislocate_action'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return `${limb}.Dislocate();\n`;
+};
+csharpGenerator.forBlock['cu_limb_undislocate'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return `${limb}.UnDislocate();\n`;
+};
+csharpGenerator.forBlock['cu_limb_dismember_action'] = (block, gen) => {
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return `${limb}.Dismember();\n`;
+};
+
+// ═══ Extended Item getters ═══════════════════════════════════
+csharpGenerator.forBlock['cu_item_id'] = () => ['item.id', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_item_category'] = () => ['item.Stats.category', ORDER_ATOMIC];
+
+// ═══ Extended World getters ══════════════════════════════════
+csharpGenerator.forBlock['cu_world_depth'] = () => ['WorldGeneration.world.PlayerTotalDepthMeters()', ORDER_ATOMIC];
 
 export { Blockly };
