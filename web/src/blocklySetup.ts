@@ -1173,7 +1173,7 @@ csharpGenerator.forBlock['cu_set_immunity'] = (block, gen) => {
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
   return `body.immunity = ${float(v)};\n`;
 };
-csharpGenerator.forBlock['cu_sleep'] = () => 'body.Sleep();\n';
+csharpGenerator.forBlock['cu_sleep'] = () => 'body.sleeping = true;\n';
 csharpGenerator.forBlock['cu_wake'] = () => 'body.Wake();\n';
 
 // Item actions
