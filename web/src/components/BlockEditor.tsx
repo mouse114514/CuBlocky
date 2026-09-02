@@ -512,7 +512,6 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
     // Inject toolbox icon CSS
     const style = document.createElement('style');
     style.textContent = `
-      .blocklyText { font-size: 15px !important; font-weight: 600; }
       .blocklyToolboxCategory {
         position: relative;
       }
@@ -531,6 +530,8 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
         opacity: 0;
       }
       .blocklyToolboxCategoryLabel {
+        font-size: 16px !important;
+        font-weight: 700;
         transition: opacity .15s;
       }
       .blocklyToolboxSelected .blocklyToolboxCategoryLabel {
