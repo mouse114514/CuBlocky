@@ -515,6 +515,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
       .blocklyToolboxCategory {
         position: relative;
         height: 44px !important;
+        line-height: 44px !important;
       }
       .cu-cat-icon {
         position: absolute;
@@ -530,9 +531,10 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
       .blocklyToolboxSelected .cu-cat-icon {
         opacity: 0;
       }
-      .blocklyToolboxCategoryLabel {
-        font-size: 16px !important;
+      .blocklyToolboxCategory .blocklyToolboxCategoryLabel {
+        font-size: 18px !important;
         font-weight: 700;
+        line-height: 44px !important;
         transition: opacity .15s;
       }
       .blocklyToolboxSelected .blocklyToolboxCategoryLabel {
