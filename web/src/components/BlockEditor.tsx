@@ -514,6 +514,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
     style.textContent = `
       .blocklyToolboxCategory {
         position: relative;
+        height: 44px !important;
       }
       .cu-cat-icon {
         position: absolute;
