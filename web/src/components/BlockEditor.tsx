@@ -520,8 +520,8 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        width: 22px;
-        height: 22px;
+        width: 32px;
+        height: 32px;
         pointer-events: none;
         transition: opacity .15s;
         image-rendering: pixelated;
@@ -530,8 +530,6 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
         opacity: 0;
       }
       .blocklyToolboxCategoryLabel {
-        font-size: 16px !important;
-        font-weight: 700;
         transition: opacity .15s;
       }
       .blocklyToolboxSelected .blocklyToolboxCategoryLabel {
