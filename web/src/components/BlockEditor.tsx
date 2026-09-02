@@ -531,6 +531,8 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
         opacity: 0;
       }
       .blocklyToolboxCategoryLabel {
+        font-size: 16px !important;
+        font-weight: 700;
         transition: opacity .15s;
       }
       .blocklyToolboxSelected .blocklyToolboxCategoryLabel {
