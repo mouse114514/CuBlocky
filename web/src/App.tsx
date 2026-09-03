@@ -3,17 +3,15 @@ import type { Blueprint } from './types';
 import { defaultBlueprint } from './types';
 import { useI18n } from './i18n';
 import { BlockEditor } from './components/BlockEditor';
+import WelcomePage from './components/WelcomePage';
 import { download, buildProject, type BuildResult } from './api';
 import * as Blockly from 'blockly/core';
 import { csharpGenerator } from './blocklySetup';
 
 export function App() {
   const { t } = useI18n();
-  const [bp, setBp] = useState<Blueprint>(() => {
-    const saved = localStorage.getItem('cublocky');
-    if (saved) { try { return JSON.parse(saved); } catch {} }
-    return defaultBlueprint();
-  });
+  const [inEditor, setInEditor] = useState(false);
+  const [bp, setBp] = useState<Blueprint>(() => defaultBlueprint());
   const [code, setCode] = useState('');
   const [showCode, setShowCode] = useState(false);
   const [building, setBuilding] = useState(false);
@@ -22,7 +20,6 @@ export function App() {
   const bpRef = useRef(bp);
   bpRef.current = bp;
 
-  // Auto-save to localStorage on every bp change (debounced)
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleAutoSave = useCallback(() => {
     if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
@@ -31,7 +28,7 @@ export function App() {
     }, 500);
   }, []);
 
-  useEffect(() => { scheduleAutoSave(); }, [bp, scheduleAutoSave]);
+  useEffect(() => { if (inEditor) scheduleAutoSave(); }, [bp, scheduleAutoSave, inEditor]);
 
   const saveLocal = () => localStorage.setItem('cublocky', JSON.stringify(bp));
 
@@ -51,6 +48,7 @@ export function App() {
       try {
         const parsed = JSON.parse(text) as Blueprint;
         setBp(parsed);
+        setInEditor(true);
         restoreWorkspace(parsed.eventHandlersXml);
       } catch { alert('Invalid .cbp file'); }
     };
@@ -85,6 +83,16 @@ export function App() {
       setBuilding(false);
     }
   };
+
+  const openProject = (projectBp: Blueprint) => {
+    setBp(projectBp);
+    setInEditor(true);
+    restoreWorkspace(projectBp.eventHandlersXml);
+  };
+
+  if (!inEditor) {
+    return <WelcomePage onOpenProject={openProject} />;
+  }
 
   return (
     <div className="app">

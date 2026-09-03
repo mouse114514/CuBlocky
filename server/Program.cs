@@ -21,6 +21,10 @@ var jsonOpts = new JsonSerializerOptions
 var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
 Directory.CreateDirectory(uploadDir);
 
+// Fixed directory for saved projects
+var projectsDir = Path.Combine(Directory.GetCurrentDirectory(), "projects");
+Directory.CreateDirectory(projectsDir);
+
 // ── Upload sprite file ──────────────────────────────────────────────
 app.MapPost("/api/upload", async (HttpRequest req) =>
 {
@@ -195,6 +199,52 @@ app.MapFallback(async ctx =>
     }
     var idx = Path.Combine(root, "index.html");
     if (File.Exists(idx)) await ctx.Response.SendFileAsync(idx);
+});
+
+// ── Project management ──────────────────────────────────────────
+app.MapGet("/api/projects", () =>
+{
+    var dirs = Directory.GetDirectories(projectsDir);
+    var projects = dirs.Select(d =>
+    {
+        var name = Path.GetFileName(d);
+        var cbpFiles = Directory.GetFiles(d, "*.cbp");
+        return new { name, cbpFile = cbpFiles.FirstOrDefault() };
+    }).OrderBy(p => p.name).ToList();
+    return Results.Json(projects, jsonOpts);
+});
+
+app.MapGet("/api/projects/{name}", (string name) =>
+{
+    var dir = Path.Combine(projectsDir, name);
+    if (!Directory.Exists(dir)) return Results.NotFound("project not found");
+    var cbpFiles = Directory.GetFiles(dir, "*.cbp");
+    if (cbpFiles.Length == 0) return Results.NotFound("no .cbp file");
+    var content = File.ReadAllText(cbpFiles[0]);
+    var bp = JsonSerializer.Deserialize<Blueprint>(content, jsonOpts);
+    return Results.Json(bp, jsonOpts);
+});
+
+app.MapPost("/api/projects", async (HttpRequest req) =>
+{
+    var bp = await JsonSerializer.DeserializeAsync<Blueprint>(req.Body, jsonOpts);
+    if (bp == null || string.IsNullOrWhiteSpace(bp.Mod?.Name))
+        return Results.BadRequest("invalid blueprint");
+    var safeName = bp.Mod.Name.Replace(' ', '_');
+    var dir = Path.Combine(projectsDir, safeName);
+    Directory.CreateDirectory(dir);
+    var cbpPath = Path.Combine(dir, safeName + ".cbp");
+    var json = JsonSerializer.Serialize(bp, jsonOpts);
+    await File.WriteAllTextAsync(cbpPath, json);
+    return Results.Ok(new { name = safeName });
+});
+
+app.MapDelete("/api/projects/{name}", (string name) =>
+{
+    var dir = Path.Combine(projectsDir, name);
+    if (!Directory.Exists(dir)) return Results.NotFound("project not found");
+    Directory.Delete(dir, true);
+    return Results.Ok();
 });
 
 app.Run();
