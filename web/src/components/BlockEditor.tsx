@@ -72,16 +72,22 @@ const TOOLBOX = `
     <block type="cu_drink">
       <value name="AMOUNT"><shadow type="cu_number"><field name="NUM">4</field></shadow></value>
     </block>
+    <block type="cu_talk">
+      <value name="TEXT"><shadow type="cu_text"><field name="TEXT">你好!</field></shadow></value>
+    </block>
+    <block type="cu_sleep"></block>
+    <block type="cu_wake"></block>
+    <block type="cu_ragdoll"></block>
+    <block type="cu_jump"></block>
+    <block type="cu_switch_hands"></block>
+    <block type="cu_throw_item"></block>
+    <sep></sep>
     <block type="cu_set_happiness">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
     </block>
     <block type="cu_set_temperature">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
-    <block type="cu_talk">
-      <value name="TEXT"><shadow type="cu_text"><field name="TEXT">你好!</field></shadow></value>
-    </block>
-    <sep></sep>
     <block type="cu_set_pain">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
@@ -97,21 +103,6 @@ const TOOLBOX = `
     <block type="cu_set_immunity">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
-    <block type="cu_sleep"></block>
-    <block type="cu_wake"></block>
-    <sep></sep>
-    <block type="cu_player_health"></block>
-    <block type="cu_player_max_health"></block>
-    <block type="cu_player_stamina"></block>
-    <block type="cu_player_oxygen"></block>
-    <block type="cu_player_sleep_quality"></block>
-    <block type="cu_player_pain"></block>
-    <block type="cu_player_stress"></block>
-    <block type="cu_player_heart_rate"></block>
-    <block type="cu_player_blood_pressure"></block>
-    <block type="cu_player_immunity"></block>
-    <block type="cu_player_thirst"></block>
-    <sep></sep>
     <block type="cu_set_energy">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
     </block>
@@ -134,6 +125,49 @@ const TOOLBOX = `
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
     <sep></sep>
+    <block type="cu_set_limb_skin_health">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+      <value name="VALUE"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
+    </block>
+    <block type="cu_set_limb_muscle_health">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+      <value name="VALUE"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
+    </block>
+    <block type="cu_set_limb_pain">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+      <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_set_limb_bleed">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+      <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_limb_break">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
+    <block type="cu_limb_mend">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
+    <block type="cu_limb_dislocate_action">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
+    <block type="cu_limb_undislocate">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
+    <block type="cu_limb_dismember_action">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+    </block>
+    <sep></sep>
+    <block type="cu_player_health"></block>
+    <block type="cu_player_max_health"></block>
+    <block type="cu_player_stamina"></block>
+    <block type="cu_player_oxygen"></block>
+    <block type="cu_player_sleep_quality"></block>
+    <block type="cu_player_pain"></block>
+    <block type="cu_player_stress"></block>
+    <block type="cu_player_heart_rate"></block>
+    <block type="cu_player_blood_pressure"></block>
+    <block type="cu_player_immunity"></block>
+    <block type="cu_player_thirst"></block>
     <block type="cu_player_energy"></block>
     <block type="cu_player_brain_health"></block>
     <block type="cu_player_shock"></block>
@@ -146,18 +180,6 @@ const TOOLBOX = `
     <block type="cu_player_clothing_temp"></block>
     <block type="cu_player_encumbrance"></block>
     <block type="cu_player_bleed_speed"></block>
-    <sep></sep>
-    <block type="cu_player_conscious"></block>
-    <block type="cu_player_standing"></block>
-    <block type="cu_player_grounded"></block>
-    <block type="cu_player_in_water"></block>
-    <block type="cu_player_breathing"></block>
-    <block type="cu_player_crouching"></block>
-    <sep></sep>
-    <block type="cu_ragdoll"></block>
-    <block type="cu_jump"></block>
-    <block type="cu_switch_hands"></block>
-    <block type="cu_throw_item"></block>
     <sep></sep>
     <block type="cu_limb_index"></block>
     <block type="cu_limb_skin_health">
@@ -175,6 +197,14 @@ const TOOLBOX = `
     <block type="cu_limb_infection">
       <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
     </block>
+    <sep></sep>
+    <block type="cu_player_conscious"></block>
+    <block type="cu_player_standing"></block>
+    <block type="cu_player_grounded"></block>
+    <block type="cu_player_in_water"></block>
+    <block type="cu_player_breathing"></block>
+    <block type="cu_player_crouching"></block>
+    <sep></sep>
     <block type="cu_limb_broken">
       <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
     </block>
@@ -187,39 +217,6 @@ const TOOLBOX = `
     <block type="cu_limb_dismembered">
       <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
     </block>
-    <sep></sep>
-    <block type="cu_set_limb_skin_health">
-      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
-      <value name="VALUE"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
-    </block>
-    <block type="cu_set_limb_muscle_health">
-      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
-      <value name="VALUE"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
-    </block>
-    <block type="cu_set_limb_pain">
-      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
-      <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
-    </block>
-    <block type="cu_set_limb_bleed">
-      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
-      <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
-    </block>
-    <sep></sep>
-    <block type="cu_limb_break">
-      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
-    </block>
-    <block type="cu_limb_mend">
-      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
-    </block>
-    <block type="cu_limb_dislocate_action">
-      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
-    </block>
-    <block type="cu_limb_undislocate">
-      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
-    </block>
-    <block type="cu_limb_dismember_action">
-      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
-    </block>
   </category>
   <category name="%{BKY_CAT_ITEM}" colour="#2196f3" icon="🎒">
     <block type="cu_item_use"></block>
@@ -229,7 +226,6 @@ const TOOLBOX = `
     <block type="cu_item_set_condition">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
     </block>
-    <sep></sep>
     <block type="cu_item_set_weight">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
     </block>
@@ -242,7 +238,6 @@ const TOOLBOX = `
     <block type="cu_item_set_slot_rotation">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
-    <sep></sep>
     <block type="cu_item_set_property">
       <value name="TARGET_ITEM"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
@@ -285,7 +280,6 @@ const TOOLBOX = `
       <value name="OLD_TILE"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
       <value name="NEW_TILE"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
     </block>
-    <sep></sep>
     <block type="cu_give_item">
       <value name="ITEM"><shadow type="cu_item_vanilla"><field name="ID">bandage</field></shadow></value>
       <value name="COUNT"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
