@@ -73,6 +73,11 @@ export default function WelcomePage({ onOpenProject }: Props) {
       </header>
 
       <div className="wp-body">
+        <div className="wp-decor wp-decor-1" />
+        <div className="wp-decor wp-decor-2" />
+        <div className="wp-decor wp-decor-3" />
+        <div className="wp-decor wp-decor-4" />
+        <div className="wp-decor wp-decor-5" />
         <h1 className="wp-title">CuBlocky</h1>
         <p className="wp-sub">{t('app.subtitle')}</p>
         <div className="wp-actions">
