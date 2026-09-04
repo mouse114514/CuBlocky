@@ -1419,15 +1419,61 @@ csharpGenerator.forBlock['cu_item_set_property'] = (block, gen) => {
   if (statsProps.includes(prop)) return `${target}.Stats.${prop} = ${float(v)};\n`;
   return `${target}.${prop} = ${v};\n`;
 };
+// Helper: walk a lists_create_with block and extract item ID strings from each slot
+function extractListItemIds(listBlock: Blockly.Block | null): string[] {
+  const ids: string[] = [];
+  if (!listBlock) return ids;
+  let i = 0;
+  while (listBlock.getInput('ADD' + i)) {
+    const itemBlock = listBlock.getInputTargetBlock('ADD' + i);
+    if (itemBlock) {
+      const id = extractSingleItemId(itemBlock);
+      if (id) ids.push(id);
+    }
+    i++;
+  }
+  return ids;
+}
+
+function extractSingleItemId(block: Blockly.Block): string | null {
+  if (block.type === 'cu_item_custom' || block.type === 'cu_item_vanilla') {
+    return (block.getFieldValue('ID') as string) || null;
+  }
+  if (block.type === 'cu_var_get') {
+    return (block.getFieldValue('VAR') as string) || null;
+  }
+  return null;
+}
+
 csharpGenerator.forBlock['cu_register_recipe'] = (block, gen) => {
-  const inputsCode = gen.valueToCode(block, 'INPUTS', ORDER_ATOMIC) || 'new List<RecipeItem>()';
   const out = gen.valueToCode(block, 'OUTPUT', ORDER_ATOMIC) || '"ironBar"';
   const amt = gen.valueToCode(block, 'AMOUNT', ORDER_ATOMIC) || '1';
   const cond = gen.valueToCode(block, 'RESULT_CONDITION', ORDER_ATOMIC) || '-1';
   const repair = gen.valueToCode(block, 'IS_REPAIR', ORDER_ATOMIC) || 'false';
+
+  // Walk the connected INPUTS list to extract real ingredient data
+  const listBlock = block.getInputTargetBlock('INPUTS');
+  const itemIds = extractListItemIds(listBlock);
+
+  // Build List<RecipeItem> code from extracted IDs
+  const recipeItems = itemIds.map(id =>
+    `new RecipeItem(0.9f) { specificId = "${id}" }`
+  ).join(', ');
+  const inputsCode = `new List<RecipeItem> { ${recipeItems} }`;
+
+  // Build code
   let code = `RecipeRegistry.Register(new Recipe {\n  result = new RecipeResult { id = ${out}, amount = ${amt}`;
   if (cond !== '-1') code += `, resultCondition = ${cond}`;
   code += ` },\n  items = ${inputsCode},\n  isRepair = ${repair}\n});\n`;
+
+  // Build JSON with real ingredients
+  const ingredients = itemIds.map(id => ({
+    Mode: 'specific',
+    Id: id,
+    Amount: 1,
+    IsLiquid: false,
+    DestroyItem: true,
+  }));
   const json = JSON.stringify({
     ResultId: out.replace(/^"|"$/g, ''),
     Category: 'Tools',
@@ -1435,9 +1481,10 @@ csharpGenerator.forBlock['cu_register_recipe'] = (block, gen) => {
     ResultAmount: parseInt(amt),
     ResultCondition: cond === '-1' ? 1 : parseFloat(cond),
     IsLiquidResult: false,
-    Ingredients: []
+    Ingredients: ingredients,
   });
-  return `//REGISTER_RECIPE:${json}\n//BLOCKLY_RECIPE_BODY:${code}\n`;
+
+  return `//REGISTER_RECIPE:${json}\n`;
 };
 
 // Body
