@@ -212,38 +212,37 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 
 /* floating decorative shapes */
 .wp-decor{
-  position:absolute;border-radius:50%;pointer-events:none;z-index:0;
-  animation-timing-function:cubic-bezier(.22,1,.36,1);
-  animation-fill-mode:both;
+  position:absolute;pointer-events:none;z-index:0;
+  filter:blur(60px);
 }
 .wp-decor-1{
-  width:320px;height:320px;top:-80px;left:-60px;
-  background:radial-gradient(circle,rgba(100,149,237,.07),transparent 70%);
+  width:400px;height:400px;top:-100px;left:-80px;
+  background:rgba(100,149,237,.18);
   animation:wp-float-1 8s 0s infinite alternate ease-in-out;
 }
 .wp-decor-2{
-  width:260px;height:260px;bottom:-60px;right:-40px;
-  background:radial-gradient(circle,rgba(147,112,219,.07),transparent 70%);
+  width:350px;height:350px;bottom:-80px;right:-60px;
+  background:rgba(147,112,219,.16);
   animation:wp-float-2 10s .5s infinite alternate ease-in-out;
 }
 .wp-decor-3{
-  width:180px;height:180px;top:30%;right:12%;
-  background:radial-gradient(circle,rgba(255,183,77,.06),transparent 70%);
+  width:280px;height:280px;top:25%;right:8%;
+  background:rgba(255,183,77,.14);
   animation:wp-float-3 7s 1s infinite alternate ease-in-out;
 }
 .wp-decor-4{
-  width:140px;height:140px;bottom:20%;left:8%;
-  background:radial-gradient(circle,rgba(46,204,113,.05),transparent 70%);
+  width:250px;height:250px;bottom:15%;left:5%;
+  background:rgba(46,204,113,.12);
   animation:wp-float-2 9s 1.5s infinite alternate ease-in-out;
 }
 .wp-decor-5{
-  width:200px;height:200px;top:10%;left:45%;
-  background:radial-gradient(circle,rgba(231,76,60,.04),transparent 70%);
+  width:300px;height:300px;top:5%;left:40%;
+  background:rgba(231,76,60,.10);
   animation:wp-float-1 11s .8s infinite alternate ease-in-out;
 }
-@keyframes wp-float-1{to{transform:translate(30px,20px) scale(1.05)}}
-@keyframes wp-float-2{to{transform:translate(-20px,-30px) scale(.95)}}
-@keyframes wp-float-3{to{transform:translate(-15px,25px) scale(1.08)}}
+@keyframes wp-float-1{to{transform:translate(40px,30px) scale(1.08)}}
+@keyframes wp-float-2{to{transform:translate(-30px,-40px) scale(.92)}}
+@keyframes wp-float-3{to{transform:translate(-20px,35px) scale(1.1)}}
 .wp-error{
   padding:8px 12px;background:#fff0f0;border:1px solid #fcc;border-radius:6px;
   font-size:12px;color:#c0392b;
