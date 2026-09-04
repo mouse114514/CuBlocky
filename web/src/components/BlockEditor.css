@@ -1,6 +1,12 @@
 /* BlockEditor.css – scratch-blocks workspace container */
 
-.be.BlocklyWorkspace {
+.be BlocklyWorkspace {
   width: 100%;
   height: 100%;
+}
+
+ BlocklyWorkspace > svg,
+ BlocklyWorkspace > .injectionDiv {
+  width: 100% !important;
+  height: 100% !important;
 }
