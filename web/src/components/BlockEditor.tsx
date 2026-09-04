@@ -479,6 +479,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
   const containerRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<Blockly.WorkspaceSvg | null>(null);
   const skipUpdate = useRef(false);
+  const injectCatIconsRef = useRef<(() => void) | null>(null);
 
   const updateCode = useCallback(() => {
     if (skipUpdate.current) { skipUpdate.current = false; return; }
@@ -561,10 +562,9 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
       `;
       document.head.appendChild(style);
 
-      // Inject emoji icons into toolbox categories via DOM query
-      requestAnimationFrame(() => {
-        const catEls = el.querySelectorAll('.blocklyToolboxCategory');
-        catEls.forEach((catEl) => {
+      const injectCatIcons = () => {
+        el.querySelectorAll('.blocklyToolboxCategory').forEach((catEl) => {
+          if (catEl.querySelector('.cu-cat-icon')) return;
           const label = catEl.querySelector('.blocklyToolboxCategoryLabel');
           const name = label?.textContent?.trim() ?? '';
           let iconSrc = '';
@@ -585,7 +585,9 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
           (catEl as HTMLElement).style.position = 'relative';
           catEl.appendChild(img);
         });
-      });
+      };
+      injectCatIcons();
+      injectCatIconsRef.current = injectCatIcons;
 
       wsRef.current = ws;
       ws.addChangeListener(updateCode);
@@ -634,6 +636,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
     }
     skipUpdate.current = true;
     wsRef.current!.updateToolbox(TOOLBOX);
+    requestAnimationFrame(() => injectCatIconsRef.current?.());
   }, [lang]);
 
   return <div ref={containerRef} className="be BlocklyWorkspace" />;
