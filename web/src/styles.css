@@ -86,7 +86,7 @@ code{background:#0d1b2a;padding:1px 4px;border-radius:3px;font-size:12px}
 .code-toggle{font-size:12px;padding:4px 10px}
 .code-toggle.active{background:#555;color:#fff}
 
-.editor-full{flex:1;overflow:hidden}
+.editor-full{flex:1;overflow:hidden;position:relative}
 .editor-full .be{width:100%;height:100%}
 
 .main{display:flex;flex:1;overflow:hidden}

@@ -4,7 +4,7 @@ import { defaultBlueprint } from './types';
 import { useI18n } from './i18n';
 import { BlockEditor } from './components/BlockEditor';
 import WelcomePage from './components/WelcomePage';
-import { download, buildProject, type BuildResult } from './api';
+import { download, buildProject, saveProject, type BuildResult } from './api';
 import * as Blockly from 'blockly/core';
 import { csharpGenerator } from './blocklySetup';
 
@@ -12,6 +12,7 @@ export function App() {
   const { t, toggle: toggleLang } = useI18n();
   const [inEditor, setInEditor] = useState(false);
   const [bp, setBp] = useState<Blueprint>(() => defaultBlueprint());
+  const [currentProjectName, setCurrentProjectName] = useState<string | null>(null);
   const [code, setCode] = useState('');
   const [showCode, setShowCode] = useState(false);
   const [building, setBuilding] = useState(false);
@@ -24,13 +25,22 @@ export function App() {
   const scheduleAutoSave = useCallback(() => {
     if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
     autoSaveTimer.current = setTimeout(() => {
-      localStorage.setItem('cublocky', JSON.stringify(bpRef.current));
+      const snapshot = bpRef.current;
+      localStorage.setItem('cublocky', JSON.stringify(snapshot));
+      if (currentProjectName) {
+        saveProject(currentProjectName, snapshot).catch(() => {});
+      }
     }, 500);
-  }, []);
+  }, [currentProjectName]);
 
   useEffect(() => { if (inEditor) scheduleAutoSave(); }, [bp, scheduleAutoSave, inEditor]);
 
-  const saveLocal = () => localStorage.setItem('cublocky', JSON.stringify(bp));
+  const saveLocal = () => {
+    localStorage.setItem('cublocky', JSON.stringify(bp));
+    if (currentProjectName) {
+      saveProject(currentProjectName, bp).catch(() => {});
+    }
+  };
 
   const saveAs = () => {
     const name = bp.mod.name.replace(/[^a-zA-Z0-9_-]/g, '_') + '.cbp';
@@ -84,8 +94,9 @@ export function App() {
     }
   };
 
-  const openProject = (projectBp: Blueprint) => {
+  const openProject = (projectBp: Blueprint, projectName: string) => {
     setBp(projectBp);
+    setCurrentProjectName(projectName);
     setInEditor(true);
     restoreWorkspace(projectBp.eventHandlersXml);
   };

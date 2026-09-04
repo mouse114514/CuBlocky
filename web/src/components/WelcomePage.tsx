@@ -9,7 +9,7 @@ interface ProjectInfo {
 }
 
 interface Props {
-  onOpenProject: (bp: Blueprint) => void;
+  onOpenProject: (bp: Blueprint, name: string) => void;
 }
 
 const API = '';
@@ -37,7 +37,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
       const res = await fetch(`${API}/api/projects/${encodeURIComponent(name)}`);
       if (!res.ok) throw new Error('failed');
       const bp = await res.json();
-      onOpenProject(bp);
+      onOpenProject(bp, name);
     } catch {} finally {
       setLoading(false);
     }
@@ -57,7 +57,8 @@ export default function WelcomePage({ onOpenProject }: Props) {
         body: JSON.stringify(bp),
       });
       if (!res.ok) throw new Error(await res.text());
-      onOpenProject(bp);
+      const data = await res.json();
+      onOpenProject(bp, data.name);
     } catch {} finally {
       setLoading(false);
     }

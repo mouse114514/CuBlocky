@@ -239,6 +239,19 @@ app.MapPost("/api/projects", async (HttpRequest req) =>
     return Results.Ok(new { name = safeName });
 });
 
+app.MapPut("/api/projects/{name}", async (string name, HttpRequest req) =>
+{
+    var dir = Path.Combine(projectsDir, name);
+    if (!Directory.Exists(dir)) return Results.NotFound("project not found");
+    var bp = await JsonSerializer.DeserializeAsync<Blueprint>(req.Body, jsonOpts);
+    if (bp == null) return Results.BadRequest("invalid blueprint");
+    var cbpFiles = Directory.GetFiles(dir, "*.cbp");
+    var cbpPath = cbpFiles.Length > 0 ? cbpFiles[0] : Path.Combine(dir, name + ".cbp");
+    var json = JsonSerializer.Serialize(bp, jsonOpts);
+    await File.WriteAllTextAsync(cbpPath, json);
+    return Results.Ok();
+});
+
 app.MapDelete("/api/projects/{name}", (string name) =>
 {
     var dir = Path.Combine(projectsDir, name);

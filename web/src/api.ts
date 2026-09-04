@@ -48,3 +48,12 @@ export function download(filename: string, content: string) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+export async function saveProject(name: string, bp: Blueprint): Promise<void> {
+  const res = await fetch(`/api/projects/${encodeURIComponent(name)}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(bp),
+  });
+  if (!res.ok) throw new Error('save failed: ' + res.status);
+}

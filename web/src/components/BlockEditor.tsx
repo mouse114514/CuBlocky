@@ -1,9 +1,27 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import * as Blockly from 'blockly/core';
 import 'blockly/blocks';
 import { defineBlocks, setMessages, csharpGenerator } from '../blocklySetup';
 import { useI18n } from '../i18n';
 import './BlockEditor.css';
+
+const SCROLL_PAD = 50000;
+
+class InfiniteScrollMetricsManager extends (Blockly.MetricsManager as any) {
+  getScrollMetrics(
+    opt_getWorkspaceCoordinates?: boolean,
+    _opt_viewMetrics?: any,
+    _opt_contentMetrics?: any
+  ): any {
+    const scale = opt_getWorkspaceCoordinates ? 1 : this.workspace_.scale;
+    return {
+      top: -SCROLL_PAD / scale,
+      left: -SCROLL_PAD / scale,
+      width: (SCROLL_PAD * 2) / scale,
+      height: (SCROLL_PAD * 2) / scale,
+    };
+  }
+}
 
 interface Props {
   onCodeChange: (code: string) => void;
@@ -478,116 +496,132 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
     }
   }, [onCodeChange, onBlocksChange]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!containerRef.current || wsRef.current) return;
 
-    setMessages(lang);
-    const catMsgs = lang === 'zh' ? CAT_MSG_ZH : CAT_MSG_EN;
-    for (const [key, val] of Object.entries(catMsgs)) {
-      (Blockly.Msg as Record<string, string>)[key] = val;
-    }
+    const el = containerRef.current;
+    let disposed = false;
 
-    defineBlocks();
+    const doInit = () => {
+      if (disposed) return;
+      setMessages(lang);
+      const catMsgs = lang === 'zh' ? CAT_MSG_ZH : CAT_MSG_EN;
+      for (const [key, val] of Object.entries(catMsgs)) {
+        (Blockly.Msg as Record<string, string>)[key] = val;
+      }
 
-    const parser = new DOMParser();
-    const toolboxDoc = parser.parseFromString(TOOLBOX, 'text/html');
-    const toolboxEl = toolboxDoc.getElementById('toolbox');
+      defineBlocks();
 
-    const ws = Blockly.inject(containerRef.current, {
-      toolbox: toolboxEl as unknown as Blockly.utils.toolbox.ToolboxDefinition,
-      renderer: 'zelos',
-      grid: { spacing: 40, length: 2, colour: '#ccc', snap: true },
-      zoom: { controls: true, wheel: true, startScale: 1.0, maxScale: 3, minScale: 0.3, scaleSpeed: 1.2 },
-      trashcan: true,
-      move: { scrollbars: true, drag: true, wheel: true },
-      media: '/media/',
-    } as any);
+      const parser = new DOMParser();
+      const toolboxDoc = parser.parseFromString(TOOLBOX, 'text/html');
+      const toolboxEl = toolboxDoc.getElementById('toolbox');
 
-    // Inject toolbox icon CSS
-    const style = document.createElement('style');
-    style.textContent = `
-      .blocklyToolboxCategory {
-        position: relative;
-        height: 44px !important;
-        line-height: 44px !important;
-      }
-      .cu-cat-icon {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 32px;
-        height: 32px;
-        pointer-events: none;
-        transition: opacity .15s;
-        image-rendering: pixelated;
-      }
-      .blocklyToolboxSelected .cu-cat-icon {
-        opacity: 0;
-      }
-      .blocklyToolboxCategory .blocklyToolboxCategoryLabel {
-        font-size: 18px !important;
-        font-weight: 700;
-        line-height: 44px !important;
-        transition: opacity .15s;
-      }
-      .blocklyToolboxSelected .blocklyToolboxCategoryLabel {
-        opacity: 1 !important;
-      }
-    `;
-    document.head.appendChild(style);
+      const ws = Blockly.inject(el, {
+        toolbox: toolboxEl as unknown as Blockly.utils.toolbox.ToolboxDefinition,
+        renderer: 'zelos',
+        grid: { spacing: 40, length: 2, colour: '#ccc', snap: true },
+        zoom: { controls: true, wheel: true, startScale: 1.0, maxScale: 3, minScale: 0.3, scaleSpeed: 1.2 },
+        trashcan: true,
+        move: { scrollbars: true, drag: true, wheel: true },
+        media: '/media/',
+        plugins: { metricsManager: InfiniteScrollMetricsManager as any },
+      } as any);
 
-    // Inject emoji icons into toolbox categories via DOM query
-    requestAnimationFrame(() => {
-      const catEls = containerRef.current!.querySelectorAll('.blocklyToolboxCategory');
-      catEls.forEach((el) => {
-        const label = el.querySelector('.blocklyToolboxCategoryLabel');
-        const name = label?.textContent?.trim() ?? '';
-        // Find matching icon by category name
-        let iconSrc = '';
-        for (const [k, v] of Object.entries(CAT_MSG_ZH)) {
-          if (v === name) { iconSrc = CAT_ICONS[k] ?? ''; break; }
+      // Inject toolbox icon CSS
+      const style = document.createElement('style');
+      style.textContent = `
+        .blocklyToolboxCategory {
+          position: relative;
+          height: 44px !important;
+          line-height: 44px !important;
         }
-        if (!iconSrc) {
-          for (const [k, v] of Object.entries(CAT_MSG_EN)) {
+        .cu-cat-icon {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          width: 32px;
+          height: 32px;
+          pointer-events: none;
+          transition: opacity .15s;
+          image-rendering: pixelated;
+        }
+        .blocklyToolboxSelected .cu-cat-icon {
+          opacity: 0;
+        }
+        .blocklyToolboxCategory .blocklyToolboxCategoryLabel {
+          font-size: 18px !important;
+          font-weight: 700;
+          line-height: 44px !important;
+          transition: opacity .15s;
+        }
+        .blocklyToolboxSelected .blocklyToolboxCategoryLabel {
+          opacity: 1 !important;
+        }
+      `;
+      document.head.appendChild(style);
+
+      // Inject emoji icons into toolbox categories via DOM query
+      requestAnimationFrame(() => {
+        const catEls = el.querySelectorAll('.blocklyToolboxCategory');
+        catEls.forEach((catEl) => {
+          const label = catEl.querySelector('.blocklyToolboxCategoryLabel');
+          const name = label?.textContent?.trim() ?? '';
+          let iconSrc = '';
+          for (const [k, v] of Object.entries(CAT_MSG_ZH)) {
             if (v === name) { iconSrc = CAT_ICONS[k] ?? ''; break; }
           }
-        }
-        if (!iconSrc) return;
-        // Hide label, inject image icon
-        (label as HTMLElement).style.opacity = '0';
-        const img = document.createElement('img');
-        img.className = 'cu-cat-icon';
-        img.src = iconSrc;
-        img.alt = name;
-        (el as HTMLElement).style.position = 'relative';
-        el.appendChild(img);
+          if (!iconSrc) {
+            for (const [k, v] of Object.entries(CAT_MSG_EN)) {
+              if (v === name) { iconSrc = CAT_ICONS[k] ?? ''; break; }
+            }
+          }
+          if (!iconSrc) return;
+          (label as HTMLElement).style.opacity = '0';
+          const img = document.createElement('img');
+          img.className = 'cu-cat-icon';
+          img.src = iconSrc;
+          img.alt = name;
+          (catEl as HTMLElement).style.position = 'relative';
+          catEl.appendChild(img);
+        });
       });
-    });
 
-    wsRef.current = ws;
-    ws.addChangeListener(updateCode);
-    if (onWorkspaceReady) onWorkspaceReady(ws);
+      wsRef.current = ws;
+      ws.addChangeListener(updateCode);
+      if (onWorkspaceReady) onWorkspaceReady(ws);
 
-    // Force lists_create_with blocks to horizontal on every change
-    const forceHorizontal = () => {
-      ws.getAllBlocks().forEach((b: any) => {
-        if (b.type === 'lists_create_with' && !b.inputsInline) {
-          b.inputsInline = true;
-          b.render();
+      const forceHorizontal = () => {
+        ws.getAllBlocks().forEach((b: any) => {
+          if (b.type === 'lists_create_with' && !b.inputsInline) {
+            b.inputsInline = true;
+            b.render();
+          }
+        });
+      };
+      ws.addChangeListener((e: any) => {
+        if (e.type === 'block_create' || e.type === 'block_change' || e.type === 'finished_mutator') {
+          forceHorizontal();
         }
       });
+
+      const ro = new ResizeObserver(() => Blockly.svgResize(ws));
+      ro.observe(el);
     };
-    ws.addChangeListener((e: any) => {
-      if (e.type === 'block_create' || e.type === 'block_change' || e.type === 'finished_mutator') {
-        forceHorizontal();
+
+    if (el.offsetWidth === 0 || el.offsetHeight === 0) {
+      requestAnimationFrame(doInit);
+    } else {
+      doInit();
+    }
+
+    return () => {
+      disposed = true;
+      if (wsRef.current) {
+        wsRef.current.dispose();
+        wsRef.current = null;
       }
-    });
-
-    const ro = new ResizeObserver(() => Blockly.svgResize(ws));
-    ro.observe(containerRef.current);
-
-    return () => { ro.disconnect(); ws.dispose(); wsRef.current = null; };
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
