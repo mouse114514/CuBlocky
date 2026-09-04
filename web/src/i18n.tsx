@@ -16,6 +16,9 @@ const dict = {
   'app.buildDir':      { zh: '工程目录', en: 'Build Directory' },
   'app.close':         { zh: '关闭', en: 'Close' },
   'app.lang':          { zh: 'English', en: '中文' },
+  'app.newProject':    { zh: '新建项目', en: 'New Project' },
+  'app.openProject':   { zh: '打开项目', en: 'Open Project' },
+  'app.subtitle':      { zh: 'Casualties Unknown 模组编辑器', en: 'Casualties Unknown Mod Editor' },
 
   // ── Sidebar ──
   'side.mod':          { zh: '模组', en: 'Mod' },

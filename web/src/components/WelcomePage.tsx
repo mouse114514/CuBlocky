@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Blueprint } from '../types';
 import { defaultBlueprint } from '../types';
+import { useI18n } from '../i18n';
 
 interface ProjectInfo {
   name: string;
@@ -14,6 +15,7 @@ interface Props {
 const API = '';
 
 export default function WelcomePage({ onOpenProject }: Props) {
+  const { t, toggle: toggleLang } = useI18n();
   const [showNew, setShowNew] = useState(false);
   const [showOpen, setShowOpen] = useState(false);
   const [projects, setProjects] = useState<ProjectInfo[]>([]);
@@ -65,24 +67,26 @@ export default function WelcomePage({ onOpenProject }: Props) {
     <div className="wp-root">
       <header className="toolbar">
         <span className="logo">CuBlocky</span>
+        <span className="spacer" />
+        <button onClick={toggleLang}>{t('app.lang')}</button>
       </header>
 
       <div className="wp-body">
         <h1 className="wp-title">CuBlocky</h1>
-        <p className="wp-sub">Casualties Unknown 模组编辑器</p>
+        <p className="wp-sub">{t('app.subtitle')}</p>
         <div className="wp-actions">
-          <button onClick={() => setShowNew(true)}>新建项目</button>
-          <button onClick={loadProjects}>打开项目</button>
+          <button onClick={() => setShowNew(true)}>{t('app.newProject')}</button>
+          <button onClick={loadProjects}>{t('app.openProject')}</button>
         </div>
       </div>
 
       {showNew && (
         <div className="modal-overlay" onClick={() => setShowNew(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <h3>新建项目</h3>
+            <h3>{showNew ? t('app.newProject') : t('app.openProject')}</h3>
             <div className="wp-form">
               <label>
-                项目名称
+                {t('mod.name')}
                 <input
                   placeholder="请在此处输入项目名称"
                   value={newName}
@@ -92,7 +96,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
                 />
               </label>
               <label>
-                插件唯一 ID
+                {t('mod.guid')}
                 <input
                   placeholder="例如 com.author.modname"
                   value={newGuid}
@@ -101,7 +105,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
                 />
               </label>
               <label>
-                描述
+                {t('mod.desc')}
                 <input
                   placeholder="可选，简要说明插件功能"
                   value={newDesc}
@@ -111,7 +115,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
               </label>
             </div>
             <div className="modal-actions">
-              <button onClick={() => setShowNew(false)}>取消</button>
+              <button onClick={() => setShowNew(false)}>{t('app.close')}</button>
               <button onClick={createProject} disabled={loading || !newName.trim() || !newGuid.trim()}>创建</button>
             </div>
           </div>

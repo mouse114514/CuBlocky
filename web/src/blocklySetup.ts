@@ -423,7 +423,7 @@ const BLOCK_JSON: any[] = [
   { type: 'cu_var_get', message0: '%1', args0: [{ type: 'field_input', name: 'NAME', text: 'myVar' }], output: 'Number', colour: C.VALUE },
   {
     type: 'cu_item_custom',
-    message0: '物品 %1',
+    message0: '%{BKY_CU_ITEM_CUSTOM} %1',
     args0: [
       { type: 'field_input', name: 'ID', text: 'myItem' },
     ],
@@ -431,7 +431,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_vanilla',
-    message0: '物品 %1',
+    message0: '%{BKY_CU_ITEM_VANILLA} %1',
     args0: [
       { type: 'field_dropdown', name: 'ID', options: [
         ['绷带', 'bandage'], ['医用绷带', 'analgesicgauze'], ['消毒绷带', 'sterilizedbandage'],
@@ -880,7 +880,7 @@ const BLOCK_JSON: any[] = [
 
   // ═══ Limb getters (teal) ════════════════════════════════════
   {
-    type: 'cu_limb_index', message0: '肢体 %1',
+    type: 'cu_limb_index', message0: '%{BKY_CU_LIMB_INDEX} %1',
     args0: [{ type: 'field_dropdown', name: 'LIMB', options: [['头部','0'],['躯干','1'],['左臂','2'],['右臂','3'],['左腿','4'],['右腿','5']], SERIALIZABLE: true }],
     output: 'Number', colour: C.BODY,
   },
@@ -1097,6 +1097,9 @@ const MSG_ZH: Record<string, string> = {
   CU_MATH_CLAMP: '限制 %1 在 %2 到 %3 之间',
   CU_ITEM_IS_EQUIPPED: '物品是否装备中',
   CU_ITEM_IS_IN_INVENTORY: '物品是否在背包中',
+  CU_ITEM_CUSTOM: '自定义物品',
+  CU_ITEM_VANILLA: '物品',
+  CU_LIMB_INDEX: '肢体',
   // Extended Body getters
   CU_PLAYER_ENERGY: '玩家体力值',
   CU_PLAYER_BRAIN_HEALTH: '玩家脑部健康',
@@ -1251,6 +1254,9 @@ const MSG_EN: Record<string, string> = {
   CU_MATH_CLAMP: 'clamp %1 between %2 and %3',
   CU_ITEM_IS_EQUIPPED: 'is item equipped',
   CU_ITEM_IS_IN_INVENTORY: 'is item in inventory',
+  CU_ITEM_CUSTOM: 'custom item',
+  CU_ITEM_VANILLA: 'item',
+  CU_LIMB_INDEX: 'limb',
   // Extended Body getters
   CU_PLAYER_ENERGY: 'player energy',
   CU_PLAYER_BRAIN_HEALTH: 'player brain health',

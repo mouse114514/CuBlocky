@@ -9,7 +9,7 @@ import * as Blockly from 'blockly/core';
 import { csharpGenerator } from './blocklySetup';
 
 export function App() {
-  const { t } = useI18n();
+  const { t, toggle: toggleLang } = useI18n();
   const [inEditor, setInEditor] = useState(false);
   const [bp, setBp] = useState<Blueprint>(() => defaultBlueprint());
   const [code, setCode] = useState('');
@@ -110,6 +110,7 @@ export function App() {
           </span>
         )}
         <span className="spacer" />
+        <button onClick={toggleLang}>{t('app.lang')}</button>
         <button className={`code-toggle ${showCode ? 'active' : ''}`} onClick={() => setShowCode(!showCode)}>
           {t('code.toggle')}
         </button>
