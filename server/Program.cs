@@ -25,6 +25,48 @@ Directory.CreateDirectory(uploadDir);
 var projectsDir = Path.Combine(Directory.GetCurrentDirectory(), "projects");
 Directory.CreateDirectory(projectsDir);
 
+// ── Asset management ──────────────────────────────────────────────
+app.MapGet("/api/assets", () =>
+{
+    if (!Directory.Exists(uploadDir)) return Results.Json(Array.Empty<object>());
+    var files = Directory.GetFiles(uploadDir)
+        .Where(f => Path.GetExtension(f).ToLowerInvariant() is ".png" or ".jpg" or ".jpeg" or ".bmp")
+        .Select(f =>
+        {
+            var info = new FileInfo(f);
+            return new { name = info.Name, size = info.Length, uploaded = info.LastWriteTimeUtc };
+        })
+        .OrderBy(a => a.name)
+        .ToList();
+    return Results.Json(files, jsonOpts);
+});
+
+app.MapDelete("/api/assets/{name}", (string name) =>
+{
+    var safe = Path.GetFileName(name);
+    var path = Path.Combine(uploadDir, safe);
+    if (!File.Exists(path)) return Results.NotFound("asset not found");
+    File.Delete(path);
+    return Results.Ok();
+});
+
+// Serve raw asset files for preview
+app.MapGet("/api/assets/raw/{name}", (string name) =>
+{
+    var safe = Path.GetFileName(name);
+    var path = Path.Combine(uploadDir, safe);
+    if (!File.Exists(path)) return Results.NotFound();
+    var ext = Path.GetExtension(safe).ToLowerInvariant();
+    var ct = ext switch
+    {
+        ".png" => "image/png",
+        ".jpg" or ".jpeg" => "image/jpeg",
+        ".bmp" => "image/bmp",
+        _ => "application/octet-stream"
+    };
+    return Results.File(path, ct);
+});
+
 // ── Upload sprite file ──────────────────────────────────────────────
 app.MapPost("/api/upload", async (HttpRequest req) =>
 {
@@ -37,7 +79,6 @@ app.MapPost("/api/upload", async (HttpRequest req) =>
     if (ext is not (".png" or ".jpg" or ".jpeg" or ".bmp"))
         return Results.BadRequest("only PNG/JPG/BMP images are accepted");
 
-    // Use original filename (sanitized) so it can be resolved by name during build
     var safeName = Path.GetFileName(file.FileName).Replace(' ', '_');
     var savedPath = Path.Combine(uploadDir, safeName);
     using (var fs = new FileStream(savedPath, FileMode.Create))
@@ -45,7 +86,6 @@ app.MapPost("/api/upload", async (HttpRequest req) =>
         await file.CopyToAsync(fs);
     }
 
-    // Return the filename as both assetId and name - used as the sprite reference
     return Results.Json(new { assetId = safeName, name = safeName, originalName = file.FileName });
 });
 

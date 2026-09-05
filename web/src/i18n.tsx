@@ -118,6 +118,16 @@ const dict = {
   'code.compiling':    { zh: '编译中...', en: 'compiling...' },
   'code.empty':        { zh: '添加物品或配方后预览', en: 'Add items or recipes to preview' },
   'code.toggle':       { zh: '查看代码', en: 'View Code' },
+
+  // ── Asset manager ──
+  'asset.manageTitle': { zh: '资源管理', en: 'Asset Manager' },
+  'asset.pickTitle':   { zh: '选择精灵图', en: 'Pick Sprite' },
+  'asset.upload':      { zh: '上传', en: 'Upload' },
+  'asset.uploading':   { zh: '上传中...', en: 'Uploading...' },
+  'asset.files':       { zh: '个文件', en: 'files' },
+  'asset.loading':     { zh: '加载中...', en: 'Loading...' },
+  'asset.empty':       { zh: '暂无资源，请上传', en: 'No assets. Upload one.' },
+  'asset.delete':      { zh: '删除', en: 'Delete' },
 } as const;
 
 type DictKey = keyof typeof dict;

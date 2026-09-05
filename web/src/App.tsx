@@ -4,9 +4,10 @@ import { defaultBlueprint } from './types';
 import { useI18n } from './i18n';
 import { BlockEditor } from './components/BlockEditor';
 import WelcomePage from './components/WelcomePage';
+import AssetManager from './components/AssetManager';
 import { download, buildProject, saveProject, type BuildResult } from './api';
 import * as Blockly from 'blockly/core';
-import { csharpGenerator } from './blocklySetup';
+import { csharpGenerator, pickSprite, setSpritePickCallback } from './blocklySetup';
 
 export function App() {
   const { t, toggle: toggleLang } = useI18n();
@@ -17,6 +18,8 @@ export function App() {
   const [showCode, setShowCode] = useState(false);
   const [building, setBuilding] = useState(false);
   const [buildResult, setBuildResult] = useState<BuildResult | null>(null);
+  const [showSpritePicker, setShowSpritePicker] = useState(false);
+  const [showAssetManager, setShowAssetManager] = useState(false);
   const wsRef = useRef<Blockly.WorkspaceSvg | null>(null);
   const bpRef = useRef(bp);
   bpRef.current = bp;
@@ -34,6 +37,13 @@ export function App() {
   }, [currentProjectName]);
 
   useEffect(() => { if (inEditor) scheduleAutoSave(); }, [bp, scheduleAutoSave, inEditor]);
+
+  // Listen for sprite picker events from Blockly fields
+  useEffect(() => {
+    const handler = () => setShowSpritePicker(true);
+    window.addEventListener('cublocky:open-sprite-picker', handler);
+    return () => window.removeEventListener('cublocky:open-sprite-picker', handler);
+  }, []);
 
   const saveLocal = () => {
     localStorage.setItem('cublocky', JSON.stringify(bp));
@@ -116,6 +126,7 @@ export function App() {
           <button className="build-btn" onClick={handleBuild} disabled={building}>
             {building ? t('app.building') : t('app.build')}
           </button>
+          <button onClick={() => setShowAssetManager(true)}>{t('asset.manageTitle')}</button>
           {buildResult && (
             <span className={`build-result ${buildResult.success ? 'ok' : 'err'}`}>
               {buildResult.success ? '✓' : '✗'} {buildResult.message}
@@ -160,6 +171,21 @@ export function App() {
             </div>
           </div>
         </div>
+      )}
+
+      {showSpritePicker && (
+        <AssetManager
+          mode="pick"
+          onSelect={(name) => pickSprite(name)}
+          onClose={() => { setSpritePickCallback(null); setShowSpritePicker(false); }}
+        />
+      )}
+
+      {showAssetManager && (
+        <AssetManager
+          mode="manage"
+          onClose={() => setShowAssetManager(false)}
+        />
       )}
     </div>
   );

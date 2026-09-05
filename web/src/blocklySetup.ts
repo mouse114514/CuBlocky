@@ -1,14 +1,18 @@
 import * as Blockly from 'blockly/core';
 import { fieldRegistry } from 'blockly/core';
 
+// ── Global sprite picker callback (React ↔ Blockly bridge) ──────
+export type SpritePickCallback = (assetName: string) => void;
+let _spritePickCb: SpritePickCallback | null = null;
+export function setSpritePickCallback(cb: SpritePickCallback | null) { _spritePickCb = cb; }
+export function pickSprite(assetName: string) { _spritePickCb?.(assetName); _spritePickCb = null; }
+
 // ── Custom sprite picker field ──────────────────────────────────────
 // @ts-ignore — Blockly v12 FieldConfig incompatible with custom field constructor
 class FieldSpritePicker extends Blockly.Field {
   private spriteId_ = '';
-  private spriteName_ = '';
   private buttonEl_: HTMLButtonElement | null = null;
   private previewEl_: HTMLSpanElement | null = null;
-  private static fileInput_: HTMLInputElement | null = null;
 
   constructor(value?: string) {
     super(value || '');
@@ -24,12 +28,10 @@ class FieldSpritePicker extends Blockly.Field {
 
   protected initView_(): void {
     if (!this.fieldGroup_) return;
-    // Preview thumbnail
     this.previewEl_ = document.createElement('span');
     this.previewEl_.style.cssText = 'display:inline-block;width:24px;height:24px;border:1px solid #666;border-radius:3px;vertical-align:middle;margin-right:4px;background:#222;text-align:center;line-height:22px;font-size:10px;color:#999;';
     this.previewEl_.textContent = this.spriteId_ ? '✓' : '?';
     this.fieldGroup_.appendChild(this.previewEl_);
-    // Button
     this.buttonEl_ = document.createElement('button');
     this.buttonEl_.textContent = '🖼';
     this.buttonEl_.title = '选择精灵图 / Pick sprite';
@@ -39,50 +41,25 @@ class FieldSpritePicker extends Blockly.Field {
       this.openPicker_();
     });
     this.fieldGroup_.appendChild(this.buttonEl_);
-    // Hidden file input (singleton)
-    if (!FieldSpritePicker.fileInput_) {
-      FieldSpritePicker.fileInput_ = document.createElement('input');
-      FieldSpritePicker.fileInput_.type = 'file';
-      FieldSpritePicker.fileInput_.accept = '.png,.jpg,.jpeg,.bmp,image/*';
-      FieldSpritePicker.fileInput_.style.display = 'none';
-      document.body.appendChild(FieldSpritePicker.fileInput_);
-    }
   }
 
   private openPicker_(): void {
-    const input = FieldSpritePicker.fileInput_!;
-    const handler = async () => {
-      input.removeEventListener('change', handler);
-      const file = input.files?.[0];
-      if (!file) return;
-      try {
-        const form = new FormData();
-        form.append('file', file);
-        const res = await fetch('/api/upload', { method: 'POST', body: form });
-        if (!res.ok) throw new Error('upload failed');
-        const data = await res.json();
-        this.spriteId_ = data.assetId;
-        this.spriteName_ = data.name;
-        this.setValue(data.assetId);
-        if (this.previewEl_) {
-          this.previewEl_.textContent = '✓';
-          this.previewEl_.title = file.name;
-        }
-      } catch (err) {
-        console.warn('Sprite upload failed:', err);
+    const self = this;
+    _spritePickCb = (assetName: string) => {
+      self.spriteId_ = assetName;
+      self.setValue(assetName);
+      if (self.previewEl_) {
+        self.previewEl_.textContent = '✓';
+        self.previewEl_.title = assetName;
       }
-      input.value = '';
+      _spritePickCb = null;
     };
-    input.addEventListener('change', handler);
-    input.click();
+    // Dispatch event for React to open AssetManager
+    window.dispatchEvent(new CustomEvent('cublocky:open-sprite-picker'));
   }
 
   getValue(): string {
     return this.spriteId_;
-  }
-
-  getValuePreview(): string {
-    return this.spriteName_;
   }
 
   protected doValueUpdate_(newValue: any): void {
@@ -93,13 +70,8 @@ class FieldSpritePicker extends Blockly.Field {
   }
 
   protected doValueInvalid_(newValue: any): void {}
-
-  protected render_(): void {
-    // Minimal render - our initView_ handles the DOM
-  }
-
+  protected render_(): void {}
   protected updateEditable_(): void {}
-
   getEditorShowArrow_: () => false = () => false as false;
 }
 

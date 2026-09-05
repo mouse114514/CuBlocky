@@ -57,3 +57,29 @@ export async function saveProject(name: string, bp: Blueprint): Promise<void> {
   });
   if (!res.ok) throw new Error('save failed: ' + res.status);
 }
+
+// ── Asset management ──
+export interface AssetInfo {
+  name: string;
+  size: number;
+  uploaded: string;
+}
+
+export async function listAssets(): Promise<AssetInfo[]> {
+  const res = await fetch('/api/assets');
+  if (!res.ok) throw new Error('list assets failed');
+  return await res.json() as AssetInfo[];
+}
+
+export async function uploadAsset(file: File): Promise<{ assetId: string; name: string }> {
+  const form = new FormData();
+  form.append('file', file);
+  const res = await fetch('/api/upload', { method: 'POST', body: form });
+  if (!res.ok) throw new Error('upload failed');
+  return await res.json();
+}
+
+export async function deleteAsset(name: string): Promise<void> {
+  const res = await fetch(`/api/assets/${encodeURIComponent(name)}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('delete failed');
+}
