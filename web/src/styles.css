@@ -225,10 +225,9 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
   animation:wp-gradient-shift 20s ease infinite;
 }
 .wp-bg-cursor{
-  position:fixed;width:160px;height:160px;border-radius:50%;z-index:1;pointer-events:none;
+  position:fixed;left:0;top:0;width:160px;height:160px;border-radius:50%;z-index:1;pointer-events:none;
   background:radial-gradient(circle,rgba(180,190,220,.18) 0%,rgba(200,190,220,.08) 40%,transparent 70%);
   filter:blur(20px);
-  transition:left .05s,top .05s;
 }
 @keyframes wp-gradient-shift{
   0%{background-position:0% 50%}
