@@ -85,8 +85,9 @@ export default function GradientBg() {
           const dy = my - py;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < RADIUS && dist > 0.1) {
-            const influence = (1 - dist / RADIUS);
-            const warp = influence * influence * STRENGTH;
+            const t0 = 1 - dist / RADIUS;
+            const influence = t0 * t0 * t0 * (t0 * (t0 * 6 - 15) + 10);
+            const warp = influence * STRENGTH;
             nx += (dx / dist) * warp;
             ny += (dy / dist) * warp;
           }
