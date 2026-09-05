@@ -126,14 +126,13 @@ export function App() {
           <button className="build-btn" onClick={handleBuild} disabled={building}>
             {building ? t('app.building') : t('app.build')}
           </button>
-          <button onClick={() => setShowAssetManager(true)}>{t('asset.manageTitle')}</button>
           {buildResult && (
             <span className={`build-result ${buildResult.success ? 'ok' : 'err'}`}>
               {buildResult.success ? '✓' : '✗'} {buildResult.message}
             </span>
           )}
           <span className="spacer" />
-          <button onClick={toggleLang}>{t('app.lang')}</button>
+          <button onClick={() => setShowAssetManager(true)}>{t('asset.manageTitle')}</button>
           <button className={`code-toggle ${showCode ? 'active' : ''}`} onClick={() => setShowCode(!showCode)}>
             {t('code.toggle')}
           </button>
