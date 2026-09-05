@@ -74,12 +74,12 @@ code{background:#0d1b2a;padding:1px 4px;border-radius:3px;font-size:12px}
 .modal h3{margin:0 0 12px;font-size:16px;color:#222}
 .modal-label{font-size:11px;color:#888;margin:8px 0 2px}
 .modal-path{
-  background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;padding:8px 10px 8px 20px;
+  background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;padding:8px 10px;
   font-size:12px;color:#333;word-break:break-all;margin:0;
 }
 .modal-path-wrap{position:relative;margin:0}
 .modal-path-wrap .copy-btn{
-  position:absolute;top:2px;left:2px;background:none;
+  position:absolute;top:2px;right:2px;background:none;
   border:none;border-radius:3px;padding:2px;
   color:#999;cursor:pointer;opacity:0;transition:opacity .15s;
   display:flex;line-height:1;
