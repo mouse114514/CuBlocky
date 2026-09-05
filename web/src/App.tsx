@@ -7,7 +7,7 @@ import WelcomePage from './components/WelcomePage';
 import AssetManager from './components/AssetManager';
 import { download, buildProject, saveProject, type BuildResult } from './api';
 import * as Blockly from 'blockly/core';
-import { csharpGenerator, pickSprite, setSpritePickCallback } from './blocklySetup';
+import { csharpGenerator, pickSprite, setSpritePickCallback, createSpriteBlock } from './blocklySetup';
 
 export function App() {
   const { t, toggle: toggleLang } = useI18n();
@@ -43,6 +43,18 @@ export function App() {
     const handler = () => setShowSpritePicker(true);
     window.addEventListener('cublocky:open-sprite-picker', handler);
     return () => window.removeEventListener('cublocky:open-sprite-picker', handler);
+  }, []);
+
+  // Listen for sprite block creation from AssetManager
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ws = wsRef.current;
+      if (!ws) return;
+      const assetName = (e as CustomEvent).detail?.assetName;
+      if (assetName) createSpriteBlock(assetName, ws);
+    };
+    window.addEventListener('cublocky:create-sprite-block', handler);
+    return () => window.removeEventListener('cublocky:create-sprite-block', handler);
   }, []);
 
   const saveLocal = () => {

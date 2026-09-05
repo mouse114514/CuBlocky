@@ -122,9 +122,20 @@ const BLOCK_JSON: any[] = [
         ['medical','medical'],['food','food'],['material','material'],
         ['armor','armor'],['container','container'],['misc','misc'],
       ]},
-      { type: 'field_sprite_picker', name: 'SPRITE', sprite: '' },
+      { type: 'input_value', name: 'SPRITE_REF', check: 'Sprite', align: 'RIGHT' },
     ],
     colour: C.REGISTER, inputsInline: true,
+  },
+
+  // Sprite reference value block
+  {
+    type: 'cu_sprite_ref',
+    message0: '%{BKY_CU_SPRITE_REF}',
+    args0: [
+      { type: 'field_dropdown', name: 'ASSET', options: [] },
+    ],
+    output: 'Sprite',
+    colour: C.REGISTER,
   },
 
   // Item use behavior container (event-style hat)
@@ -986,6 +997,7 @@ const MSG_ZH: Record<string, string> = {
   CU_WHEN_LASTSTAND: '当濒死战起',
   CU_WHEN_ENTER_WORLD: '当进入世界',
   CU_REGISTER_ITEM: '注册物品 id %1 名称 %2 描述 %3 分类 %4 精灵图 %5',
+  CU_SPRITE_REF: '精灵图 %1',
   CU_DEFINE_ITEM_USE: '物品 %1 使用时',
   CU_DEFINE_ITEM_LIMB_USE: '物品 %1 肢体使用时',
   CU_ITEM_SET_PROPERTY: '设置物品 %1 属性 %2 为 %3',
@@ -1143,6 +1155,7 @@ const MSG_EN: Record<string, string> = {
   CU_WHEN_LASTSTAND: 'when last stand',
   CU_WHEN_ENTER_WORLD: 'when enter world',
   CU_REGISTER_ITEM: 'register item id %1 name %2 desc %3 category %4 sprite %5',
+  CU_SPRITE_REF: 'sprite %1',
   CU_DEFINE_ITEM_USE: 'when %1 item used',
   CU_DEFINE_ITEM_LIMB_USE: 'when %1 item limb used',
   CU_ITEM_SET_PROPERTY: 'set item %1 property %2 to %3',
@@ -1310,6 +1323,35 @@ export function defineBlocks() {
   blocksDefined = true;
 }
 
+// ── Create sprite block in workspace ──────────────────────────────
+export function createSpriteBlock(assetName: string, ws: Blockly.WorkspaceSvg) {
+  const block = ws.newBlock('cu_sprite_ref') as any;
+  block.getInput('ASSET')?.fieldRow?.[0]?.setValue(assetName);
+  block.initSvg();
+  block.render();
+  const metrics = ws.getMetrics();
+  block.moveBy(metrics.viewLeft + metrics.viewWidth / 2 - 60, metrics.viewTop + metrics.viewHeight / 2 - 20);
+}
+
+// ── Refresh all cu_sprite_ref dropdowns with current assets ───────
+export async function refreshSpriteDropdowns(ws: Blockly.WorkspaceSvg) {
+  try {
+    const res = await fetch('/api/assets');
+    if (!res.ok) return;
+    const assets = await res.json() as { name: string }[];
+    const options: [string, string][] = assets.map(a => [a.name, a.name]);
+    const blocks = ws.getBlocksByType('cu_sprite_ref');
+    for (const block of blocks) {
+      const field = block.getField('ASSET') as any;
+      if (field && typeof field.updateOptions === 'function') {
+        const current = field.getValue();
+        field.updateOptions(options);
+        if (options.some(o => o[1] === current)) field.setValue(current);
+      }
+    }
+  } catch { }
+}
+
 // ── C# Code Generator ──
 export const csharpGenerator = new Blockly.Generator('CSharp');
 
@@ -1355,9 +1397,14 @@ csharpGenerator.forBlock['cu_register_item'] = (block, gen) => {
   const name = block.getFieldValue('FULL_NAME').replace(/"/g, '\\"');
   const desc = block.getFieldValue('DESC').replace(/"/g, '\\"');
   const cat = block.getFieldValue('CATEGORY');
-  const spriteId = block.getFieldValue('SPRITE') || '';
-  const json = JSON.stringify({Id: id.replace(/^"|"$/g, ''), FullName: name, Description: desc, Category: cat, Weight: 0.4, Value: 1, DecayMinutes: 180, Recognition: 2, SpawnFrequency: 1, SpriteAssetId: spriteId || null});
+  const spriteCode = gen.valueToCode(block, 'SPRITE_REF', ORDER_ATOMIC) || '';
+  const spriteId = spriteCode.replace(/^"|"$/g, '') || null;
+  const json = JSON.stringify({Id: id.replace(/^"|"$/g, ''), FullName: name, Description: desc, Category: cat, Weight: 0.4, Value: 1, DecayMinutes: 180, Recognition: 2, SpawnFrequency: 1, SpriteAssetId: spriteId});
   return `//REGISTER_ITEM:${json}\n`;
+};
+csharpGenerator.forBlock['cu_sprite_ref'] = (block, gen) => {
+  const asset = block.getFieldValue('ASSET') || '';
+  return [`"${asset}"`, ORDER_ATOMIC];
 };
 csharpGenerator.forBlock['cu_define_item_use'] = (block, gen) => {
   const item = gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || '"myItem"';

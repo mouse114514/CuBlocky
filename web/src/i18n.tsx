@@ -109,6 +109,7 @@ const dict = {
   'block.valFloat':         { zh: '数字', en: 'Number' },
   'block.valString':        { zh: '文本', en: 'Text' },
   'block.valBool':          { zh: '布尔值', en: 'Boolean' },
+  'block.spriteRef':       { zh: '精灵图 %1', en: 'Sprite %1' },
 
   // ── Code preview ──
   'code.register':     { zh: 'RegisterContent.cs', en: 'RegisterContent.cs' },
@@ -128,6 +129,7 @@ const dict = {
   'asset.loading':     { zh: '加载中...', en: 'Loading...' },
   'asset.empty':       { zh: '暂无资源，请上传', en: 'No assets. Upload one.' },
   'asset.delete':      { zh: '删除', en: 'Delete' },
+  'asset.generate':    { zh: '生成积木', en: 'Generate Block' },
 } as const;
 
 type DictKey = keyof typeof dict;

@@ -13,6 +13,7 @@ export default function AssetManager({ mode, onSelect, onClose }: Props) {
   const [assets, setAssets] = useState<AssetInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
@@ -37,6 +38,7 @@ export default function AssetManager({ mode, onSelect, onClose }: Props) {
   const handleDelete = async (name: string) => {
     try {
       await deleteAsset(name);
+      setSelected(null);
       await load();
     } catch (e) { console.warn('delete failed', e); }
   };
@@ -44,6 +46,15 @@ export default function AssetManager({ mode, onSelect, onClose }: Props) {
   const handleSelect = (name: string) => {
     onSelect?.(name);
     onClose();
+  };
+
+  const handleGenerate = (name: string) => {
+    window.dispatchEvent(new CustomEvent('cublocky:create-sprite-block', { detail: { assetName: name } }));
+  };
+
+  const handleCardClick = (name: string) => {
+    if (mode === 'pick') { handleSelect(name); return; }
+    setSelected(selected === name ? null : name);
   };
 
   return (
@@ -57,6 +68,13 @@ export default function AssetManager({ mode, onSelect, onClose }: Props) {
           </button>
           <span className="asset-count">{assets.length} {t('asset.files')}</span>
         </div>
+        {selected && (
+          <div className="asset-action-bar">
+            <span className="asset-action-name">{selected}</span>
+            <button className="asset-action-btn" onClick={() => handleGenerate(selected)}>{t('asset.generate')}</button>
+            <button className="asset-action-btn danger" onClick={() => handleDelete(selected)}>{t('asset.delete')}</button>
+          </div>
+        )}
         {loading ? (
           <div className="asset-empty">{t('asset.loading')}</div>
         ) : assets.length === 0 ? (
@@ -64,12 +82,9 @@ export default function AssetManager({ mode, onSelect, onClose }: Props) {
         ) : (
           <div className="asset-grid">
             {assets.map(a => (
-              <div key={a.name} className="asset-card" onClick={() => mode === 'pick' ? handleSelect(a.name) : undefined}>
+              <div key={a.name} className={`asset-card${selected === a.name ? ' selected' : ''}`} onClick={() => handleCardClick(a.name)}>
                 <img src={`/api/assets/raw/${encodeURIComponent(a.name)}`} alt={a.name} className="asset-thumb" />
                 <div className="asset-name" title={a.name}>{a.name}</div>
-                {mode === 'manage' && (
-                  <button className="asset-del" title={t('asset.delete')} onClick={e => { e.stopPropagation(); handleDelete(a.name); }}>×</button>
-                )}
               </div>
             ))}
           </div>

@@ -262,12 +262,25 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 .asset-toolbar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .asset-count{font-size:12px;color:#888;margin-left:auto}
 .asset-empty{font-size:13px;color:#999;font-style:italic;padding:32px;text-align:center}
+.asset-action-bar{
+  display:flex;align-items:center;gap:8px;padding:8px 12px;margin-bottom:8px;
+  background:#f5f5f5;border:1px solid #e0e0e0;border-radius:6px;
+}
+.asset-action-name{font-size:12px;color:#333;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.asset-action-btn{
+  background:#222;color:#fff;border:none;border-radius:12px;padding:4px 14px;font-size:12px;
+  cursor:pointer;white-space:nowrap;transition:background .15s;
+}
+.asset-action-btn:hover{background:#444}
+.asset-action-btn.danger{background:#c0392b}
+.asset-action-btn.danger:hover{background:#e74c3c}
 .asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;overflow-y:auto;max-height:400px;padding:4px}
 .asset-card{
   position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;
   padding:6px;border:2px solid transparent;border-radius:8px;cursor:pointer;transition:border-color .15s;
 }
 .asset-card:hover{border-color:#1a8a1a}
+.asset-card.selected{border-color:#1a8a1a;background:#e8f5e9}
 .asset-thumb{width:48px;height:48px;object-fit:contain;border-radius:4px;background:#f0f0f0;image-rendering:pixelated}
 .asset-name{font-size:10px;color:#666;text-align:center;word-break:break-all;max-height:28px;overflow:hidden}
 .asset-del{

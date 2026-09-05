@@ -71,6 +71,7 @@ const TOOLBOX = `
     <block type="cu_register_item">
       <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
     </block>
+    <block type="cu_sprite_ref"></block>
     <block type="cu_register_recipe">
       <value name="INPUTS"><shadow type="lists_create_with"></shadow></value>
       <value name="OUTPUT"><shadow type="cu_item_vanilla"><field name="ID">bandage</field></shadow></value>
