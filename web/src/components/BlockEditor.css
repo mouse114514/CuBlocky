@@ -10,3 +10,7 @@
   width: 100% !important;
   height: 100% !important;
 }
+
+.be .blocklyToolbox {
+  margin-top: var(--toolbar-h, 40px);
+}
