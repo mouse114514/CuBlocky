@@ -1327,7 +1327,7 @@ export function defineBlocks() {
 export function createSpriteBlock(assetName: string, ws: Blockly.WorkspaceSvg) {
   try {
     const block = ws.newBlock('cu_sprite_ref') as any;
-    block.getInput('ASSET')?.fieldRow?.[0]?.setValue(assetName);
+    block.setFieldValue(assetName, 'ASSET');
     block.initSvg();
     block.render();
     const metrics = ws.getMetrics();
