@@ -29,29 +29,6 @@ function fbm(x: number, y: number, octaves: number): number {
   return v;
 }
 
-const PALETTE: [number, number, number][] = [
-  [100, 149, 237],
-  [147, 112, 219],
-  [255, 183, 77],
-  [46, 204, 113],
-  [52, 152, 219],
-  [231, 76, 60],
-];
-
-function colorMap(t: number): [number, number, number] {
-  const n = PALETTE.length;
-  const scaled = ((t % 1) + 1) % 1 * n;
-  const i = Math.floor(scaled);
-  const f = scaled - i;
-  const c0 = PALETTE[i % n];
-  const c1 = PALETTE[(i + 1) % n];
-  return [
-    c0[0] + (c1[0] - c0[0]) * f,
-    c0[1] + (c1[1] - c0[1]) * f,
-    c0[2] + (c1[2] - c0[2]) * f,
-  ];
-}
-
 export default function GradientBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouse = useRef({ x: -9999, y: -9999 });
@@ -60,7 +37,7 @@ export default function GradientBg() {
   useEffect(() => {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext('2d')!;
-    const SCALE = 3;
+    const SCALE = 4;
     let w = 0, h = 0, cw = 0, ch = 0;
     let offCanvas: HTMLCanvasElement, offCtx: CanvasRenderingContext2D;
 
@@ -89,11 +66,11 @@ export default function GradientBg() {
     canvas.addEventListener('mouseleave', onLeave);
 
     let t = 0;
-    const RADIUS = 80;
-    const STRENGTH = 2.5;
+    const RADIUS = 100;
+    const STRENGTH = 2.0;
 
     const draw = () => {
-      t += 0.003;
+      t += 0.002;
       const imgData = offCtx.createImageData(cw, ch);
       const d = imgData.data;
       const mx = mouse.current.x;
@@ -101,8 +78,8 @@ export default function GradientBg() {
 
       for (let py = 0; py < ch; py++) {
         for (let px = 0; px < cw; px++) {
-          let nx = px * 0.008;
-          let ny = py * 0.008;
+          let nx = px * 0.006;
+          let ny = py * 0.006;
 
           const dx = mx - px;
           const dy = my - py;
@@ -114,15 +91,13 @@ export default function GradientBg() {
             ny += (dy / dist) * warp;
           }
 
-          const v1 = fbm(nx + t * 0.5, ny + t * 0.3, 4);
-          const v2 = fbm(nx * 1.5 - t * 0.2, ny * 1.5 + t * 0.4, 3);
-          const v3 = fbm(nx * 0.7 + t * 0.15, ny * 0.7 - t * 0.1, 3);
+          const v = fbm(nx + t * 0.4, ny + t * 0.3, 3);
 
-          const c = colorMap(v1 * 0.5 + v2 * 0.3 + v3 * 0.2 + t * 0.1);
+          const c = v * 18 + 230;
           const idx = (py * cw + px) * 4;
-          d[idx] = c[0];
-          d[idx + 1] = c[1];
-          d[idx + 2] = c[2];
+          d[idx] = c;
+          d[idx + 1] = c;
+          d[idx + 2] = c + (1 - v) * 4;
           d[idx + 3] = 255;
         }
       }
