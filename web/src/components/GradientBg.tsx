@@ -81,11 +81,12 @@ export default function GradientBg() {
           let nx = px * 0.006;
           let ny = py * 0.006;
 
-          const dx = mx - px;
-          const dy = my - py;
+          const dx = px - mx;
+          const dy = py - my;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < RADIUS && dist > 0.1) {
-            const influence = Math.exp(-(dist * dist) / (RADIUS * RADIUS * 0.4));
+            const t0 = dist / RADIUS;
+            const influence = (1 - t0 * t0) * (1 - t0 * t0);
             const warp = influence * STRENGTH;
             nx += (dx / dist) * warp;
             ny += (dy / dist) * warp;
