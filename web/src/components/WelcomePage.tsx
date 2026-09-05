@@ -91,7 +91,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
               <label>
                 {t('mod.name')}
                 <input
-                  placeholder="请在此处输入项目名称"
+                  placeholder={t('app.placeholder.name')}
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && createProject()}
@@ -101,7 +101,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
               <label>
                 {t('mod.guid')}
                 <input
-                  placeholder="例如 com.author.modname"
+                  placeholder={t('app.placeholder.guid')}
                   value={newGuid}
                   onChange={e => setNewGuid(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && createProject()}
@@ -110,7 +110,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
               <label>
                 {t('mod.desc')}
                 <input
-                  placeholder="可选，简要说明插件功能"
+                  placeholder={t('app.placeholder.desc')}
                   value={newDesc}
                   onChange={e => setNewDesc(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && createProject()}
@@ -119,7 +119,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
             </div>
             <div className="modal-actions">
               <button onClick={() => setShowNew(false)}>{t('app.close')}</button>
-              <button onClick={createProject} disabled={loading || !newName.trim() || !newGuid.trim()}>创建</button>
+              <button onClick={createProject} disabled={loading || !newName.trim() || !newGuid.trim()}>{t('app.create')}</button>
             </div>
           </div>
         </div>
@@ -128,10 +128,10 @@ export default function WelcomePage({ onOpenProject }: Props) {
       {showOpen && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>打开项目</h3>
+            <h3>{t('app.openProject')}</h3>
             <div className="wp-project-list">
               {projects.length === 0 ? (
-                <div className="wp-empty">暂无项目</div>
+                <div className="wp-empty">{t('app.noProjects')}</div>
               ) : (
                 projects.map(p => (
                   <div key={p.name} className="wp-item" onClick={() => loadProject(p.name)}>
@@ -142,7 +142,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
               )}
             </div>
             <div className="modal-actions">
-              <button onClick={() => setShowOpen(false)}>关闭</button>
+              <button onClick={() => setShowOpen(false)}>{t('app.close')}</button>
             </div>
           </div>
         </div>

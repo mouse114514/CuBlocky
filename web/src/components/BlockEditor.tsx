@@ -512,7 +512,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
         (Blockly.Msg as Record<string, string>)[key] = val;
       }
 
-      defineBlocks();
+      defineBlocks(lang);
 
       const parser = new DOMParser();
       const toolboxDoc = parser.parseFromString(TOOLBOX, 'text/html');
@@ -631,6 +631,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
   useEffect(() => {
     if (!wsRef.current) return;
     setMessages(lang);
+    defineBlocks(lang);
     const catMsgs = lang === 'zh' ? CAT_MSG_ZH : CAT_MSG_EN;
     for (const [key, val] of Object.entries(catMsgs)) {
       (Blockly.Msg as Record<string, string>)[key] = val;

@@ -1309,18 +1309,16 @@ export function setMessages(lang: string) {
 }
 
 // ── Define blocks ──
-let blocksDefined = false;
-export function defineBlocks() {
-  if (blocksDefined) return;
-  Blockly.defineBlocksWithJsonArray(BLOCK_JSON);
+export function defineBlocks(lang: string = 'zh') {
+  _blocksLang = lang;
+  const defs = applyLang(lang);
+  Blockly.defineBlocksWithJsonArray(defs);
 
   // Force lists_create_with to horizontal
-  const defs = (Blockly as any).Blocks;
-  if (defs && defs.lists_create_with) {
-    defs.lists_create_with.inputsInline = true;
+  const blocks = (Blockly as any).Blocks;
+  if (blocks && blocks.lists_create_with) {
+    blocks.lists_create_with.inputsInline = true;
   }
-
-  blocksDefined = true;
 }
 
 // ── Create sprite block in workspace ──────────────────────────────
@@ -2027,5 +2025,265 @@ csharpGenerator.forBlock['cu_item_category'] = () => ['item.Stats.category', ORD
 
 // ═══ Extended World getters ══════════════════════════════════
 csharpGenerator.forBlock['cu_world_depth'] = () => ['WorldGeneration.world.PlayerTotalDepthMeters()', ORDER_ATOMIC];
+
+// ═══ Dropdown i18n ═══════════════════════════════════════════
+type DdOption = [string, string, string]; // [zhLabel, enLabel, value]
+let _blocksLang = 'zh';
+
+const PROP_OPTIONS: DdOption[] = [
+  ['耐久', 'Durability', 'condition'], ['重量', 'Weight', 'weight'],
+  ['价值', 'Value', 'value'], ['标签', 'Tags', 'tags'],
+  ['可使用', 'Usable', 'usable'], ['可穿戴', 'Wearable', 'wearable'],
+  ['左手使用', 'UseLimbAction', 'useLimbAction'],
+  ['零耐久销毁', 'DestroyAtZero', 'destroyAtZeroCondition'],
+];
+
+const TARGET_OPTIONS: DdOption[] = [
+  ['当前物品', 'This item', 'this'],
+  ['左手', 'Left hand', 'left'],
+  ['右手', 'Right hand', 'right'],
+];
+
+const ACTION_OPTIONS: DdOption[] = [
+  ['使用', 'Use', 'use'],
+  ['丢弃', 'Drop', 'drop'],
+  ['装备', 'Equip', 'equip'],
+];
+
+const COND_OP_OPTIONS: DdOption[] = [
+  ['设为', 'Set', '='],
+  ['增加', 'Add', '+'],
+  ['减少', 'Subtract', '-'],
+];
+
+const MATH_FUNC_OPTIONS: DdOption[] = [
+  ['四舍五入', 'Round', 'ROUND'],
+  ['绝对值', 'Absolute', 'ABS'],
+  ['平方根', 'Square root', 'SQRT'],
+  ['取反', 'Negate', 'NEG'],
+];
+
+const MATH_OP_OPTIONS: DdOption[] = [
+  ['+', '+', 'ADD'], ['−', '−', 'SUB'], ['×', '×', 'MUL'],
+  ['÷', '÷', 'DIV'], ['%', '%', 'MOD'], ['幂', 'Pow', 'POW'],
+];
+
+const STRING_OP_OPTIONS: DdOption[] = [
+  ['字符串长度', 'Length', 'LEN'],
+  ['拼接', 'Join', 'JOIN'],
+];
+
+const LOGIC_OP_OPTIONS: DdOption[] = [
+  ['且', 'And', 'AND'],
+  ['或', 'Or', 'OR'],
+];
+
+const PLACEMENT_OPTIONS: DdOption[] = [
+  ['地面', 'Floor', 'Floor'],
+  ['墙壁', 'Wall', 'Wall'],
+  ['天花板', 'Ceiling', 'Ceiling'],
+];
+
+const BUILDING_PROP_OPTIONS: DdOption[] = [
+  ['血量', 'Health', 'health'], ['名称', 'Name', 'name'],
+  ['描述', 'Description', 'description'], ['地面放置', 'RequireGround', 'requireGround'],
+  ['金属', 'Metallic', 'metallic'], ['动物', 'Animal', 'animal'],
+  ['掉落倍率', 'DropChance', 'dropChanceMultiplier'],
+  ['生成最小数', 'SpawnMin', 'spawnMinPerChunk'],
+  ['生成最大数', 'SpawnMax', 'spawnMaxPerChunk'],
+];
+
+const COLLIDER_OPTIONS: DdOption[] = [
+  ['网格', 'Grid', 'Grid'],
+  ['精灵', 'Sprite', 'Sprite'],
+  ['无', 'None', 'None'],
+];
+
+const GEN_STYLE_OPTIONS: DdOption[] = [
+  ['矿脉', 'Vein', 'Vein'],
+  ['重矿脉', 'HeavyVeins', 'HeavyVeins'],
+  ['单独', 'Singular', 'Singular'],
+  ['条纹', 'Stripe', 'Stripe'],
+  ['内部', 'Inner', 'Inner'],
+  ['外围', 'Outskirt', 'Outskirt'],
+];
+
+const TILE_PROP_OPTIONS: DdOption[] = [
+  ['血量', 'Health', 'health'], ['名称', 'Name', 'name'],
+  ['描述', 'Description', 'description'], ['金属', 'Metallic', 'metallic'],
+  ['毒性', 'Toxicity', 'toxicity'], ['滑', 'Slippery', 'slippery'],
+  ['睡眠质量', 'SleepQuality', 'sleepQuality'],
+  ['生成量', 'SpawnAmount', 'spawnAmount'],
+];
+
+const LOCALE_TYPE_OPTIONS: DdOption[] = [
+  ['物品', 'Item', 'item'],
+  ['建筑', 'Building', 'building'],
+  ['标题', 'Title', 'title'],
+];
+
+const LIMB_OPTIONS: DdOption[] = [
+  ['头部', 'Head', '0'],
+  ['躯干', 'Torso', '1'],
+  ['左臂', 'Left arm', '2'],
+  ['右臂', 'Right arm', '3'],
+  ['左腿', 'Left leg', '4'],
+  ['右腿', 'Right leg', '5'],
+];
+
+const VANILLA_ITEMS: DdOption[] = [
+  ['绷带', 'Bandage', 'bandage'], ['医用绷带', 'Medical Gauze', 'analgesicgauze'],
+  ['消毒绷带', 'Sterilized Bandage', 'sterilizedbandage'],
+  ['塑料绷带', 'Plastic Bandage', 'plasticbandage'],
+  ['创可贴', 'Adhesive Bandage', 'adhesivebandage'],
+  ['藻酸盐绷带', 'Alginate Bandage', 'alginate'],
+  ['止痛药瓶', 'Painkillers', 'painkillers'],
+  ['镇痛膏瓶', 'Pain Cream', 'paincream'],
+  ['吗啡注射器', 'Morphine', 'morphine'],
+  ['抗生素药瓶', 'Antibiotics', 'antibiotics'],
+  ['抗血清注射器', 'Antiserum', 'antiserum'],
+  ['抗辐射剂药瓶', 'Antirad', 'antirad'],
+  ['纳洛酮注射器', 'Naloxone', 'naloxone'],
+  ['芬太尼注射器', 'Fentanyl', 'fentanyl'],
+  ['海洛因注射器', 'Heroin', 'heroin'],
+  ['鸦片注射器', 'Opium', 'opium'],
+  ['自动体外除颤仪', 'AED', 'aed'],
+  ['手动除颤仪', 'Manual Defibrillator', 'manualdefibrillator'],
+  ['局部复苏装置', 'LRD', 'lrd'],
+  ['简易局部复苏装置', 'Makeshift LRD', 'makeshiftlrd'],
+  ['自动泵', 'Auto Pump', 'autopump'],
+  ['医疗包', 'Medkit', 'medkit'], ['夹板', 'Splint', 'splint'],
+  ['血袋', 'Blood Bag', 'bloodbag'],
+  ['消毒液瓶', 'Disinfectant', 'disinfectant'],
+  ['注射器', 'Syringe', 'syringe'], ['止血带', 'Tourniquet', 'tourniquet'],
+  ['手枪', 'Pistol', 'pistol'], ['步枪', 'Rifle', 'rifle'],
+  ['霰弹枪', 'Shotgun', 'shotgun'],
+  ['9mm子弹', '9mm Round', '9mmround'],
+  ['5.56子弹', '5.56 Round', '556round'],
+  ['12号霰弹', '12 Gauge', '12gauge'],
+  ['简易步枪', 'Makeshift Rifle', 'makeshiftrifle'],
+  ['砍刀', 'Machete', 'machete'], ['十字镐', 'Pickaxe', 'pickaxe'],
+  ['大锤', 'Sledgehammer', 'sledgehammer'], ['爪子', 'Claws', 'claws'],
+  ['炸药', 'Dynamite', 'dynamite'], ['铲子', 'Shovel', 'shovel'],
+  ['木铲', 'Wood Shovel', 'woodshovel'], ['干草叉', 'Pitchfork', 'pitchfork'],
+  ['微型激光钻', 'Mini Laser Drill', 'minilaserdrill'],
+  ['重型钻', 'Heavy Drill', 'heavydrill'],
+  ['钛合金多功能工具', 'Titanium Multitool', 'titaniummultitool'],
+  ['扳手', 'Wrench', 'wrench'], ['简易扳手', 'Makeshift Wrench', 'makeshiftwrench'],
+  ['攀爬绳', 'Climbing Rope', 'climbingrope'],
+  ['攀爬爪', 'Climbing Claws', 'climbingclaws'],
+  ['抓钩', 'Grappling Hook', 'grapplinghook'],
+  ['手摇发电机', 'Hand Crank', 'handcrank'],
+  ['打火机', 'Lighter', 'lighter'], ['火把', 'Torch', 'torch'],
+  ['营地篝火', 'Campfire', 'campfire'],
+  ['地形扫描仪', 'Terrain Scanner', 'terrainscanner'],
+  ['盖革计数器', 'Geiger Counter', 'geigercounter'],
+  ['开锁工具包', 'Lockpicking Kit', 'lockpickingkit'],
+  ['废金属', 'Scrap Metal', 'scrapmetal'],
+  ['废料块', 'Scrap Cube', 'scrapcube'],
+  ['废料板', 'Scrap Panel', 'scrappanel'],
+  ['废料管', 'Scrap Tube', 'scraptube'],
+  ['木材碎片', 'Wood Scraps', 'woodscraps'],
+  ['木块', 'Wood Cube', 'woodcube'], ['木板', 'Wood Panel', 'woodpanel'],
+  ['绳子', 'Rope', 'rope'], ['细绳', 'String', 'string'],
+  ['木棍', 'Stick', 'stick'], ['钉子', 'Nails', 'nails'],
+  ['布料', 'Canvas', 'canvas'], ['铜矿石', 'Raw Copper', 'rawcopper'],
+  ['加工铜', 'Processed Copper', 'processedcopper'],
+  ['钛板', 'Titanium Slab', 'titaniumslab'],
+  ['钛棒', 'Titanium Rod', 'titaniumrod'],
+  ['钛片', 'Titanium Sheet', 'titaniumsheet'],
+  ['塑料块', 'Plastic Chunk', 'plasticchunk'],
+  ['柔性玻璃', 'Flexiglass', 'flexiglass'],
+  ['电路板', 'Circuit Board', 'circuitboard'],
+  ['一捆电线', 'Bundle of Wires', 'bundleofwires'],
+  ['煤炭', 'Charcoal', 'charcoal'],
+  ['易燃粉末', 'Flammable Powder', 'flammablepowder'],
+  ['水瓶', 'Water Bottle', 'waterbottle'], ['牛奶', 'Milk', 'milk'],
+  ['巧克力牛奶', 'Chocolate Milk', 'chocolatemilk'],
+  ['汤', 'Soup', 'soup'], ['能量饮料', 'Energy Drink', 'energydrink'],
+  ['咖啡', 'Coffee', 'coffee'], ['苹果汁', 'Apple Juice', 'applejuice'],
+  ['柠檬水', 'Lemonade', 'lemonade'], ['冰茶', 'Ice Tea', 'icetea'],
+  ['苏打水', 'Soda Bottle', 'sodabottle'], ['苏打罐', 'Soda Can', 'sodacan'],
+  ['酒精', 'Alcohol', 'alcohol'], ['汉堡', 'Burger', 'burger'],
+  ['牛排', 'Steak', 'steak'], ['披萨片', 'Pizza Slice', 'pizzaslice'],
+  ['饼干', 'Cookies', 'cookies'], ['薯片', 'Chips', 'chips'],
+  ['面包', 'Bread', 'bread'], ['蛋糕', 'Cake', 'cake'],
+  ['肉干', 'Pemmican', 'pemmican'],
+  ['营养棒', 'Nutrient Bar', 'nutrientbar'],
+  ['塑料袋', 'Plastic Bag', 'plasticbag'],
+  ['垃圾袋', 'Trash Bag', 'trashbag'],
+  ['植物纤维袋', 'Foliage Bag', 'foliagebag'],
+  ['植物纤维挎包', 'Sling Bag', 'slingbag'],
+  ['重力袋', 'Grav Bag', 'gravbag'], ['腿包', 'Leg Pouch', 'legpouch'],
+  ['随身水包', 'Liquid Pouch', 'liquidpouch'],
+  ['材料包', 'Material Pouch', 'materialpouch'],
+  ['小背包', 'Small Pack', 'smallpack'],
+  ['双肩大背包', 'Big Pack', 'bigpack'],
+  ['工具箱', 'Toolbox', 'toolbox'], ['纸箱', 'Box', 'box'],
+  ['小桶', 'Mini Barrel', 'minibarrel'], ['水壶', 'Canteen', 'canteen'],
+  ['水罐', 'Water Jug', 'waterjug'],
+  ['自行车头盔', 'Bike Helmet', 'bikehelmet'],
+  ['防毒面具', 'Dust Mask', 'dustmask'], ['围巾', 'Scarf', 'scarf'],
+  ['头灯', 'Headlamp', 'headlamp'],
+  ['安全眼镜', 'Safety Glasses', 'safetyglasses'],
+  ['巴拉克拉法帽', 'Balaclava', 'balaclava'],
+  ['手套', 'Latex Gloves', 'latexgloves'],
+  ['战术手套', 'Tactical Gloves', 'tacticalgloves'],
+  ['腰带', 'Belt', 'belt'], ['防弹衣', 'Belly Armor', 'bellyarmor'],
+  ['弹药带', 'Bandolier', 'bandolier'], ['腰包', 'Fanny Pack', 'fannypack'],
+  ['运动鞋', 'Sneakers', 'sneakers'],
+  ['战术靴', 'Tactical Boots', 'tacticalboots'],
+  ['护膝', 'Kneepads', 'kneepads'],
+  ['小型电池', 'Small Battery', 'smallbattery'],
+  ['中型电池', 'Medium Battery', 'mediumbattery'],
+  ['大型电池', 'Large Battery', 'largebattery'],
+  ['手电筒', 'Flashlight', 'flashlight'],
+  ['应急手电', 'Emergency Light', 'emergencylight'],
+  ['提灯', 'Lantern', 'lantern'], ['灯泡', 'Light Bulb', 'lightbulb'],
+  ['MP3播放器', 'MP3 Player', 'mp3player'], ['手表', 'Watch', 'watch'],
+  ['喷气背包', 'Jetpack', 'jetpack'],
+  ['等离子切割器', 'Plasma Cutter', 'plasmacutter'],
+];
+
+const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
+  cu_item_set_property: { PROP: PROP_OPTIONS },
+  cu_item_use: { TARGET: TARGET_OPTIONS, ACTION: ACTION_OPTIONS },
+  cu_item_consume: { TARGET: TARGET_OPTIONS },
+  cu_item_set_condition: { TARGET: TARGET_OPTIONS, OP: COND_OP_OPTIONS },
+  cu_item_set_weight: { TARGET: TARGET_OPTIONS },
+  cu_item_set_value: { TARGET: TARGET_OPTIONS },
+  cu_item_set_decay: { TARGET: TARGET_OPTIONS },
+  cu_item_set_slot_rotation: { TARGET: TARGET_OPTIONS },
+  cu_math_func: { FUNC: MATH_FUNC_OPTIONS },
+  cu_math_op: { OP: MATH_OP_OPTIONS },
+  cu_string_op: { OP: STRING_OP_OPTIONS },
+  cu_logic_compare: { OP: LOGIC_OP_OPTIONS },
+  cu_register_building: { PLACEMENT: PLACEMENT_OPTIONS },
+  cu_building_set_property: { PROP: BUILDING_PROP_OPTIONS },
+  cu_register_tile: { COLLIDER: COLLIDER_OPTIONS, GEN_STYLE: GEN_STYLE_OPTIONS },
+  cu_tile_set_property: { PROP: TILE_PROP_OPTIONS },
+  cu_register_locale: { TYPE: LOCALE_TYPE_OPTIONS },
+  cu_limb_index: { LIMB: LIMB_OPTIONS },
+  cu_item_vanilla: { ID: VANILLA_ITEMS },
+};
+
+function dd(lang: string, opts: DdOption[]): [string, string][] {
+  return opts.map(([zh, en, val]) => [lang === 'zh' ? zh : en, val]);
+}
+
+/** Deep-clone BLOCK_JSON and replace every field_dropdown options array with lang-correct labels. */
+function applyLang(lang: string) {
+  const defs: any[] = JSON.parse(JSON.stringify(BLOCK_JSON));
+  for (const def of defs) {
+    const fields = DROPDOWN_I18N[def.type];
+    if (!fields || !def.args0) continue;
+    for (const arg of def.args0) {
+      if (arg.type !== 'field_dropdown') continue;
+      const opts = fields[arg.name];
+      if (opts) arg.options = dd(lang, opts);
+    }
+  }
+  return defs;
+}
 
 export { Blockly };
