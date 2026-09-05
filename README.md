@@ -15,28 +15,32 @@ A Scratch-style visual block editor for creating [Casualties Unknown](https://st
 
 ## Requirements
 
-- .NET 9 SDK
-- Node.js 18+
+- .NET 9 SDK — https://dotnet.microsoft.com/download/dotnet/9.0
+- Node.js 18+ — https://nodejs.org/
 - [BepInEx 5](https://github.com/BepInEx/BepInEx) installed in Casualties Unknown
 - [CUCoreLib](https://github.com/jimmyking9999999/CUCoreLib) (`net.cucorelib`) installed as a BepInEx plugin
 
-## Quick Start
+## Build & Run (Windows)
 
 ```bash
-# Build frontend
+# 1. Clone or extract the source code
+git clone https://github.com/mouse114514/CuBlocky.git
+cd CuBlocky
+
+# 2. Install frontend dependencies and build
 cd web
 npm install
 npm run build
+cd ..
 
-# Build server
-cd ../server
-dotnet build -c Release
+# 3. Build the server
+dotnet build server/server.csproj -c Release
 
-# Run
-dotnet run
+# 4. Run the server
+dotnet run --project server/server.csproj -c Release --urls http://localhost:5099
 ```
 
-The editor opens at `http://localhost:5000`.
+Open your browser and go to `http://localhost:5099`.
 
 ## Usage
 
@@ -97,15 +101,8 @@ CuBlocky/
 │       │   └── RecipeForm.tsx   # Recipe editor
 │       └── types.ts            # TypeScript interfaces
 ├── LICENSE                 # MPL 2.0
-└── Launch.ps1              # One-click launcher
+└── README.md
 ```
-
-## API
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/build` | POST | Compile blueprint to DLL |
-| `/api/upload` | POST | Upload sprite asset |
 
 ## License
 
