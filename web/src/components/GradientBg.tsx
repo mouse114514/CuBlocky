@@ -37,9 +37,9 @@ export default function GradientBg() {
   useEffect(() => {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext('2d')!;
-    const SCALE = 4;
+    const SCALE = 3;
     let w = 0, h = 0, cw = 0, ch = 0;
-    let offCanvas: HTMLCanvasElement, offCtx: CanvasRenderingContext2D;
+    let bgCanvas: HTMLCanvasElement, bgCtx: CanvasRenderingContext2D;
 
     const resize = () => {
       w = canvas.offsetWidth;
@@ -48,65 +48,97 @@ export default function GradientBg() {
       canvas.height = h;
       cw = Math.ceil(w / SCALE);
       ch = Math.ceil(h / SCALE);
-      offCanvas = document.createElement('canvas');
-      offCanvas.width = cw;
-      offCanvas.height = ch;
-      offCtx = offCanvas.getContext('2d')!;
+      bgCanvas = document.createElement('canvas');
+      bgCanvas.width = cw;
+      bgCanvas.height = ch;
+      bgCtx = bgCanvas.getContext('2d')!;
     };
     resize();
     window.addEventListener('resize', resize);
 
     const onMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
-      mouse.current.x = (e.clientX - rect.left) / SCALE;
-      mouse.current.y = (e.clientY - rect.top) / SCALE;
+      mouse.current.x = e.clientX - rect.left;
+      mouse.current.y = e.clientY - rect.top;
     };
     const onLeave = () => { mouse.current.x = -9999; mouse.current.y = -9999; };
     canvas.addEventListener('mousemove', onMove);
     canvas.addEventListener('mouseleave', onLeave);
 
     let t = 0;
-    const RADIUS = 50;
-    const STRENGTH = 0.8;
+    const RADIUS = 40;
 
     const draw = () => {
       t += 0.002;
-      const imgData = offCtx.createImageData(cw, ch);
-      const d = imgData.data;
-      const mx = mouse.current.x;
-      const my = mouse.current.y;
 
+      // 1. Draw background noise
+      const imgData = bgCtx.createImageData(cw, ch);
+      const d = imgData.data;
       for (let py = 0; py < ch; py++) {
         for (let px = 0; px < cw; px++) {
-          let nx = px * 0.006;
-          let ny = py * 0.006;
-
-          const dx = px - mx;
-          const dy = py - my;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < RADIUS) {
-            const t0 = dist / RADIUS;
-            const influence = (1 - t0 * t0) * (1 - t0 * t0);
-            nx += dx * influence * STRENGTH;
-            ny += dy * influence * STRENGTH;
-          }
-
-          const v = fbm(nx + t * 0.4, ny + t * 0.3, 3);
-
-          const c = v * 18 + 230;
+          const nx = px * 0.008;
+          const ny = py * 0.008;
+          const v1 = fbm(nx + t * 0.4, ny + t * 0.3, 3);
+          const v2 = fbm(nx * 1.8 - t * 0.2, ny * 1.8 + t * 0.3, 2);
+          const v = v1 * 0.7 + v2 * 0.3;
+          const c = 215 + v * 30;
           const idx = (py * cw + px) * 4;
           d[idx] = c;
           d[idx + 1] = c;
-          d[idx + 2] = c + (1 - v) * 4;
+          d[idx + 2] = c + 3;
           d[idx + 3] = 255;
         }
       }
+      bgCtx.putImageData(imgData, 0, 0);
 
-      offCtx.putImageData(imgData, 0, 0);
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(offCanvas, 0, 0, w, h);
+      // 2. Pixel-level displacement based on mouse
+      const mx = mouse.current.x;
+      const my = mouse.current.y;
+      const outData = ctx.createImageData(w, h);
+      const out = outData.data;
+      const bgData = bgCtx.getImageData(0, 0, cw, ch);
+      const bg = bgData.data;
 
+      for (let py = 0; py < ch; py++) {
+        for (let px = 0; px < cw; px++) {
+          const screenX = px * SCALE;
+          const screenY = py * SCALE;
+          const dx = screenX - mx;
+          const dy = screenY - my;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          let srcX = px;
+          let srcY = py;
+
+          if (dist < RADIUS && dist > 0) {
+            const t0 = dist / RADIUS;
+            const strength = (1 - t0 * t0) * (1 - t0 * t0) * 3;
+            srcX = px - (dx / dist) * strength;
+            srcY = py - (dy / dist) * strength;
+          }
+
+          srcX = Math.max(0, Math.min(cw - 1, srcX));
+          srcY = Math.max(0, Math.min(ch - 1, srcY));
+
+          const si = (Math.round(srcY) * cw + Math.round(srcX)) * 4;
+          const di = (py * cw + px) * 4;
+          const r = bg[si];
+          const g = bg[si + 1];
+          const b = bg[si + 2];
+
+          for (let sy = 0; sy < SCALE; sy++) {
+            for (let sx = 0; sx < SCALE; sx++) {
+              const fi = ((py * SCALE + sy) * w + (px * SCALE + sx)) * 4;
+              out[fi] = r;
+              out[fi + 1] = g;
+              out[fi + 2] = b;
+              out[fi + 3] = 255;
+            }
+          }
+        }
+      }
+
+      ctx.putImageData(outData, 0, 0);
       raf.current = requestAnimationFrame(draw);
     };
     draw();
