@@ -2,7 +2,8 @@
 .SYNOPSIS
     CuBlocky 一键启动脚本
 .DESCRIPTION
-    构建前后端 → 启动 Kestrel → 打开浏览器
+    源码模式：构建前后端 → 启动 Kestrel → 打开浏览器
+    发布模式：直接运行 CuBlocky.Server.exe
     关闭 PowerShell 窗口即停服务
 #>
 
@@ -18,39 +19,50 @@ Write-Host ''
 
 Set-Location $Root
 
-# ── 前端构建 ──
-if (-not (Test-Path 'server\wwwroot\index.html')) {
-    Write-Host '[1/4] Building frontend...' -ForegroundColor Yellow
-    Push-Location web
-    npm install --silent | Out-Null
-    npx vite build
-    Pop-Location
-    Write-Host ''
+$isRelease = Test-Path 'CuBlocky.Server.exe'
+
+if ($isRelease) {
+    # ── 发布模式：直接运行 exe ──
+    Write-Host '[1/2] Release mode detected.' -ForegroundColor DarkGray
+    Write-Host "[2/2] Starting CuBlocky.Server.exe on $Url ..." -ForegroundColor Yellow
+    $proc = Start-Process -FilePath '.\CuBlocky.Server.exe' `
+        -ArgumentList "--urls $Url" `
+        -WorkingDirectory $Root `
+        -PassThru `
+        -WindowStyle Hidden
 } else {
-    Write-Host '[1/4] Frontend ready (delete server\wwwroot to rebuild).' -ForegroundColor DarkGray
-}
+    # ── 源码模式：构建 + dotnet run ──
+    if (-not (Test-Path 'server\wwwroot\index.html')) {
+        Write-Host '[1/4] Building frontend...' -ForegroundColor Yellow
+        Push-Location web
+        npm install --silent | Out-Null
+        npx vite build
+        Pop-Location
+        Write-Host ''
+    } else {
+        Write-Host '[1/4] Frontend ready (delete server\wwwroot to rebuild).' -ForegroundColor DarkGray
+    }
 
-# ── 后端构建 ──
-Write-Host '[2/4] Building server...' -ForegroundColor Yellow
-dotnet build server\server.csproj -c Release --nologo -v q
-if ($LASTEXITCODE -ne 0) {
-    Write-Host '  BUILD FAILED.' -ForegroundColor Red
-    Read-Host 'Press Enter to exit'
-    exit 1
-}
-Write-Host ''
+    Write-Host '[2/4] Building server...' -ForegroundColor Yellow
+    dotnet build server\server.csproj -c Release --nologo -v q
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host '  BUILD FAILED.' -ForegroundColor Red
+        Read-Host 'Press Enter to exit'
+        exit 1
+    }
+    Write-Host ''
 
-# ── 启动服务器 ──
-Write-Host "[3/4] Starting server on $Url ..." -ForegroundColor Yellow
-$proc = Start-Process dotnet -ArgumentList "run --project server\server.csproj -c Release --urls $Url --no-build" `
-    -WorkingDirectory $Root `
-    -PassThru `
-    -WindowStyle Hidden
+    Write-Host "[3/4] Starting server on $Url ..." -ForegroundColor Yellow
+    $proc = Start-Process dotnet -ArgumentList "run --project server\server.csproj -c Release --urls $Url --no-build" `
+        -WorkingDirectory $Root `
+        -PassThru `
+        -WindowStyle Hidden
+}
 
 Write-Host "       Server PID: $($proc.Id)" -ForegroundColor DarkGray
 
 # ── 等待就绪 ──
-Write-Host '[4/4] Waiting for server...' -ForegroundColor Yellow
+Write-Host '       Waiting for server...' -ForegroundColor Yellow
 $ready = $false
 for ($i = 0; $i -lt 30; $i++) {
     Start-Sleep -Milliseconds 500
@@ -79,7 +91,7 @@ try {
     }
     Write-Host '  Server stopped.' -ForegroundColor DarkGray
 } catch {
-    # Ctrl+C / window closed — kill server
+    # Ctrl+C / window closed
 } finally {
     if (-not $proc.HasExited) {
         Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue

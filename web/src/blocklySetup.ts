@@ -982,6 +982,157 @@ const BLOCK_JSON: any[] = [
 
   // ═══ Extended World getters (cyan) ═══════════════════════════
   { type: 'cu_world_depth', message0: '%{BKY_CU_WORLD_DEPTH}', output: 'Number', colour: C.WORLD },
+
+  // ═══ Advanced Item Registration (pink) ═══════════════════════
+  {
+    type: 'cu_register_item_advanced',
+    message0: '%{BKY_CU_REGISTER_ITEM_ADV} id %1 名称 %2 描述 %3 分类 %4 精灵图 %5',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
+      { type: 'field_input', name: 'FULL_NAME', text: 'My Item', align: 'RIGHT' },
+      { type: 'field_input', name: 'DESC', text: 'A description', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'CATEGORY', options: [
+        ['nospawn','nospawn'],['weapon','weapon'],['tool','tool'],
+        ['medical','medical'],['food','food'],['material','material'],
+        ['armor','armor'],['container','container'],['misc','misc'],
+      ]},
+      { type: 'input_value', name: 'SPRITE_REF', check: 'Sprite', align: 'RIGHT' },
+    ],
+    colour: C.REGISTER, inputsInline: true,
+  },
+  {
+    type: 'cu_item_container',
+    message0: '%{BKY_CU_ITEM_CONTAINER} id %1 容量 %2 单物品最大重量 %3 减重 %4 物品可见 %5 标签限制 %6',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
+      { type: 'input_value', name: 'CAPACITY', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'MAX_WEIGHT', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'ENCUMBRANCE', check: 'Number', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'VISIBLE', options: [['true','true'],['false','false']] },
+      { type: 'field_input', name: 'TAG_RESTRICTION', text: '' },
+    ],
+    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_item_tool',
+    message0: '%{BKY_CU_ITEM_TOOL} 伤害 %1 结构伤害 %2 距离 %3 击退 %4 冷却 %5 体力消耗 %6 穿透 %7',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
+      { type: 'input_value', name: 'DAMAGE', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'STRUCTURAL_DAMAGE', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'DISTANCE', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'KNOCKBACK', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'COOLDOWN', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'STAMINA', check: 'Number', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'PIERCING', options: [['true','true'],['false','false']] },
+    ],
+    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_item_wearable',
+    message0: '%{BKY_CU_ITEM_WEARABLE} 部位 %1 插槽 %2 护甲 %3 隔离 %4 耐久损失倍率 %5',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'WEAR_LIMB', options: [
+        ['头部','Head'],['躯干上','UpTorso'],['躯干下','DownTorso'],
+        ['左臂','HandA'],['右臂','HandB'],['左腿','LegA'],['右腿','LegB'],
+      ]},
+      { type: 'field_input', name: 'SLOT_ID', text: 'back' },
+      { type: 'input_value', name: 'ARMOR', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'ISOLATION', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'DURABILITY_LOSS', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_register_liquid',
+    message0: '%{BKY_CU_REGISTER_LIQUID} id %1 名称 %2 描述 %3 颜色R %4 G %5 B %6 每升价值 %7',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myLiquid' },
+      { type: 'field_input', name: 'NAME', text: 'My Liquid' },
+      { type: 'field_input', name: 'DESC', text: 'A custom liquid' },
+      { type: 'input_value', name: 'COLOR_R', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'COLOR_G', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'COLOR_B', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.REGISTER, inputsInline: true,
+  },
+  {
+    type: 'cu_liquid_flags',
+    message0: '%{BKY_CU_LIQUID_FLAGS} 可饮用 %1 可外用 %2 可注射 %3 注射不适 %4 不可获得 %5',
+    args0: [
+      { type: 'field_dropdown', name: 'DRINKABLE', options: [['true','true'],['false','false']] },
+      { type: 'field_dropdown', name: 'HEALTH_USABLE', options: [['true','true'],['false','false']] },
+      { type: 'field_dropdown', name: 'INJECTABLE', options: [['true','true'],['false','false']] },
+      { type: 'input_value', name: 'INJECTION_SICKNESS', check: 'Number', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'UNOBTAINABLE', options: [['false','false'],['true','true']] },
+    ],
+    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_item_liquid_container',
+    message0: '%{BKY_CU_ITEM_LIQUID_CONTAINER} 容量 %1 自动填充 %2 液体ID %3 液体量 %4',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
+      { type: 'input_value', name: 'CAPACITY', check: 'Number', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'AUTO_FILL', options: [['false','false'],['true','true']] },
+      { type: 'field_input', name: 'LIQUID_ID', text: 'water' },
+      { type: 'input_value', name: 'LIQUID_AMOUNT', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_item_battery',
+    message0: '%{BKY_CU_ITEM_BATTERY} 预设 %1 初始电量 %2 随机带电池 %3',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'PRESET', options: [['Small','Small'],['Medium','Medium'],['Large','Large']] },
+      { type: 'input_value', name: 'START_CHARGE', check: 'Number', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'SPAWN_WITH_BATTERY', options: [['true','true'],['false','false']] },
+    ],
+    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_item_light',
+    message0: '%{BKY_CU_ITEM_LIGHT} 强度 %1 外半径 %2 R %3 G %4 B %5',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
+      { type: 'input_value', name: 'INTENSITY', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'RADIUS', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'COLOR_R', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'COLOR_G', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'COLOR_B', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_item_bandage',
+    message0: '%{BKY_CU_ITEM_BANDAGE} 效力 %1 皮肤治疗 %2 止血 %3 止痛 %4 骨恢复 %5 脱臼恢复 %6',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
+      { type: 'input_value', name: 'EFFECTIVENESS', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'SKIN_HEAL', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'BANDAGE_SLOW', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'PAIN_REDUCTION', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'BONE_HEAL', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'DISLOCATION', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_item_syringe',
+    message0: '%{BKY_CU_ITEM_SYRINGE} 容量 %1 每次注射 %2 自动填充 %3 液体ID %4 液体量 %5',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
+      { type: 'input_value', name: 'CAPACITY', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'AMOUNT_PER_USE', check: 'Number', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'AUTO_FILL', options: [['false','false'],['true','true']] },
+      { type: 'field_input', name: 'LIQUID_ID', text: 'morphine' },
+      { type: 'input_value', name: 'LIQUID_AMOUNT', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
 ];
 
 // ── Messages ──
@@ -1141,6 +1292,18 @@ const MSG_ZH: Record<string, string> = {
   CU_ITEM_CATEGORY: '物品分类',
   // World
   CU_WORLD_DEPTH: '玩家深度(米)',
+  // Advanced items
+  CU_REGISTER_ITEM_ADV: '注册高级物品(CCL)',
+  CU_ITEM_CONTAINER: '设置容器属性',
+  CU_ITEM_TOOL: '设置武器/工具属性',
+  CU_ITEM_WEARABLE: '设置可穿戴属性',
+  CU_REGISTER_LIQUID: '注册液体',
+  CU_LIQUID_FLAGS: '液体标志',
+  CU_ITEM_LIQUID_CONTAINER: '设置液体容器',
+  CU_ITEM_BATTERY: '设置电池属性',
+  CU_ITEM_LIGHT: '设置光源属性',
+  CU_ITEM_BANDAGE: '设置绷带属性',
+  CU_ITEM_SYRINGE: '设置注射器属性',
 };
 
 const MSG_EN: Record<string, string> = {
@@ -1299,6 +1462,18 @@ const MSG_EN: Record<string, string> = {
   CU_ITEM_CATEGORY: 'item category',
   // World
   CU_WORLD_DEPTH: 'player depth (meters)',
+  // Advanced items
+  CU_REGISTER_ITEM_ADV: 'register advanced item (CCL)',
+  CU_ITEM_CONTAINER: 'set container properties',
+  CU_ITEM_TOOL: 'set weapon/tool properties',
+  CU_ITEM_WEARABLE: 'set wearable properties',
+  CU_REGISTER_LIQUID: 'register liquid',
+  CU_LIQUID_FLAGS: 'liquid flags',
+  CU_ITEM_LIQUID_CONTAINER: 'set liquid container',
+  CU_ITEM_BATTERY: 'set battery properties',
+  CU_ITEM_LIGHT: 'set light properties',
+  CU_ITEM_BANDAGE: 'set bandage properties',
+  CU_ITEM_SYRINGE: 'set syringe properties',
 };
 
 export function setMessages(lang: string) {
@@ -2025,6 +2200,127 @@ csharpGenerator.forBlock['cu_item_category'] = () => ['item.Stats.category', ORD
 
 // ═══ Extended World getters ══════════════════════════════════
 csharpGenerator.forBlock['cu_world_depth'] = () => ['WorldGeneration.world.PlayerTotalDepthMeters()', ORDER_ATOMIC];
+
+// ═══ Advanced Item Registration ═══════════════════════════════
+csharpGenerator.forBlock['cu_register_item_advanced'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
+  const name = block.getFieldValue('FULL_NAME').replace(/"/g, '\\"');
+  const desc = block.getFieldValue('DESC').replace(/"/g, '\\"');
+  const cat = block.getFieldValue('CATEGORY');
+  const spriteCode = gen.valueToCode(block, 'SPRITE_REF', ORDER_ATOMIC) || '';
+  const spriteId = spriteCode.replace(/^"|"$/g, '') || null;
+  const itemId = id.replace(/^"|"$/g, '');
+  const json = JSON.stringify({Id: itemId, FullName: name, Description: desc, Category: cat, Weight: 0.4, Value: 1, DecayMinutes: 180, Recognition: 2, SpawnFrequency: 1, SpriteAssetId: spriteId, IsAdvanced: true});
+  return `//REGISTER_ITEM:${json}\n`;
+};
+csharpGenerator.forBlock['cu_item_container'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
+  const itemId = id.replace(/^"|"$/g, '');
+  const cap = gen.valueToCode(block, 'CAPACITY', ORDER_ATOMIC) || '5';
+  const maxW = gen.valueToCode(block, 'MAX_WEIGHT', ORDER_ATOMIC) || '2';
+  const enc = gen.valueToCode(block, 'ENCUMBRANCE', ORDER_ATOMIC) || '1';
+  const vis = block.getFieldValue('VISIBLE') === 'true';
+  const tags = block.getFieldValue('TAG_RESTRICTION') || '';
+  const json = JSON.stringify({Id: itemId, Container: {Capacity: cap, MaxWeightPerItem: maxW, EncumbranceReduction: enc, ItemsVisible: vis, TagRestriction: tags}});
+  return `//ITEM_PROP:${json}\n`;
+};
+csharpGenerator.forBlock['cu_item_tool'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
+  const itemId = id.replace(/^"|"$/g, '');
+  const dmg = gen.valueToCode(block, 'DAMAGE', ORDER_ATOMIC) || '10';
+  const struct = gen.valueToCode(block, 'STRUCTURAL_DAMAGE', ORDER_ATOMIC) || '5';
+  const dist = gen.valueToCode(block, 'DISTANCE', ORDER_ATOMIC) || '4';
+  const kb = gen.valueToCode(block, 'KNOCKBACK', ORDER_ATOMIC) || '50';
+  const cd = gen.valueToCode(block, 'COOLDOWN', ORDER_ATOMIC) || '0.3';
+  const stam = gen.valueToCode(block, 'STAMINA', ORDER_ATOMIC) || '0.3';
+  const pierce = block.getFieldValue('PIERCING') === 'true';
+  const json = JSON.stringify({Id: itemId, Tool: {Damage: dmg, StructuralDamage: struct, Distance: dist, KnockBack: kb, Cooldown: cd, StaminaUse: stam, Piercing: pierce}});
+  return `//ITEM_PROP:${json}\n`;
+};
+csharpGenerator.forBlock['cu_item_wearable'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
+  const itemId = id.replace(/^"|"$/g, '');
+  const limb = block.getFieldValue('WEAR_LIMB');
+  const slot = block.getFieldValue('SLOT_ID') || 'back';
+  const armor = gen.valueToCode(block, 'ARMOR', ORDER_ATOMIC) || '0';
+  const iso = gen.valueToCode(block, 'ISOLATION', ORDER_ATOMIC) || '0';
+  const durLoss = gen.valueToCode(block, 'DURABILITY_LOSS', ORDER_ATOMIC) || '1';
+  const json = JSON.stringify({Id: itemId, Wearable: {DesiredWearLimb: limb, WearSlotId: slot, WearableArmor: armor, WearableIsolation: iso, WearableHitDurabilityLossMultiplier: durLoss}});
+  return `//ITEM_PROP:${json}\n`;
+};
+csharpGenerator.forBlock['cu_register_liquid'] = (block, gen) => {
+  const id = block.getFieldValue('ID') || 'myLiquid';
+  const name = block.getFieldValue('NAME').replace(/"/g, '\\"');
+  const desc = block.getFieldValue('DESC').replace(/"/g, '\\"');
+  const r = gen.valueToCode(block, 'COLOR_R', ORDER_ATOMIC) || '1';
+  const g = gen.valueToCode(block, 'COLOR_G', ORDER_ATOMIC) || '1';
+  const b = gen.valueToCode(block, 'COLOR_B', ORDER_ATOMIC) || '1';
+  const val = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '10';
+  const json = JSON.stringify({Id: id, Name: name, Description: desc, ColorR: r, ColorG: g, ColorB: b, ValuePerLiter: val});
+  return `//REGISTER_LIQUID:${json}\n`;
+};
+csharpGenerator.forBlock['cu_liquid_flags'] = (block, gen) => {
+  const drinkable = block.getFieldValue('DRINKABLE') === 'true';
+  const healthUsable = block.getFieldValue('HEALTH_USABLE') === 'true';
+  const injectable = block.getFieldValue('INJECTABLE') === 'true';
+  const sickness = gen.valueToCode(block, 'INJECTION_SICKNESS', ORDER_ATOMIC) || '1';
+  const unobtainable = block.getFieldValue('UNOBTAINABLE') === 'true';
+  const json = JSON.stringify({Drinkable: drinkable, HealthUsable: healthUsable, Injectable: injectable, InjectionSickness: sickness, Unobtainable: unobtainable});
+  return `//LIQUID_FLAGS:${json}\n`;
+};
+csharpGenerator.forBlock['cu_item_liquid_container'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
+  const itemId = id.replace(/^"|"$/g, '');
+  const cap = gen.valueToCode(block, 'CAPACITY', ORDER_ATOMIC) || '100';
+  const autoFill = block.getFieldValue('AUTO_FILL') === 'true';
+  const liquidId = block.getFieldValue('LIQUID_ID') || 'water';
+  const liquidAmt = gen.valueToCode(block, 'LIQUID_AMOUNT', ORDER_ATOMIC) || '100';
+  const json = JSON.stringify({Id: itemId, LiquidContainer: {Capacity: cap, AutoFill: autoFill, LiquidId: liquidId, LiquidAmount: liquidAmt}});
+  return `//ITEM_PROP:${json}\n`;
+};
+csharpGenerator.forBlock['cu_item_battery'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
+  const itemId = id.replace(/^"|"$/g, '');
+  const preset = block.getFieldValue('PRESET');
+  const charge = gen.valueToCode(block, 'START_CHARGE', ORDER_ATOMIC) || '0';
+  const spawnWith = block.getFieldValue('SPAWN_WITH_BATTERY') === 'true';
+  const json = JSON.stringify({Id: itemId, Battery: {Preset: preset, StartCharge: charge, SpawnWithBattery: spawnWith}});
+  return `//ITEM_PROP:${json}\n`;
+};
+csharpGenerator.forBlock['cu_item_light'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
+  const itemId = id.replace(/^"|"$/g, '');
+  const intensity = gen.valueToCode(block, 'INTENSITY', ORDER_ATOMIC) || '0.5';
+  const radius = gen.valueToCode(block, 'RADIUS', ORDER_ATOMIC) || '5';
+  const r = gen.valueToCode(block, 'COLOR_R', ORDER_ATOMIC) || '1';
+  const g = gen.valueToCode(block, 'COLOR_G', ORDER_ATOMIC) || '1';
+  const b = gen.valueToCode(block, 'COLOR_B', ORDER_ATOMIC) || '1';
+  const json = JSON.stringify({Id: itemId, Light: {Intensity: intensity, Radius: radius, ColorR: r, ColorG: g, ColorB: b}});
+  return `//ITEM_PROP:${json}\n`;
+};
+csharpGenerator.forBlock['cu_item_bandage'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
+  const itemId = id.replace(/^"|"$/g, '');
+  const eff = gen.valueToCode(block, 'EFFECTIVENESS', ORDER_ATOMIC) || '8';
+  const skin = gen.valueToCode(block, 'SKIN_HEAL', ORDER_ATOMIC) || '8';
+  const slow = gen.valueToCode(block, 'BANDAGE_SLOW', ORDER_ATOMIC) || '18';
+  const pain = gen.valueToCode(block, 'PAIN_REDUCTION', ORDER_ATOMIC) || '40';
+  const bone = gen.valueToCode(block, 'BONE_HEAL', ORDER_ATOMIC) || '5';
+  const dislo = gen.valueToCode(block, 'DISLOCATION', ORDER_ATOMIC) || '5';
+  const json = JSON.stringify({Id: itemId, Bandage: {Effectiveness: eff, SkinHealAmount: skin, BandageSlowAmount: slow, PainReduction: pain, BoneHealTimerReduction: bone, DislocationTimerReduction: dislo}});
+  return `//ITEM_PROP:${json}\n`;
+};
+csharpGenerator.forBlock['cu_item_syringe'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
+  const itemId = id.replace(/^"|"$/g, '');
+  const cap = gen.valueToCode(block, 'CAPACITY', ORDER_ATOMIC) || '100';
+  const perUse = gen.valueToCode(block, 'AMOUNT_PER_USE', ORDER_ATOMIC) || '100';
+  const autoFill = block.getFieldValue('AUTO_FILL') === 'true';
+  const liquidId = block.getFieldValue('LIQUID_ID') || 'morphine';
+  const liquidAmt = gen.valueToCode(block, 'LIQUID_AMOUNT', ORDER_ATOMIC) || '100';
+  const json = JSON.stringify({Id: itemId, Syringe: {Capacity: cap, AmountPerFullUse: perUse, AutoFill: autoFill, LiquidId: liquidId, LiquidAmount: liquidAmt}});
+  return `//ITEM_PROP:${json}\n`;
+};
 
 // ═══ Dropdown i18n ═══════════════════════════════════════════
 type DdOption = [string, string, string]; // [zhLabel, enLabel, value]

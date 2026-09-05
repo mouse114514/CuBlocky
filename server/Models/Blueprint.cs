@@ -46,6 +46,104 @@ public class ItemEntry
     public string UseActionXml { get; set; } = "";
     public string UseLimbAction { get; set; } = "";
     public string UseLimbActionXml { get; set; } = "";
+    // Advanced CCL properties (from //ITEM_PROP: markers)
+    public bool IsAdvanced { get; set; } = false;
+    public ContainerProps? Container { get; set; }
+    public ToolProps? Tool { get; set; }
+    public WearableProps? Wearable { get; set; }
+    public LiquidContainerProps? LiquidContainer { get; set; }
+    public BatteryProps? Battery { get; set; }
+    public LightProps? Light { get; set; }
+    public BandageProps? Bandage { get; set; }
+    public SyringeProps? Syringe { get; set; }
+}
+
+public class ContainerProps
+{
+    public string Capacity { get; set; } = "5";
+    public string MaxWeightPerItem { get; set; } = "2";
+    public string EncumbranceReduction { get; set; } = "1";
+    public bool ItemsVisible { get; set; } = true;
+    public string TagRestriction { get; set; } = "";
+}
+
+public class ToolProps
+{
+    public string Damage { get; set; } = "10";
+    public string StructuralDamage { get; set; } = "5";
+    public string Distance { get; set; } = "4";
+    public string KnockBack { get; set; } = "50";
+    public string Cooldown { get; set; } = "0.3";
+    public string StaminaUse { get; set; } = "0.3";
+    public bool Piercing { get; set; } = false;
+}
+
+public class WearableProps
+{
+    public string DesiredWearLimb { get; set; } = "UpTorso";
+    public string WearSlotId { get; set; } = "back";
+    public string WearableArmor { get; set; } = "0";
+    public string WearableIsolation { get; set; } = "0";
+    public string WearableHitDurabilityLossMultiplier { get; set; } = "1";
+}
+
+public class LiquidContainerProps
+{
+    public string Capacity { get; set; } = "100";
+    public bool AutoFill { get; set; } = false;
+    public string LiquidId { get; set; } = "water";
+    public string LiquidAmount { get; set; } = "100";
+}
+
+public class BatteryProps
+{
+    public string Preset { get; set; } = "Medium";
+    public string StartCharge { get; set; } = "0";
+    public bool SpawnWithBattery { get; set; } = true;
+}
+
+public class LightProps
+{
+    public string Intensity { get; set; } = "0.5";
+    public string Radius { get; set; } = "5";
+    public string ColorR { get; set; } = "1";
+    public string ColorG { get; set; } = "1";
+    public string ColorB { get; set; } = "1";
+}
+
+public class BandageProps
+{
+    public string Effectiveness { get; set; } = "8";
+    public string SkinHealAmount { get; set; } = "8";
+    public string BandageSlowAmount { get; set; } = "18";
+    public string PainReduction { get; set; } = "40";
+    public string BoneHealTimerReduction { get; set; } = "5";
+    public string DislocationTimerReduction { get; set; } = "5";
+}
+
+public class SyringeProps
+{
+    public string Capacity { get; set; } = "100";
+    public string AmountPerFullUse { get; set; } = "100";
+    public bool AutoFill { get; set; } = false;
+    public string LiquidId { get; set; } = "morphine";
+    public string LiquidAmount { get; set; } = "100";
+}
+
+public class LiquidEntry
+{
+    public string Id { get; set; } = "myliquid";
+    public string Name { get; set; } = "My Liquid";
+    public string Description { get; set; } = "";
+    public string ColorR { get; set; } = "1";
+    public string ColorG { get; set; } = "1";
+    public string ColorB { get; set; } = "1";
+    public string ValuePerLiter { get; set; } = "10";
+    public bool Drinkable { get; set; } = false;
+    public bool HealthUsable { get; set; } = false;
+    public bool Injectable { get; set; } = false;
+    public string InjectionSickness { get; set; } = "1";
+    public bool Unobtainable { get; set; } = false;
 }
 
 // ── Block (Scratch-style, recursive tree) ──────────────────────────

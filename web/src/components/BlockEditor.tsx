@@ -82,6 +82,66 @@ const TOOLBOX = `
     <block type="cu_register_building"></block>
     <block type="cu_register_tile"></block>
     <block type="cu_register_locale"></block>
+    <sep></sep>
+    <block type="cu_register_item_advanced">
+      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+    </block>
+    <block type="cu_register_liquid"></block>
+    <block type="cu_liquid_flags"></block>
+    <sep></sep>
+    <block type="cu_item_container">
+      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+      <value name="CAPACITY"><shadow type="cu_number"><field name="NUM">5</field></shadow></value>
+      <value name="MAX_WEIGHT"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
+      <value name="ENCUMBRANCE"><shadow type="cu_number"><field name="NUM">0.5</field></shadow></value>
+    </block>
+    <block type="cu_item_tool">
+      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+      <value name="DAMAGE"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
+      <value name="STRUCTURAL_DAMAGE"><shadow type="cu_number"><field name="NUM">5</field></shadow></value>
+      <value name="DISTANCE"><shadow type="cu_number"><field name="NUM">4</field></shadow></value>
+      <value name="KNOCKBACK"><shadow type="cu_number"><field name="NUM">50</field></shadow></value>
+      <value name="COOLDOWN"><shadow type="cu_number"><field name="NUM">0.3</field></shadow></value>
+      <value name="STAMINA"><shadow type="cu_number"><field name="NUM">0.3</field></shadow></value>
+    </block>
+    <block type="cu_item_wearable">
+      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+      <value name="ARMOR"><shadow type="cu_number"><field name="NUM">0.2</field></shadow></value>
+      <value name="ISOLATION"><shadow type="cu_number"><field name="NUM">0.1</field></shadow></value>
+      <value name="DURABILITY_LOSS"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+    </block>
+    <block type="cu_item_liquid_container">
+      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+      <value name="CAPACITY"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
+      <value name="LIQUID_AMOUNT"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
+    </block>
+    <block type="cu_item_battery">
+      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+      <value name="START_CHARGE"><shadow type="cu_number"><field name="NUM">35</field></shadow></value>
+    </block>
+    <block type="cu_item_light">
+      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+      <value name="INTENSITY"><shadow type="cu_number"><field name="NUM">0.75</field></shadow></value>
+      <value name="RADIUS"><shadow type="cu_number"><field name="NUM">7.5</field></shadow></value>
+      <value name="COLOR_R"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="COLOR_G"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="COLOR_B"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+    </block>
+    <block type="cu_item_bandage">
+      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+      <value name="EFFECTIVENESS"><shadow type="cu_number"><field name="NUM">8</field></shadow></value>
+      <value name="SKIN_HEAL"><shadow type="cu_number"><field name="NUM">8</field></shadow></value>
+      <value name="BANDAGE_SLOW"><shadow type="cu_number"><field name="NUM">18</field></shadow></value>
+      <value name="PAIN_REDUCTION"><shadow type="cu_number"><field name="NUM">40</field></shadow></value>
+      <value name="BONE_HEAL"><shadow type="cu_number"><field name="NUM">5</field></shadow></value>
+      <value name="DISLOCATION"><shadow type="cu_number"><field name="NUM">5</field></shadow></value>
+    </block>
+    <block type="cu_item_syringe">
+      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+      <value name="CAPACITY"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
+      <value name="AMOUNT_PER_USE"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
+      <value name="LIQUID_AMOUNT"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
+    </block>
   </category>
   <category name="%{BKY_CAT_BODY}" colour="#4caf50" icon="🧍">
     <block type="cu_eat">
