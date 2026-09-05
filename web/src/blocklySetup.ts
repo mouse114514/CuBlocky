@@ -1015,7 +1015,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_tool',
-    message0: '%{BKY_CU_ITEM_TOOL} 伤害 %1 结构伤害 %2 距离 %3 击退 %4 冷却 %5 体力消耗 %6 穿透 %7',
+    message0: '%{BKY_CU_ITEM_TOOL} id %1 伤害 %2 结构伤害 %3 距离 %4 击退 %5 冷却 %6 体力消耗 %7 穿透 %8',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'DAMAGE', check: 'Number', align: 'RIGHT' },
@@ -1030,7 +1030,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_wearable',
-    message0: '%{BKY_CU_ITEM_WEARABLE} 部位 %1 插槽 %2 护甲 %3 隔离 %4 耐久损失倍率 %5',
+    message0: '%{BKY_CU_ITEM_WEARABLE} id %1 部位 %2 插槽 %3 护甲 %4 隔离 %5 耐久损失倍率 %6',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'field_dropdown', name: 'WEAR_LIMB', options: [
@@ -1072,7 +1072,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_liquid_container',
-    message0: '%{BKY_CU_ITEM_LIQUID_CONTAINER} 容量 %1 自动填充 %2 液体ID %3 液体量 %4',
+    message0: '%{BKY_CU_ITEM_LIQUID_CONTAINER} id %1 容量 %2 自动填充 %3 液体ID %4 液体量 %5',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'CAPACITY', check: 'Number', align: 'RIGHT' },
@@ -1084,7 +1084,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_battery',
-    message0: '%{BKY_CU_ITEM_BATTERY} 预设 %1 初始电量 %2 随机带电池 %3',
+    message0: '%{BKY_CU_ITEM_BATTERY} id %1 预设 %2 初始电量 %3 随机带电池 %4',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'field_dropdown', name: 'PRESET', options: [['Small','Small'],['Medium','Medium'],['Large','Large']] },
@@ -1095,7 +1095,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_light',
-    message0: '%{BKY_CU_ITEM_LIGHT} 强度 %1 外半径 %2 R %3 G %4 B %5',
+    message0: '%{BKY_CU_ITEM_LIGHT} id %1 强度 %2 外半径 %3 R %4 G %5 B %6',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'INTENSITY', check: 'Number', align: 'RIGHT' },
@@ -1108,7 +1108,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_bandage',
-    message0: '%{BKY_CU_ITEM_BANDAGE} 效力 %1 皮肤治疗 %2 止血 %3 止痛 %4 骨恢复 %5 脱臼恢复 %6',
+    message0: '%{BKY_CU_ITEM_BANDAGE} id %1 效力 %2 皮肤治疗 %3 止血 %4 止痛 %5 骨恢复 %6 脱臼恢复 %7',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'EFFECTIVENESS', check: 'Number', align: 'RIGHT' },
@@ -1122,7 +1122,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_syringe',
-    message0: '%{BKY_CU_ITEM_SYRINGE} 容量 %1 每次注射 %2 自动填充 %3 液体ID %4 液体量 %5',
+    message0: '%{BKY_CU_ITEM_SYRINGE} id %1 容量 %2 每次注射 %3 自动填充 %4 液体ID %5 液体量 %6',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'CAPACITY', check: 'Number', align: 'RIGHT' },
