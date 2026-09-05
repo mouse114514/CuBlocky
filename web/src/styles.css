@@ -218,34 +218,23 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
   position:absolute;pointer-events:none;z-index:0;
   filter:blur(60px);
 }
-.wp-decor-1{
-  width:400px;height:400px;top:-100px;left:-80px;
-  background:rgba(100,149,237,.18);
-  animation:wp-float-1 8s 0s infinite alternate ease-in-out;
+.wp-bg-gradient{
+  position:absolute;inset:0;z-index:0;
+  background:linear-gradient(135deg,#f0f0f5 0%,#f5f0fa 25%,#f0f5f8 50%,#faf5f0 75%,#f0f0f5 100%);
+  background-size:400% 400%;
+  animation:wp-gradient-shift 20s ease infinite;
 }
-.wp-decor-2{
-  width:350px;height:350px;bottom:-80px;right:-60px;
-  background:rgba(147,112,219,.16);
-  animation:wp-float-2 10s .5s infinite alternate ease-in-out;
+.wp-bg-cursor{
+  position:fixed;width:160px;height:160px;border-radius:50%;z-index:1;pointer-events:none;
+  background:radial-gradient(circle,rgba(180,190,220,.18) 0%,rgba(200,190,220,.08) 40%,transparent 70%);
+  filter:blur(20px);
+  transition:left .05s,top .05s;
 }
-.wp-decor-3{
-  width:280px;height:280px;top:25%;right:8%;
-  background:rgba(255,183,77,.14);
-  animation:wp-float-3 7s 1s infinite alternate ease-in-out;
+@keyframes wp-gradient-shift{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
 }
-.wp-decor-4{
-  width:250px;height:250px;bottom:15%;left:5%;
-  background:rgba(46,204,113,.12);
-  animation:wp-float-2 9s 1.5s infinite alternate ease-in-out;
-}
-.wp-decor-5{
-  width:300px;height:300px;top:5%;left:40%;
-  background:rgba(231,76,60,.10);
-  animation:wp-float-1 11s .8s infinite alternate ease-in-out;
-}
-@keyframes wp-float-1{to{transform:translate(40px,30px) scale(1.08)}}
-@keyframes wp-float-2{to{transform:translate(-30px,-40px) scale(.92)}}
-@keyframes wp-float-3{to{transform:translate(-20px,35px) scale(1.1)}}
 .wp-error{
   padding:8px 12px;background:#fff0f0;border:1px solid #fcc;border-radius:6px;
   font-size:12px;color:#c0392b;
