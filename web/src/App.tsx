@@ -45,18 +45,6 @@ export function App() {
     return () => window.removeEventListener('cublocky:open-sprite-picker', handler);
   }, []);
 
-  // Listen for sprite block creation from AssetManager
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const ws = wsRef.current;
-      if (!ws) return;
-      const assetName = (e as CustomEvent).detail?.assetName;
-      if (assetName) createSpriteBlock(assetName, ws);
-    };
-    window.addEventListener('cublocky:create-sprite-block', handler);
-    return () => window.removeEventListener('cublocky:create-sprite-block', handler);
-  }, []);
-
   const saveLocal = () => {
     localStorage.setItem('cublocky', JSON.stringify(bp));
     if (currentProjectName) {
@@ -195,6 +183,10 @@ export function App() {
       {showAssetManager && (
         <AssetManager
           mode="manage"
+          onGenerate={(name) => {
+            const ws = wsRef.current;
+            if (ws) createSpriteBlock(name, ws);
+          }}
           onClose={() => setShowAssetManager(false)}
         />
       )}

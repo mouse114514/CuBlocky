@@ -5,10 +5,11 @@ import { useI18n } from '../i18n';
 interface Props {
   mode: 'manage' | 'pick';
   onSelect?: (name: string) => void;
+  onGenerate?: (name: string) => void;
   onClose: () => void;
 }
 
-export default function AssetManager({ mode, onSelect, onClose }: Props) {
+export default function AssetManager({ mode, onSelect, onGenerate, onClose }: Props) {
   const { t } = useI18n();
   const [assets, setAssets] = useState<AssetInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,10 +49,6 @@ export default function AssetManager({ mode, onSelect, onClose }: Props) {
     onClose();
   };
 
-  const handleGenerate = (name: string) => {
-    window.dispatchEvent(new CustomEvent('cublocky:create-sprite-block', { detail: { assetName: name } }));
-  };
-
   const handleCardClick = (name: string) => {
     if (mode === 'pick') { handleSelect(name); return; }
     setSelected(selected === name ? null : name);
@@ -71,7 +68,7 @@ export default function AssetManager({ mode, onSelect, onClose }: Props) {
         {selected && (
           <div className="asset-action-bar">
             <span className="asset-action-name">{selected}</span>
-            <button className="asset-action-btn" onClick={() => handleGenerate(selected)}>{t('asset.generate')}</button>
+            <button className="asset-action-btn" onClick={() => onGenerate?.(selected)}>{t('asset.generate')}</button>
             <button className="asset-action-btn danger" onClick={() => handleDelete(selected)}>{t('asset.delete')}</button>
           </div>
         )}

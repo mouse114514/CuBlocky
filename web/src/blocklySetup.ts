@@ -132,7 +132,7 @@ const BLOCK_JSON: any[] = [
     type: 'cu_sprite_ref',
     message0: '%{BKY_CU_SPRITE_REF}',
     args0: [
-      { type: 'field_dropdown', name: 'ASSET', options: [] },
+      { type: 'field_input', name: 'ASSET', text: 'sprite.png' },
     ],
     output: 'Sprite',
     colour: C.REGISTER,
@@ -1324,44 +1324,17 @@ export function defineBlocks() {
 }
 
 // ── Create sprite block in workspace ──────────────────────────────
-export async function createSpriteBlock(assetName: string, ws: Blockly.WorkspaceSvg) {
-  let options: [string, string][] = [];
+export function createSpriteBlock(assetName: string, ws: Blockly.WorkspaceSvg) {
   try {
-    const res = await fetch('/api/assets');
-    if (res.ok) {
-      const assets = await res.json() as { name: string }[];
-      options = assets.map(a => [a.name, a.name]);
-    }
-  } catch { }
-  if (!options.some(o => o[1] === assetName)) options.push([assetName, assetName]);
-
-  const block = ws.newBlock('cu_sprite_ref') as any;
-  const field = block.getField('ASSET');
-  if (field && typeof field.updateOptions === 'function') field.updateOptions(options);
-  block.getInput('ASSET')?.fieldRow?.[0]?.setValue(assetName);
-  block.initSvg();
-  block.render();
-  const metrics = ws.getMetrics();
-  block.moveBy(metrics.viewLeft + metrics.viewWidth / 2 - 60, metrics.viewTop + metrics.viewHeight / 2 - 20);
-}
-
-// ── Refresh all cu_sprite_ref dropdowns with current assets ───────
-export async function refreshSpriteDropdowns(ws: Blockly.WorkspaceSvg) {
-  try {
-    const res = await fetch('/api/assets');
-    if (!res.ok) return;
-    const assets = await res.json() as { name: string }[];
-    const options: [string, string][] = assets.map(a => [a.name, a.name]);
-    const blocks = ws.getBlocksByType('cu_sprite_ref');
-    for (const block of blocks) {
-      const field = block.getField('ASSET') as any;
-      if (field && typeof field.updateOptions === 'function') {
-        const current = field.getValue();
-        field.updateOptions(options);
-        if (options.some(o => o[1] === current)) field.setValue(current);
-      }
-    }
-  } catch { }
+    const block = ws.newBlock('cu_sprite_ref') as any;
+    block.getInput('ASSET')?.fieldRow?.[0]?.setValue(assetName);
+    block.initSvg();
+    block.render();
+    const metrics = ws.getMetrics();
+    block.moveBy(metrics.viewLeft + metrics.viewWidth / 2 - 60, metrics.viewTop + metrics.viewHeight / 2 - 20);
+  } catch (e) {
+    console.error('Failed to create sprite block:', e);
+  }
 }
 
 // ── C# Code Generator ──
