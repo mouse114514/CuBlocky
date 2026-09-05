@@ -17,19 +17,23 @@ var jsonOpts = new JsonSerializerOptions
     PropertyNameCaseInsensitive = true,
 };
 
-// Temp directory for uploaded sprite assets
-var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
-Directory.CreateDirectory(uploadDir);
-
-// Fixed directory for saved projects
 var projectsDir = Path.Combine(Directory.GetCurrentDirectory(), "projects");
 Directory.CreateDirectory(projectsDir);
 
-// ── Asset management ──────────────────────────────────────────────
-app.MapGet("/api/assets", () =>
+// Helper: get project asset directory
+static string GetProjectAssetsDir(string projectName)
 {
-    if (!Directory.Exists(uploadDir)) return Results.Json(Array.Empty<object>());
-    var files = Directory.GetFiles(uploadDir)
+    var dir = Path.Combine(Directory.GetCurrentDirectory(), "projects", projectName, "assets");
+    Directory.CreateDirectory(dir);
+    return dir;
+}
+
+// ── Project-scoped asset management ────────────────────────────────
+app.MapGet("/api/projects/{name}/assets", (string name) =>
+{
+    var assetsDir = GetProjectAssetsDir(name);
+    if (!Directory.Exists(assetsDir)) return Results.Json(Array.Empty<object>());
+    var files = Directory.GetFiles(assetsDir)
         .Where(f => Path.GetExtension(f).ToLowerInvariant() is ".png" or ".jpg" or ".jpeg" or ".bmp")
         .Select(f =>
         {
@@ -41,20 +45,42 @@ app.MapGet("/api/assets", () =>
     return Results.Json(files, jsonOpts);
 });
 
-app.MapDelete("/api/assets/{name}", (string name) =>
+app.MapPost("/api/projects/{name}/assets/upload", async (string name, HttpRequest req) =>
 {
-    var safe = Path.GetFileName(name);
-    var path = Path.Combine(uploadDir, safe);
+    var assetsDir = GetProjectAssetsDir(name);
+    if (!req.HasFormContentType) return Results.BadRequest("expected multipart form");
+    var form = await req.ReadFormAsync();
+    var file = form.Files.GetFile("file");
+    if (file == null || file.Length == 0) return Results.BadRequest("no file");
+
+    var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+    if (ext is not (".png" or ".jpg" or ".jpeg" or ".bmp"))
+        return Results.BadRequest("only PNG/JPG/BMP images are accepted");
+
+    var safeName = Path.GetFileName(file.FileName).Replace(' ', '_');
+    var savedPath = Path.Combine(assetsDir, safeName);
+    using (var fs = new FileStream(savedPath, FileMode.Create))
+    {
+        await file.CopyToAsync(fs);
+    }
+    return Results.Json(new { assetId = safeName, name = safeName, originalName = file.FileName });
+});
+
+app.MapDelete("/api/projects/{name}/assets/{assetName}", (string name, string assetName) =>
+{
+    var assetsDir = GetProjectAssetsDir(name);
+    var safe = Path.GetFileName(assetName);
+    var path = Path.Combine(assetsDir, safe);
     if (!File.Exists(path)) return Results.NotFound("asset not found");
     File.Delete(path);
     return Results.Ok();
 });
 
-// Serve raw asset files for preview
-app.MapGet("/api/assets/raw/{name}", (string name) =>
+app.MapGet("/api/projects/{name}/assets/raw/{assetName}", (string name, string assetName) =>
 {
-    var safe = Path.GetFileName(name);
-    var path = Path.Combine(uploadDir, safe);
+    var assetsDir = GetProjectAssetsDir(name);
+    var safe = Path.GetFileName(assetName);
+    var path = Path.Combine(assetsDir, safe);
     if (!File.Exists(path)) return Results.NotFound();
     var ext = Path.GetExtension(safe).ToLowerInvariant();
     var ct = ext switch
@@ -67,26 +93,10 @@ app.MapGet("/api/assets/raw/{name}", (string name) =>
     return Results.File(path, ct);
 });
 
-// ── Upload sprite file ──────────────────────────────────────────────
+// Legacy upload endpoint (redirects to project-scoped)
 app.MapPost("/api/upload", async (HttpRequest req) =>
 {
-    if (!req.HasFormContentType) return Results.BadRequest("expected multipart form");
-    var form = await req.ReadFormAsync();
-    var file = form.Files.GetFile("file");
-    if (file == null || file.Length == 0) return Results.BadRequest("no file");
-
-    var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-    if (ext is not (".png" or ".jpg" or ".jpeg" or ".bmp"))
-        return Results.BadRequest("only PNG/JPG/BMP images are accepted");
-
-    var safeName = Path.GetFileName(file.FileName).Replace(' ', '_');
-    var savedPath = Path.Combine(uploadDir, safeName);
-    using (var fs = new FileStream(savedPath, FileMode.Create))
-    {
-        await file.CopyToAsync(fs);
-    }
-
-    return Results.Json(new { assetId = safeName, name = safeName, originalName = file.FileName });
+    return Results.BadRequest("use /api/projects/{name}/assets/upload instead");
 });
 
 // ── Node catalog (frontend palette) ───────────────────────────────
@@ -127,6 +137,9 @@ app.MapPost("/api/build", async (HttpRequest req) =>
     var asmName = Path.GetFileNameWithoutExtension(files.Keys.First(k => k.EndsWith(".csproj")));
     var buildDir = Path.Combine(Directory.GetCurrentDirectory(), "builds", asmName);
 
+    // Determine project name from mod name for asset lookup
+    var projectName = bp.Mod?.Name?.Replace(' ', '_') ?? "";
+
     try
     {
         if (Directory.Exists(buildDir)) Directory.Delete(buildDir, true);
@@ -138,11 +151,14 @@ app.MapPost("/api/build", async (HttpRequest req) =>
             await File.WriteAllTextAsync(fp, kv.Value);
         }
 
-        // Copy uploaded sprites into project and embed as resources
+        // Copy project assets into build and embed as resources
         var spriteFiles = new List<string>();
+        var projectAssetsDir = Path.Combine(projectsDir, projectName, "assets");
+
+        // Copy assets referenced by Blueprint.Assets
         foreach (var asset in bp.Assets)
         {
-            var src = Path.Combine(uploadDir, asset.Name);
+            var src = Path.Combine(projectAssetsDir, asset.Name);
             if (File.Exists(src))
             {
                 var destDir = Path.Combine(buildDir, "Sprites");
@@ -154,7 +170,6 @@ app.MapPost("/api/build", async (HttpRequest req) =>
         }
 
         // Also scan RegisterContent.cs for AssetLoader.LoadEmbeddedSprite calls
-        // and ensure referenced sprites exist in the Sprites folder
         var rcPath = Path.Combine(buildDir, "RegisterContent.cs");
         if (File.Exists(rcPath))
         {
@@ -170,8 +185,7 @@ app.MapPost("/api/build", async (HttpRequest req) =>
                     var spriteName = rcContent[start..end];
                     if (!spriteFiles.Contains(spriteName))
                     {
-                        // Check if file exists in upload dir
-                        var src = Path.Combine(uploadDir, spriteName);
+                        var src = Path.Combine(projectAssetsDir, spriteName);
                         if (File.Exists(src))
                         {
                             var destDir = Path.Combine(buildDir, "Sprites");

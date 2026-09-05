@@ -132,7 +132,7 @@ export function App() {
             </span>
           )}
           <span className="spacer" />
-          <button onClick={() => setShowAssetManager(true)}>{t('asset.manageTitle')}</button>
+          <button onClick={() => setShowAssetManager(true)} disabled={!currentProjectName}>{t('asset.manageTitle')}</button>
           <button className={`code-toggle ${showCode ? 'active' : ''}`} onClick={() => setShowCode(!showCode)}>
             {t('code.toggle')}
           </button>
@@ -172,16 +172,18 @@ export function App() {
         </div>
       )}
 
-      {showSpritePicker && (
+      {showSpritePicker && currentProjectName && (
         <AssetManager
+          projectName={currentProjectName}
           mode="pick"
           onSelect={(name) => pickSprite(name)}
           onClose={() => { setSpritePickCallback(null); setShowSpritePicker(false); }}
         />
       )}
 
-      {showAssetManager && (
+      {showAssetManager && currentProjectName && (
         <AssetManager
+          projectName={currentProjectName}
           mode="manage"
           onGenerate={(name) => {
             const ws = wsRef.current;

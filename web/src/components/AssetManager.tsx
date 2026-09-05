@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
-import { listAssets, uploadAsset, deleteAsset, type AssetInfo } from '../api';
+import { listAssets, uploadAsset, deleteAsset, assetRawUrl, type AssetInfo } from '../api';
 import { useI18n } from '../i18n';
 
 interface Props {
+  projectName: string;
   mode: 'manage' | 'pick';
   onSelect?: (name: string) => void;
   onGenerate?: (name: string) => void;
   onClose: () => void;
 }
 
-export default function AssetManager({ mode, onSelect, onGenerate, onClose }: Props) {
+export default function AssetManager({ projectName, mode, onSelect, onGenerate, onClose }: Props) {
   const { t } = useI18n();
   const [assets, setAssets] = useState<AssetInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,17 +20,17 @@ export default function AssetManager({ mode, onSelect, onGenerate, onClose }: Pr
 
   const load = async () => {
     setLoading(true);
-    try { setAssets(await listAssets()); } catch { }
+    try { setAssets(await listAssets(projectName)); } catch { }
     setLoading(false);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [projectName]);
 
   const handleUpload = async () => {
     const file = fileRef.current?.files?.[0];
     if (!file) return;
     setUploading(true);
     try {
-      await uploadAsset(file);
+      await uploadAsset(projectName, file);
       await load();
     } catch (e) { console.warn('upload failed', e); }
     if (fileRef.current) fileRef.current.value = '';
@@ -38,7 +39,7 @@ export default function AssetManager({ mode, onSelect, onGenerate, onClose }: Pr
 
   const handleDelete = async (name: string) => {
     try {
-      await deleteAsset(name);
+      await deleteAsset(projectName, name);
       setSelected(null);
       await load();
     } catch (e) { console.warn('delete failed', e); }
@@ -80,7 +81,7 @@ export default function AssetManager({ mode, onSelect, onGenerate, onClose }: Pr
           <div className="asset-grid">
             {assets.map(a => (
               <div key={a.name} className={`asset-card${selected === a.name ? ' selected' : ''}`} onClick={() => handleCardClick(a.name)}>
-                <img src={`/api/assets/raw/${encodeURIComponent(a.name)}`} alt={a.name} className="asset-thumb" />
+                <img src={assetRawUrl(projectName, a.name)} alt={a.name} className="asset-thumb" />
                 <div className="asset-name" title={a.name}>{a.name}</div>
               </div>
             ))}

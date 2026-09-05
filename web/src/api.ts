@@ -58,28 +58,32 @@ export async function saveProject(name: string, bp: Blueprint): Promise<void> {
   if (!res.ok) throw new Error('save failed: ' + res.status);
 }
 
-// ── Asset management ──
+// ── Project-scoped asset management ──
 export interface AssetInfo {
   name: string;
   size: number;
   uploaded: string;
 }
 
-export async function listAssets(): Promise<AssetInfo[]> {
-  const res = await fetch('/api/assets');
+export async function listAssets(projectName: string): Promise<AssetInfo[]> {
+  const res = await fetch(`/api/projects/${encodeURIComponent(projectName)}/assets`);
   if (!res.ok) throw new Error('list assets failed');
   return await res.json() as AssetInfo[];
 }
 
-export async function uploadAsset(file: File): Promise<{ assetId: string; name: string }> {
+export async function uploadAsset(projectName: string, file: File): Promise<{ assetId: string; name: string }> {
   const form = new FormData();
   form.append('file', file);
-  const res = await fetch('/api/upload', { method: 'POST', body: form });
+  const res = await fetch(`/api/projects/${encodeURIComponent(projectName)}/assets/upload`, { method: 'POST', body: form });
   if (!res.ok) throw new Error('upload failed');
   return await res.json();
 }
 
-export async function deleteAsset(name: string): Promise<void> {
-  const res = await fetch(`/api/assets/${encodeURIComponent(name)}`, { method: 'DELETE' });
+export async function deleteAsset(projectName: string, assetName: string): Promise<void> {
+  const res = await fetch(`/api/projects/${encodeURIComponent(projectName)}/assets/${encodeURIComponent(assetName)}`, { method: 'DELETE' });
   if (!res.ok) throw new Error('delete failed');
+}
+
+export function assetRawUrl(projectName: string, assetName: string): string {
+  return `/api/projects/${encodeURIComponent(projectName)}/assets/raw/${encodeURIComponent(assetName)}`;
 }
