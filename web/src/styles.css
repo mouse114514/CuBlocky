@@ -79,10 +79,10 @@ code{background:#0d1b2a;padding:1px 4px;border-radius:3px;font-size:12px}
 }
 .modal-path-wrap{position:relative;margin:0}
 .modal-path-wrap .copy-btn{
-  position:absolute;top:0;left:0;height:100%;width:20px;background:none;
-  border:none;border-radius:6px 0 0 6px;padding:0;
+  position:absolute;top:2px;left:2px;background:none;
+  border:none;border-radius:3px;padding:2px;
   color:#999;cursor:pointer;opacity:0;transition:opacity .15s;
-  display:flex;align-items:center;justify-content:center;line-height:1;
+  display:flex;line-height:1;
 }
 .modal-path-wrap:hover .copy-btn{opacity:1}
 .modal-path-wrap .copy-btn:hover{color:#333}
