@@ -56,8 +56,8 @@ export default function AssetManager({ projectName, mode, onSelect, onGenerate, 
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal asset-modal" onClick={e => e.stopPropagation()}>
+    <div className="modal-overlay">
+      <div className="modal asset-modal">
         <h3>{mode === 'pick' ? t('asset.pickTitle') : t('asset.manageTitle')}</h3>
         <div className="asset-toolbar">
           <input ref={fileRef} type="file" accept=".png,.jpg,.jpeg,.bmp,image/*" style={{ display: 'none' }} onChange={handleUpload} />

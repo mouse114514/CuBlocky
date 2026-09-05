@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, type ReactNode } from 'react';
 import type { Blueprint } from './types';
 import { defaultBlueprint } from './types';
 import { useI18n } from './i18n';
@@ -8,6 +8,41 @@ import AssetManager from './components/AssetManager';
 import { download, buildProject, saveProject, type BuildResult } from './api';
 import * as Blockly from 'blockly/core';
 import { csharpGenerator, pickSprite, setSpritePickCallback, createSpriteBlock } from './blocklySetup';
+
+function CopyIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  );
+}
+
+function CopyBlock({ children }: { children: ReactNode }) {
+  const [copied, setCopied] = useState(false);
+  const text = typeof children === 'string' ? children : '';
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(text); } catch { return; }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
+  };
+  return (
+    <div className="modal-path-wrap">
+      <button className={`copy-btn${copied ? ' copied' : ''}`} onClick={copy} title="Copy">
+        {copied ? <CheckIcon /> : <CopyIcon />}
+      </button>
+      <pre className="modal-path">{children}</pre>
+    </div>
+  );
+}
 
 export function App() {
   const { t, toggle: toggleLang } = useI18n();
@@ -152,15 +187,15 @@ export function App() {
       )}
 
       {buildResult && (
-        <div className="modal-overlay" onClick={() => setBuildResult(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay">
+          <div className="modal">
             <h3>{buildResult.success ? t('app.buildOk') : t('app.buildFail')}</h3>
             {buildResult.success ? (
               <>
                 <p className="modal-label">{t('app.dllPath')}</p>
-                <pre className="modal-path">{buildResult.dllPath}</pre>
+                <CopyBlock>{buildResult.dllPath || ''}</CopyBlock>
                 <p className="modal-label">{t('app.buildDir')}</p>
-                <pre className="modal-path">{buildResult.buildDir}</pre>
+                <CopyBlock>{buildResult.buildDir || ''}</CopyBlock>
               </>
             ) : (
               <pre className="modal-err">{buildResult.message}</pre>

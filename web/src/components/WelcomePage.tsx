@@ -84,8 +84,8 @@ export default function WelcomePage({ onOpenProject }: Props) {
       </div>
 
       {showNew && (
-        <div className="modal-overlay" onClick={() => setShowNew(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-overlay">
+          <div className="modal">
             <h3>{showNew ? t('app.newProject') : t('app.openProject')}</h3>
             <div className="wp-form">
               <label>
@@ -126,8 +126,8 @@ export default function WelcomePage({ onOpenProject }: Props) {
       )}
 
       {showOpen && (
-        <div className="modal-overlay" onClick={() => setShowOpen(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-overlay">
+          <div className="modal">
             <h3>打开项目</h3>
             <div className="wp-project-list">
               {projects.length === 0 ? (
