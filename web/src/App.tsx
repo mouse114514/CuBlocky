@@ -107,27 +107,27 @@ export function App() {
 
   return (
     <div className="app">
-      <header className="toolbar">
-        <span className="logo">{t('app.title')}</span>
-        <button onClick={openFile}>{t('app.open')}</button>
-        <button onClick={saveLocal}>{t('app.save')}</button>
-        <button onClick={saveAs}>{t('app.saveAs')}</button>
-        <button className="build-btn" onClick={handleBuild} disabled={building}>
-          {building ? t('app.building') : t('app.build')}
-        </button>
-        {buildResult && (
-          <span className={`build-result ${buildResult.success ? 'ok' : 'err'}`}>
-            {buildResult.success ? '✓' : '✗'} {buildResult.message}
-          </span>
-        )}
-        <span className="spacer" />
-        <button onClick={toggleLang}>{t('app.lang')}</button>
-        <button className={`code-toggle ${showCode ? 'active' : ''}`} onClick={() => setShowCode(!showCode)}>
-          {t('code.toggle')}
-        </button>
-      </header>
-
       <div className="editor-full">
+        <header className="toolbar editor-toolbar">
+          <span className="logo">{t('app.title')}</span>
+          <button onClick={openFile}>{t('app.open')}</button>
+          <button onClick={saveLocal}>{t('app.save')}</button>
+          <button onClick={saveAs}>{t('app.saveAs')}</button>
+          <button className="build-btn" onClick={handleBuild} disabled={building}>
+            {building ? t('app.building') : t('app.build')}
+          </button>
+          {buildResult && (
+            <span className={`build-result ${buildResult.success ? 'ok' : 'err'}`}>
+              {buildResult.success ? '✓' : '✗'} {buildResult.message}
+            </span>
+          )}
+          <span className="spacer" />
+          <button onClick={toggleLang}>{t('app.lang')}</button>
+          <button className={`code-toggle ${showCode ? 'active' : ''}`} onClick={() => setShowCode(!showCode)}>
+            {t('code.toggle')}
+          </button>
+        </header>
+
         <BlockEditor
           onCodeChange={(c) => { setCode(c); setBp(prev => ({ ...prev, eventHandlers: c })); }}
           onBlocksChange={(xml) => { setBp(prev => ({ ...prev, eventHandlersXml: xml })); }}
