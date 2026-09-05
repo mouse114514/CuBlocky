@@ -66,8 +66,8 @@ export default function GradientBg() {
     canvas.addEventListener('mouseleave', onLeave);
 
     let t = 0;
-    const RADIUS = 100;
-    const STRENGTH = 2.0;
+    const RADIUS = 50;
+    const STRENGTH = 0.8;
 
     const draw = () => {
       t += 0.002;
