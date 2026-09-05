@@ -1324,8 +1324,20 @@ export function defineBlocks() {
 }
 
 // ── Create sprite block in workspace ──────────────────────────────
-export function createSpriteBlock(assetName: string, ws: Blockly.WorkspaceSvg) {
+export async function createSpriteBlock(assetName: string, ws: Blockly.WorkspaceSvg) {
+  let options: [string, string][] = [];
+  try {
+    const res = await fetch('/api/assets');
+    if (res.ok) {
+      const assets = await res.json() as { name: string }[];
+      options = assets.map(a => [a.name, a.name]);
+    }
+  } catch { }
+  if (!options.some(o => o[1] === assetName)) options.push([assetName, assetName]);
+
   const block = ws.newBlock('cu_sprite_ref') as any;
+  const field = block.getField('ASSET');
+  if (field && typeof field.updateOptions === 'function') field.updateOptions(options);
   block.getInput('ASSET')?.fieldRow?.[0]?.setValue(assetName);
   block.initSvg();
   block.render();
