@@ -62,6 +62,9 @@ code{background:#0d1b2a;padding:1px 4px;border-radius:3px;font-size:12px}
 .toolbar .build-result{font-size:11px;color:#333;display:flex;align-items:center;gap:6px}
 .toolbar .build-result.ok{color:#1a8a1a}
 .toolbar .build-result.err{color:#c0392b}
+.deploy-result{margin:10px 0 0;font-size:12px}
+.deploy-result.ok{color:#1a8a1a}
+.deploy-result.err{color:#c0392b}
 .toolbar .block-search{
   background:#ebebeb;color:#222;border:none;border-radius:16px;padding:6px 12px 6px 30px;
   font-size:13px;outline:none;width:180px;transition:width .2s;

@@ -5,7 +5,7 @@ import { useI18n } from './i18n';
 import { BlockEditor } from './components/BlockEditor';
 import WelcomePage from './components/WelcomePage';
 import AssetManager from './components/AssetManager';
-import { download, buildProject, saveProject, getConfig, updateConfig, type BuildResult, type ServerConfig } from './api';
+import { download, buildProject, saveProject, getConfig, updateConfig, deployDll, type BuildResult, type ServerConfig } from './api';
 import * as Blockly from 'blockly/core';
 import { csharpGenerator, pickSprite, setSpritePickCallback, createSpriteBlock } from './blocklySetup';
 
@@ -53,6 +53,7 @@ export function App() {
   const [showCode, setShowCode] = useState(false);
   const [building, setBuilding] = useState(false);
   const [buildResult, setBuildResult] = useState<BuildResult | null>(null);
+  const [deployResult, setDeployResult] = useState<{ success: boolean; message: string } | null>(null);
   const [showSpritePicker, setShowSpritePicker] = useState(false);
   const [showAssetManager, setShowAssetManager] = useState(false);
   const [blockSearch, setBlockSearch] = useState('');
@@ -140,6 +141,7 @@ export function App() {
   const handleBuild = async () => {
     setBuilding(true);
     setBuildResult(null);
+    setDeployResult(null);
     try {
       let eventHandlers = bp.eventHandlers || '';
       if (wsRef.current) {
@@ -151,6 +153,16 @@ export function App() {
       setBuildResult({ success: false, message: e.message });
     } finally {
       setBuilding(false);
+    }
+  };
+
+  const handleDeploy = async () => {
+    if (!buildResult?.dllPath) return;
+    try {
+      const r = await deployDll(buildResult.dllPath);
+      setDeployResult(r);
+    } catch (e: any) {
+      setDeployResult({ success: false, message: e.message });
     }
   };
 
@@ -225,8 +237,16 @@ export function App() {
             ) : (
               <pre className="modal-err">{buildResult.message}</pre>
             )}
+            {deployResult && (
+              <p className={`deploy-result ${deployResult.success ? 'ok' : 'err'}`}>
+                {deployResult.success ? '✓' : '✗'} {deployResult.message}
+              </p>
+            )}
             <div className="modal-actions">
-              <button onClick={() => setBuildResult(null)}>{t('app.close')}</button>
+              <button onClick={() => { setBuildResult(null); setDeployResult(null); }}>{t('app.close')}</button>
+              {buildResult.success && (
+                <button className="build-btn" onClick={handleDeploy}>{t('app.deploy')}</button>
+              )}
             </div>
           </div>
         </div>

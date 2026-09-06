@@ -29,6 +29,7 @@ const dict = {
   'app.gamePath':      { zh: '游戏路径', en: 'Game Path' },
   'app.gamePathDesc':  { zh: 'Casualties Unknown Demo 的安装目录', en: 'Installation directory of Casualties Unknown Demo' },
   'app.saveSettings':  { zh: '保存设置', en: 'Save Settings' },
+  'app.deploy':        { zh: '部署', en: 'Deploy' },
 
   // ── Sidebar ──
   'side.mod':          { zh: '模组', en: 'Mod' },

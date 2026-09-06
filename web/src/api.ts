@@ -108,3 +108,13 @@ export async function updateConfig(cfg: ServerConfig): Promise<ServerConfig> {
   if (!res.ok) throw new Error('update config failed');
   return await res.json() as ServerConfig;
 }
+
+export async function deployDll(dllPath: string): Promise<{ success: boolean; message: string; dest?: string }> {
+  const res = await fetch('/api/deploy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dllPath }),
+  });
+  if (!res.ok) throw new Error('deploy failed');
+  return await res.json();
+}

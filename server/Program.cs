@@ -254,6 +254,43 @@ app.MapPost("/api/build", async (HttpRequest req) =>
     }
 });
 
+// ── Deploy: kill game process + copy DLL to plugins ──
+app.MapPost("/api/deploy", async (HttpRequest req) =>
+{
+    var body = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(req.Body, jsonOpts);
+    if (body == null || !body.TryGetValue("dllPath", out var dllPath) || !File.Exists(dllPath))
+        return Results.BadRequest("dllPath missing or file not found");
+
+    var gamePath = config.GamePath;
+    var pluginsDir = Path.Combine(gamePath, "BepInEx", "plugins");
+    var dllName = Path.GetFileName(dllPath);
+    var dest = Path.Combine(pluginsDir, dllName);
+
+    // Kill game process if running
+    var killed = false;
+    try
+    {
+        var procs = Process.GetProcessesByName("CasualtiesUnknown");
+        foreach (var p in procs)
+        {
+            try { p.Kill(); p.WaitForExit(5000); killed = true; } catch { }
+        }
+    }
+    catch { }
+
+    // Copy DLL to plugins
+    try
+    {
+        Directory.CreateDirectory(pluginsDir);
+        File.Copy(dllPath, dest, true);
+        return Results.Json(new { success = true, message = killed ? "Game killed, DLL deployed." : "DLL deployed (game not running).", dest });
+    }
+    catch (Exception ex)
+    {
+        return Results.Json(new { success = false, message = ex.Message });
+    }
+});
+
 // SPA fallback: non-/api routes serve index.html
 app.MapFallback(async ctx =>
 {

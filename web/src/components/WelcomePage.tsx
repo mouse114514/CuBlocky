@@ -3,6 +3,7 @@ import type { Blueprint } from '../types';
 import { defaultBlueprint } from '../types';
 import { useI18n } from '../i18n';
 import GradientBg from './GradientBg';
+import { getConfig, updateConfig, type ServerConfig } from '../api';
 
 interface ProjectInfo {
   name: string;
@@ -24,6 +25,20 @@ export default function WelcomePage({ onOpenProject }: Props) {
   const [newName, setNewName] = useState('');
   const [newGuid, setNewGuid] = useState('');
   const [newDesc, setNewDesc] = useState('');
+  const [showSettings, setShowSettings] = useState(false);
+  const [gamePath, setGamePath] = useState('');
+
+  const openSettings = () => {
+    getConfig().then(cfg => setGamePath(cfg.gamePath)).catch(() => {});
+    setShowSettings(true);
+  };
+
+  const saveSettings = async () => {
+    try {
+      await updateConfig({ gamePath });
+      setShowSettings(false);
+    } catch { /* ignore */ }
+  };
 
   const loadProjects = () => {
     fetch(`${API}/api/projects`)
@@ -70,6 +85,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
       <header className="toolbar">
         <span className="logo">CuBlocky</span>
         <span className="spacer" />
+        <button onClick={openSettings}>{t('app.settings')}</button>
         <button onClick={toggleLang}>{t('app.lang')}</button>
       </header>
 
@@ -143,6 +159,26 @@ export default function WelcomePage({ onOpenProject }: Props) {
             </div>
             <div className="modal-actions">
               <button onClick={() => setShowOpen(false)}>{t('app.close')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSettings && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>{t('app.settingsTitle')}</h3>
+            <p className="modal-label">{t('app.gamePath')}</p>
+            <p className="modal-hint">{t('app.gamePathDesc')}</p>
+            <input
+              className="modal-input"
+              value={gamePath}
+              onChange={(e) => setGamePath(e.target.value)}
+              placeholder="C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo"
+            />
+            <div className="modal-actions">
+              <button onClick={() => setShowSettings(false)}>{t('app.close')}</button>
+              <button className="build-btn" onClick={saveSettings}>{t('app.saveSettings')}</button>
             </div>
           </div>
         </div>
