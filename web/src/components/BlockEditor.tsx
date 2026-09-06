@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useRef, useCallback, useState } from 'react';
 import * as Blockly from 'blockly/core';
 import 'blockly/blocks';
 import { defineBlocks, setMessages, csharpGenerator } from '../blocklySetup';
@@ -538,6 +538,10 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
   const wsRef = useRef<Blockly.WorkspaceSvg | null>(null);
   const skipUpdate = useRef(false);
   const injectCatIconsRef = useRef<(() => void) | null>(null);
+  const origToolboxRef = useRef<string>('');
+  const blockNameMapRef = useRef<Record<string, string>>({});
+  const catNameMapRef = useRef<Record<string, string>>({});
+  const [searchTerm, setSearchTerm] = useState('');
 
   const updateCode = useCallback(() => {
     if (skipUpdate.current) { skipUpdate.current = false; return; }
@@ -554,6 +558,44 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
       console.warn('Code generation error:', e);
     }
   }, [onCodeChange, onBlocksChange]);
+
+  const filterToolbox = useCallback((term: string) => {
+    const ws = wsRef.current;
+    if (!ws || !origToolboxRef.current) return;
+    if (!term.trim()) {
+      ws.updateToolbox(origToolboxRef.current);
+      requestAnimationFrame(() => injectCatIconsRef.current?.());
+      return;
+    }
+    const q = term.toLowerCase();
+    const doc = new DOMParser().parseFromString(origToolboxRef.current, 'text/html');
+    const root = doc.getElementById('toolbox');
+    if (!root) return;
+    const result = doc.createElement('xml');
+    result.id = 'toolbox';
+    for (const cat of Array.from(root.children)) {
+      if (cat.tagName !== 'category') continue;
+      const catClone = cat.cloneNode(false) as Element;
+      let hasMatch = false;
+      for (const child of Array.from(cat.children)) {
+        if (child.tagName === 'sep') {
+          if (hasMatch) catClone.appendChild(child.cloneNode(true));
+          continue;
+        }
+        if (child.tagName === 'block') {
+          const type = child.getAttribute('type') || '';
+          const display = blockNameMapRef.current[type] || '';
+          if (type.toLowerCase().includes(q) || display.toLowerCase().includes(q)) {
+            catClone.appendChild(child.cloneNode(true));
+            hasMatch = true;
+          }
+        }
+      }
+      if (hasMatch) result.appendChild(catClone);
+    }
+    ws.updateToolbox(result as any);
+    requestAnimationFrame(() => injectCatIconsRef.current?.());
+  }, []);
 
   useLayoutEffect(() => {
     if (!containerRef.current || wsRef.current) return;
@@ -574,6 +616,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
       const parser = new DOMParser();
       const toolboxDoc = parser.parseFromString(TOOLBOX, 'text/html');
       const toolboxEl = toolboxDoc.getElementById('toolbox');
+      origToolboxRef.current = toolboxEl!.outerHTML;
 
       const ws = Blockly.inject(el, {
         toolbox: toolboxEl as unknown as Blockly.utils.toolbox.ToolboxDefinition,
@@ -648,6 +691,21 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
       injectCatIconsRef.current = injectCatIcons;
 
       wsRef.current = ws;
+
+      const bMap: Record<string, string> = {};
+      for (const key of Object.keys(Blockly.Blocks)) {
+        const msgKey = 'CU_' + key.replace(/^cu_/, '').toUpperCase();
+        const msg = (Blockly.Msg as Record<string, string>)[msgKey];
+        if (msg) bMap[key] = msg.replace(/\s*%\d+.*$/, '');
+      }
+      blockNameMapRef.current = bMap;
+
+      const cMap: Record<string, string> = {};
+      for (const [k, v] of Object.entries(Blockly.Msg as Record<string, string>)) {
+        if (k.startsWith('CAT_')) cMap[k] = v;
+      }
+      catNameMapRef.current = cMap;
+
       ws.addChangeListener(updateCode);
       if (onWorkspaceReady) onWorkspaceReady(ws);
 
@@ -693,10 +751,34 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
     for (const [key, val] of Object.entries(catMsgs)) {
       (Blockly.Msg as Record<string, string>)[key] = val;
     }
-    skipUpdate.current = true;
-    wsRef.current!.updateToolbox(TOOLBOX);
-    requestAnimationFrame(() => injectCatIconsRef.current?.());
-  }, [lang]);
 
-  return <div ref={containerRef} className="be BlocklyWorkspace" />;
+    const bMap: Record<string, string> = {};
+    for (const key of Object.keys(Blockly.Blocks)) {
+      const msgKey = 'CU_' + key.replace(/^cu_/, '').toUpperCase();
+      const msg = (Blockly.Msg as Record<string, string>)[msgKey];
+      if (msg) bMap[key] = msg.replace(/\s*%\d+.*$/, '');
+    }
+    blockNameMapRef.current = bMap;
+
+    const cMap: Record<string, string> = {};
+    for (const [k, v] of Object.entries(Blockly.Msg as Record<string, string>)) {
+      if (k.startsWith('CAT_')) cMap[k] = v;
+    }
+    catNameMapRef.current = cMap;
+
+    skipUpdate.current = true;
+    filterToolbox(searchTerm);
+  }, [lang, searchTerm, filterToolbox]);
+
+  return (
+    <div ref={containerRef} className="be BlocklyWorkspace">
+      <input
+        className="be-search"
+        type="text"
+        placeholder={lang === 'zh' ? '搜索积木...' : 'Search blocks...'}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+    </div>
+  );
 }
