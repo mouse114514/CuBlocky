@@ -20,3 +20,9 @@ server/wwwroot/
 # OS
 Thumbs.db
 .DS_Store
+
+# Publish output
+publish/
+
+# Release packages
+*.zip
