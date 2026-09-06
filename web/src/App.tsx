@@ -45,7 +45,7 @@ function CopyBlock({ children }: { children: ReactNode }) {
 }
 
 export function App() {
-  const { t, toggle: toggleLang } = useI18n();
+  const { lang, t, toggle: toggleLang } = useI18n();
   const [inEditor, setInEditor] = useState(false);
   const [bp, setBp] = useState<Blueprint>(() => defaultBlueprint());
   const [currentProjectName, setCurrentProjectName] = useState<string | null>(null);
@@ -55,6 +55,7 @@ export function App() {
   const [buildResult, setBuildResult] = useState<BuildResult | null>(null);
   const [showSpritePicker, setShowSpritePicker] = useState(false);
   const [showAssetManager, setShowAssetManager] = useState(false);
+  const [blockSearch, setBlockSearch] = useState('');
   const wsRef = useRef<Blockly.WorkspaceSvg | null>(null);
   const bpRef = useRef(bp);
   bpRef.current = bp;
@@ -167,6 +168,13 @@ export function App() {
             </span>
           )}
           <span className="spacer" />
+          <input
+            className="block-search"
+            type="text"
+            placeholder={lang === 'zh' ? '搜索积木...' : 'Search blocks...'}
+            value={blockSearch}
+            onChange={(e) => setBlockSearch(e.target.value)}
+          />
           <button onClick={() => setShowAssetManager(true)} disabled={!currentProjectName}>{t('asset.manageTitle')}</button>
           <button className={`code-toggle ${showCode ? 'active' : ''}`} onClick={() => setShowCode(!showCode)}>
             {t('code.toggle')}
@@ -177,6 +185,7 @@ export function App() {
           onCodeChange={(c) => { setCode(c); setBp(prev => ({ ...prev, eventHandlers: c })); }}
           onBlocksChange={(xml) => { setBp(prev => ({ ...prev, eventHandlersXml: xml })); }}
           onWorkspaceReady={(ws) => { wsRef.current = ws; restoreWorkspace(bp.eventHandlersXml); }}
+          searchTerm={blockSearch}
         />
       </div>
 

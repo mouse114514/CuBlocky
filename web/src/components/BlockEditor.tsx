@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import * as Blockly from 'blockly/core';
 import 'blockly/blocks';
 import { defineBlocks, setMessages, csharpGenerator } from '../blocklySetup';
@@ -27,6 +27,7 @@ interface Props {
   onCodeChange: (code: string) => void;
   onBlocksChange?: (xml: string) => void;
   onWorkspaceReady?: (ws: Blockly.WorkspaceSvg) => void;
+  searchTerm?: string;
 }
 
 const CAT_ICONS: Record<string, string> = {
@@ -532,7 +533,7 @@ const CAT_MSG_EN: Record<string, string> = {
   CAT_BUILDING: 'Building', CAT_TILE: 'Tile', CAT_LOCALE: 'Locale',
 };
 
-export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: Props) {
+export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, searchTerm }: Props) {
   const { lang } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<Blockly.WorkspaceSvg | null>(null);
@@ -541,7 +542,6 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
   const origToolboxRef = useRef<string>('');
   const blockNameMapRef = useRef<Record<string, string>>({});
   const catNameMapRef = useRef<Record<string, string>>({});
-  const [searchTerm, setSearchTerm] = useState('');
 
   const updateCode = useCallback(() => {
     if (skipUpdate.current) { skipUpdate.current = false; return; }
@@ -767,18 +767,8 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady }: 
     catNameMapRef.current = cMap;
 
     skipUpdate.current = true;
-    filterToolbox(searchTerm);
+    filterToolbox(searchTerm ?? '');
   }, [lang, searchTerm, filterToolbox]);
 
-  return (
-    <div ref={containerRef} className="be BlocklyWorkspace">
-      <input
-        className="be-search"
-        type="text"
-        placeholder={lang === 'zh' ? '搜索积木...' : 'Search blocks...'}
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-    </div>
-  );
+  return <div ref={containerRef} className="be BlocklyWorkspace" />;
 }
