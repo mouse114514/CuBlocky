@@ -5,7 +5,7 @@ import { useI18n } from './i18n';
 import { BlockEditor } from './components/BlockEditor';
 import WelcomePage from './components/WelcomePage';
 import AssetManager from './components/AssetManager';
-import { download, buildProject, saveProject, type BuildResult } from './api';
+import { download, buildProject, saveProject, getConfig, updateConfig, type BuildResult, type ServerConfig } from './api';
 import * as Blockly from 'blockly/core';
 import { csharpGenerator, pickSprite, setSpritePickCallback, createSpriteBlock } from './blocklySetup';
 
@@ -56,6 +56,8 @@ export function App() {
   const [showSpritePicker, setShowSpritePicker] = useState(false);
   const [showAssetManager, setShowAssetManager] = useState(false);
   const [blockSearch, setBlockSearch] = useState('');
+  const [showSettings, setShowSettings] = useState(false);
+  const [gamePath, setGamePath] = useState('');
   const wsRef = useRef<Blockly.WorkspaceSvg | null>(null);
   const bpRef = useRef(bp);
   bpRef.current = bp;
@@ -80,6 +82,18 @@ export function App() {
     window.addEventListener('cublocky:open-sprite-picker', handler);
     return () => window.removeEventListener('cublocky:open-sprite-picker', handler);
   }, []);
+
+  // Load server config on mount
+  useEffect(() => {
+    getConfig().then(cfg => setGamePath(cfg.gamePath)).catch(() => {});
+  }, []);
+
+  const saveSettings = async () => {
+    try {
+      await updateConfig({ gamePath });
+      setShowSettings(false);
+    } catch { /* ignore */ }
+  };
 
   const saveLocal = () => {
     localStorage.setItem('cublocky', JSON.stringify(bp));
@@ -177,6 +191,7 @@ export function App() {
             onMouseDown={(e) => e.stopPropagation()}
           />
           <button onClick={() => setShowAssetManager(true)} disabled={!currentProjectName}>{t('asset.manageTitle')}</button>
+          <button onClick={() => setShowSettings(true)}>{t('app.settings')}</button>
           <button className={`code-toggle ${showCode ? 'active' : ''}`} onClick={() => setShowCode(!showCode)}>
             {t('code.toggle')}
           </button>
@@ -236,6 +251,26 @@ export function App() {
           }}
           onClose={() => setShowAssetManager(false)}
         />
+      )}
+
+      {showSettings && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>{t('app.settingsTitle')}</h3>
+            <p className="modal-label">{t('app.gamePath')}</p>
+            <p className="modal-hint">{t('app.gamePathDesc')}</p>
+            <input
+              className="modal-input"
+              value={gamePath}
+              onChange={(e) => setGamePath(e.target.value)}
+              placeholder="C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo"
+            />
+            <div className="modal-actions">
+              <button onClick={() => setShowSettings(false)}>{t('app.close')}</button>
+              <button className="build-btn" onClick={saveSettings}>{t('app.saveSettings')}</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -87,3 +87,24 @@ export async function deleteAsset(projectName: string, assetName: string): Promi
 export function assetRawUrl(projectName: string, assetName: string): string {
   return `/api/projects/${encodeURIComponent(projectName)}/assets/raw/${encodeURIComponent(assetName)}`;
 }
+
+// ── Config ──
+export interface ServerConfig {
+  gamePath: string;
+}
+
+export async function getConfig(): Promise<ServerConfig> {
+  const res = await fetch('/api/config');
+  if (!res.ok) throw new Error('get config failed');
+  return await res.json() as ServerConfig;
+}
+
+export async function updateConfig(cfg: ServerConfig): Promise<ServerConfig> {
+  const res = await fetch('/api/config', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(cfg),
+  });
+  if (!res.ok) throw new Error('update config failed');
+  return await res.json() as ServerConfig;
+}

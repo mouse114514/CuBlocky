@@ -20,6 +20,20 @@ var jsonOpts = new JsonSerializerOptions
 var projectsDir = Path.Combine(Directory.GetCurrentDirectory(), "projects");
 Directory.CreateDirectory(projectsDir);
 
+var config = ServerConfig.Load();
+
+// ── Config API ──────────────────────────────────────────────────────
+app.MapGet("/api/config", () => Results.Json(config));
+
+app.MapPut("/api/config", async (HttpRequest req) =>
+{
+    var body = await JsonSerializer.DeserializeAsync<ServerConfig>(req.Body, jsonOpts);
+    if (body == null) return Results.BadRequest("invalid config");
+    config.GamePath = body.GamePath;
+    config.Save();
+    return Results.Ok(config);
+});
+
 // Helper: get project asset directory
 static string GetProjectAssetsDir(string projectName)
 {
@@ -123,7 +137,7 @@ app.MapPost("/api/compile/project", async (HttpRequest req) =>
 {
     var bp = await JsonSerializer.DeserializeAsync<Blueprint>(req.Body, jsonOpts);
     if (bp == null) return Results.BadRequest("invalid blueprint");
-    var files = ProjectEmitter.EmitProject(bp);
+    var files = ProjectEmitter.EmitProject(bp, config.GamePath);
     return Results.Json(new { files }, jsonOpts);
 });
 
@@ -133,7 +147,7 @@ app.MapPost("/api/build", async (HttpRequest req) =>
     var bp = await JsonSerializer.DeserializeAsync<Blueprint>(req.Body, jsonOpts);
     if (bp == null) return Results.BadRequest("invalid blueprint");
 
-    var files = ProjectEmitter.EmitProject(bp);
+    var files = ProjectEmitter.EmitProject(bp, config.GamePath);
     var asmName = Path.GetFileNameWithoutExtension(files.Keys.First(k => k.EndsWith(".csproj")));
     var buildDir = Path.Combine(Directory.GetCurrentDirectory(), "builds", asmName);
 

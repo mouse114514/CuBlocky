@@ -8,7 +8,9 @@ namespace CuBlocky.Server.Compiler;
 // M1: Plugin.cs + RegisterContent.cs + .csproj + README. M5: zip download.
 public static class ProjectEmitter
 {
-    public static Dictionary<string, string> EmitProject(Blueprint bp)
+    private const string DefaultGamePath = @"C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo";
+
+    public static Dictionary<string, string> EmitProject(Blueprint bp, string? gamePath = null)
     {
         var ns = SafeIdent(bp.Mod.RootNamespace);
         var asmName = SafeIdent(bp.Mod.RootNamespace);
@@ -21,11 +23,13 @@ public static class ProjectEmitter
         // Extract register markers from event code
         var (eventCode, registerItems, registerRecipes, registerBuildings, registerTiles, registerLocales, registerLiquids) = ExtractRegisterMarkers(bp.EventHandlers!);
 
+        var gPath = gamePath ?? DefaultGamePath;
+
         var files = new Dictionary<string, string>
         {
             ["Plugin.cs"] = EmitPlugin(ns, guid, name, ver, desc, hasEvents),
             ["RegisterContent.cs"] = CodeEmitter.EmitRegisterContent(bp, registerItems, registerRecipes, registerBuildings, registerTiles, registerLocales, registerLiquids),
-            [asmName + ".csproj"] = EmitCsproj(asmName, ns),
+            [asmName + ".csproj"] = EmitCsproj(asmName, ns, gPath),
             ["README.md"] = EmitReadme(name, ver),
         };
 
@@ -287,10 +291,11 @@ namespace {ns}
 ";
     }
 
-    private static string EmitCsproj(string asmName, string ns)
+    private static string EmitCsproj(string asmName, string ns, string gamePath)
     {
         // net4.7.2 to match BepInEx 5 / Unity / Mono. CUCoreLib.dll resolved from
         // the game's BepInEx/plugins folder (CCL setup docs convention).
+        var g = gamePath.Replace("\\", "\\\\");
         return $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
@@ -304,31 +309,31 @@ namespace {ns}
   </PropertyGroup>
   <ItemGroup>
     <Reference Include=""BepInEx"">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo\BepInEx\core\BepInEx.dll</HintPath>
+      <HintPath>{g}\BepInEx\core\BepInEx.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include=""0Harmony"">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo\BepInEx\core\0Harmony.dll</HintPath>
+      <HintPath>{g}\BepInEx\core\0Harmony.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include=""CUCoreLib"">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo\BepInEx\plugins\CUCoreLib.dll</HintPath>
+      <HintPath>{g}\BepInEx\plugins\CUCoreLib.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include=""Assembly-CSharp"">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo\CasualtiesUnknown_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>{g}\CasualtiesUnknown_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include=""UnityEngine"">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo\CasualtiesUnknown_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>{g}\CasualtiesUnknown_Data\Managed\UnityEngine.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include=""UnityEngine.CoreModule"">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo\CasualtiesUnknown_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>{g}\CasualtiesUnknown_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include=""UnityEngine.AudioModule"">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo\CasualtiesUnknown_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>{g}\CasualtiesUnknown_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>

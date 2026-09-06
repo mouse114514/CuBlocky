@@ -24,6 +24,11 @@ const dict = {
   'app.newProject':    { zh: '新建项目', en: 'New Project' },
   'app.openProject':   { zh: '打开项目', en: 'Open Project' },
   'app.subtitle':      { zh: 'Casualties Unknown 模组编辑器', en: 'Casualties Unknown Mod Editor' },
+  'app.settings':      { zh: '设置', en: 'Settings' },
+  'app.settingsTitle': { zh: '服务器设置', en: 'Server Settings' },
+  'app.gamePath':      { zh: '游戏路径', en: 'Game Path' },
+  'app.gamePathDesc':  { zh: 'Casualties Unknown Demo 的安装目录', en: 'Installation directory of Casualties Unknown Demo' },
+  'app.saveSettings':  { zh: '保存设置', en: 'Save Settings' },
 
   // ── Sidebar ──
   'side.mod':          { zh: '模组', en: 'Mod' },
