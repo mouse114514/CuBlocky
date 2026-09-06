@@ -11,6 +11,8 @@ input,textarea,select{
   border-radius:4px;padding:4px 8px;font-size:13px;width:100%;
 }
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+.cublocky-search-input{background:#4caf50!important;color:#fff!important;border:none!important}
+.cublocky-search-input::placeholder{color:rgba(255,255,255,0.7)!important}
 textarea{resize:vertical;min-height:60px}
 button{
   background:var(--bg3);color:var(--fg);border:1px solid var(--border);
