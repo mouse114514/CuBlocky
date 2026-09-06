@@ -314,4 +314,15 @@ app.MapDelete("/api/projects/{name}", (string name) =>
     return Results.Ok();
 });
 
+// ── Auto-open browser ──────────────────────────────────────────
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    var url = app.Urls.FirstOrDefault() ?? "http://localhost:5000";
+    try
+    {
+        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+    }
+    catch { }
+});
+
 app.Run();
