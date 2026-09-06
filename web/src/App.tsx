@@ -174,6 +174,7 @@ export function App() {
             placeholder={lang === 'zh' ? '搜索积木...' : 'Search blocks...'}
             value={blockSearch}
             onChange={(e) => setBlockSearch(e.target.value)}
+            onMouseDown={(e) => e.stopPropagation()}
           />
           <button onClick={() => setShowAssetManager(true)} disabled={!currentProjectName}>{t('asset.manageTitle')}</button>
           <button className={`code-toggle ${showCode ? 'active' : ''}`} onClick={() => setShowCode(!showCode)}>

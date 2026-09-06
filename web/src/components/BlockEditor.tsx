@@ -561,41 +561,44 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
 
   const filterToolbox = useCallback((term: string) => {
     const ws = wsRef.current;
-    if (!ws || !origToolboxRef.current) return;
+    if (!ws) return;
+    const toolbox = ws.getToolbox?.();
+    const flyout = ws.getFlyout?.();
+    if (!toolbox || !flyout) return;
     if (!term.trim()) {
-      ws.updateToolbox(origToolboxRef.current);
-      requestAnimationFrame(() => injectCatIconsRef.current?.());
+      const sel = toolbox.getSelectedItem?.();
+      if (sel) {
+        const contents = (sel as any).getContents?.() || (sel as any).flyoutItems_ || [];
+        flyout.show(contents);
+      }
       return;
     }
     const q = term.toLowerCase();
-    const doc = new DOMParser().parseFromString(origToolboxRef.current, 'text/xml');
-    const root = doc.documentElement;
-    if (!root) return;
-    const result = doc.createElement('xml');
-    result.id = 'toolbox';
-    for (const cat of Array.from(root.children) as Element[]) {
-      if (cat.tagName !== 'category') {
-        if (cat.tagName === 'sep') result.appendChild(cat.cloneNode(true));
-        continue;
-      }
-      const catClone = doc.createElement('category');
-      for (const attr of Array.from(cat.attributes)) {
-        catClone.setAttribute(attr.name, attr.value);
-      }
-      for (const child of Array.from(cat.children) as Element[]) {
-        if (child.tagName === 'block') {
-          const type = child.getAttribute('type') || '';
+    const sel = toolbox.getSelectedItem?.();
+    if (sel) {
+      const contents: any[] = (sel as any).getContents?.() || (sel as any).flyoutItems_ || [];
+      const filtered = contents.filter((item: any) => {
+        const el = item.getElement?.() || item;
+        const type = el.type || el.getAttribute?.('type') || '';
+        const display = blockNameMapRef.current[type] || '';
+        return type.toLowerCase().includes(q) || display.toLowerCase().includes(q);
+      });
+      flyout.show(filtered);
+    } else {
+      const allItems: any[] = [];
+      for (const cat of (toolbox as any).getToolboxItems?.() || []) {
+        const contents: any[] = (cat as any).getContents?.() || (cat as any).flyoutItems_ || [];
+        for (const item of contents) {
+          const el = item.getElement?.() || item;
+          const type = el.type || el.getAttribute?.('type') || '';
           const display = blockNameMapRef.current[type] || '';
           if (type.toLowerCase().includes(q) || display.toLowerCase().includes(q)) {
-            catClone.appendChild(child.cloneNode(true));
+            allItems.push(item);
           }
         }
       }
-      result.appendChild(catClone);
+      if (allItems.length > 0) flyout.show(allItems);
     }
-    const serializer = new XMLSerializer();
-    ws.updateToolbox(serializer.serializeToString(result));
-    requestAnimationFrame(() => injectCatIconsRef.current?.());
   }, []);
 
   useLayoutEffect(() => {
