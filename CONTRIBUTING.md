@@ -32,4 +32,4 @@ Thank you for your interest in contributing!
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under MPL 2.0.
+By contributing, you agree that your contributions will be licensed under MIT.

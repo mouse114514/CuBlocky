@@ -100,10 +100,10 @@ CuBlocky/
 │       │   ├── ItemForm.tsx     # Item editor with tabs
 │       │   └── RecipeForm.tsx   # Recipe editor
 │       └── types.ts            # TypeScript interfaces
-├── LICENSE                 # MPL 2.0
+├── LICENSE                 # MIT
 └── README.md
 ```
 
 ## License
 
-[Mozilla Public License 2.0](LICENSE)
+[MIT License](LICENSE)
