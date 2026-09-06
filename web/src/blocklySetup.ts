@@ -2583,6 +2583,16 @@ const LIMB_OPTIONS: DdOption[] = [
   ['右腿', 'Right leg', '5'],
 ];
 
+const WEAR_LIMB_OPTIONS: DdOption[] = [
+  ['头部', 'Head', 'Head'],
+  ['躯干上', 'Upper Torso', 'UpTorso'],
+  ['躯干下', 'Lower Torso', 'DownTorso'],
+  ['左臂', 'Left Arm', 'HandA'],
+  ['右臂', 'Right Arm', 'HandB'],
+  ['左腿', 'Left Leg', 'LegA'],
+  ['右腿', 'Right Leg', 'LegB'],
+];
+
 const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_item_set_property: { PROP: PROP_OPTIONS },
   cu_item_use: { TARGET: TARGET_OPTIONS, ACTION: ACTION_OPTIONS },
@@ -2602,6 +2612,7 @@ const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_tile_set_property: { PROP: TILE_PROP_OPTIONS },
   cu_register_locale: { TYPE: LOCALE_TYPE_OPTIONS },
   cu_limb_index: { LIMB: LIMB_OPTIONS },
+  cu_item_wearable: { WEAR_LIMB: WEAR_LIMB_OPTIONS },
   cu_item_vanilla: { ID: VANILLA_ITEMS },
 };
 
