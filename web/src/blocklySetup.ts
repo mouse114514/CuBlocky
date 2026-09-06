@@ -1140,23 +1140,7 @@ const BLOCK_JSON: any[] = [
   // ═══ Extended World getters (cyan) ═══════════════════════════
   { type: 'cu_world_depth', message0: '%{BKY_CU_WORLD_DEPTH}', output: 'Number', colour: C.WORLD },
 
-  // ═══ Advanced Item Registration (pink) ═══════════════════════
-  {
-    type: 'cu_register_item_advanced',
-    message0: '%{BKY_CU_REGISTER_ITEM_ADV} %1 %2 %3 %4 %5',
-    args0: [
-      { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
-      { type: 'field_input', name: 'FULL_NAME', text: 'My Item', align: 'RIGHT' },
-      { type: 'field_input', name: 'DESC', text: 'A description', align: 'RIGHT' },
-      { type: 'field_dropdown', name: 'CATEGORY', options: [
-        ['nospawn','nospawn'],['weapon','weapon'],['tool','tool'],
-        ['medical','medical'],['food','food'],['material','material'],
-        ['armor','armor'],['container','container'],['misc','misc'],
-      ]},
-      { type: 'input_value', name: 'SPRITE_REF', check: 'Sprite', align: 'RIGHT' },
-    ],
-    colour: C.REGISTER, inputsInline: true,
-  },
+  // ═══ Item Property blocks (pink) ═══════════════════════════
   {
     type: 'cu_item_container',
     message0: '%{BKY_CU_ITEM_CONTAINER} %1 %2 %3 %4 %5 %6',
@@ -1168,7 +1152,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_dropdown', name: 'VISIBLE', options: [['true','true'],['false','false']] },
       { type: 'field_input', name: 'TAG_RESTRICTION', text: '' },
     ],
-    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+    colour: C.REGISTER, inputsInline: true,
   },
   {
     type: 'cu_item_tool',
@@ -1183,7 +1167,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'STAMINA', check: 'Number', align: 'RIGHT' },
       { type: 'field_dropdown', name: 'PIERCING', options: [['true','true'],['false','false']] },
     ],
-    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+    colour: C.REGISTER, inputsInline: true,
   },
   {
     type: 'cu_item_wearable',
@@ -1199,7 +1183,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'ISOLATION', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'DURABILITY_LOSS', check: 'Number', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+    colour: C.REGISTER, inputsInline: true,
   },
   {
     type: 'cu_register_liquid',
@@ -1225,7 +1209,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'INJECTION_SICKNESS', check: 'Number', align: 'RIGHT' },
       { type: 'field_dropdown', name: 'UNOBTAINABLE', options: [['false','false'],['true','true']] },
     ],
-    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+    colour: C.REGISTER, inputsInline: true,
   },
   {
     type: 'cu_item_liquid_container',
@@ -1237,7 +1221,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'LIQUID_ID', text: 'water' },
       { type: 'input_value', name: 'LIQUID_AMOUNT', check: 'Number', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+    colour: C.REGISTER, inputsInline: true,
   },
   {
     type: 'cu_item_battery',
@@ -1248,7 +1232,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'START_CHARGE', check: 'Number', align: 'RIGHT' },
       { type: 'field_dropdown', name: 'SPAWN_WITH_BATTERY', options: [['true','true'],['false','false']] },
     ],
-    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+    colour: C.REGISTER, inputsInline: true,
   },
   {
     type: 'cu_item_light',
@@ -1261,7 +1245,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'COLOR_G', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'COLOR_B', check: 'Number', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+    colour: C.REGISTER, inputsInline: true,
   },
   {
     type: 'cu_item_bandage',
@@ -1275,7 +1259,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'BONE_HEAL', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'DISLOCATION', check: 'Number', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+    colour: C.REGISTER, inputsInline: true,
   },
   {
     type: 'cu_item_syringe',
@@ -1288,7 +1272,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'LIQUID_ID', text: 'morphine' },
       { type: 'input_value', name: 'LIQUID_AMOUNT', check: 'Number', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+    colour: C.REGISTER, inputsInline: true,
   },
 ];
 
@@ -1449,8 +1433,7 @@ const MSG_ZH: Record<string, string> = {
   CU_ITEM_CATEGORY: '物品分类',
   // World
   CU_WORLD_DEPTH: '玩家深度(米)',
-  // Advanced items
-  CU_REGISTER_ITEM_ADV: '注册高级物品(CCL) id %1 名称 %2 描述 %3 分类 %4 精灵图 %5',
+  // Item properties
   CU_ITEM_CONTAINER: '设置容器属性 id %1 容量 %2 单物品最大重量 %3 减重 %4 物品可见 %5 标签限制 %6',
   CU_ITEM_TOOL: '设置武器/工具属性 id %1 伤害 %2 结构伤害 %3 距离 %4 击退 %5 冷却 %6 体力消耗 %7 穿透 %8',
   CU_ITEM_WEARABLE: '设置可穿戴属性 id %1 部位 %2 插槽 %3 护甲 %4 隔离 %5 耐久损失倍率 %6',
@@ -1619,8 +1602,7 @@ const MSG_EN: Record<string, string> = {
   CU_ITEM_CATEGORY: 'item category',
   // World
   CU_WORLD_DEPTH: 'player depth (meters)',
-  // Advanced items
-  CU_REGISTER_ITEM_ADV: 'register advanced item (CCL) id %1 name %2 desc %3 category %4 sprite %5',
+  // Item properties
   CU_ITEM_CONTAINER: 'set container properties id %1 capacity %2 max weight %3 encumbrance %4 visible %5 tag restriction %6',
   CU_ITEM_TOOL: 'set weapon/tool properties id %1 damage %2 structural %3 distance %4 knockback %5 cooldown %6 stamina %7 piercing %8',
   CU_ITEM_WEARABLE: 'set wearable properties id %1 limb %2 slot %3 armor %4 isolation %5 durability loss %6',
@@ -2358,18 +2340,7 @@ csharpGenerator.forBlock['cu_item_category'] = () => ['item.Stats.category', ORD
 // ═══ Extended World getters ══════════════════════════════════
 csharpGenerator.forBlock['cu_world_depth'] = () => ['WorldGeneration.world.PlayerTotalDepthMeters()', ORDER_ATOMIC];
 
-// ═══ Advanced Item Registration ═══════════════════════════════
-csharpGenerator.forBlock['cu_register_item_advanced'] = (block, gen) => {
-  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
-  const name = block.getFieldValue('FULL_NAME').replace(/"/g, '\\"');
-  const desc = block.getFieldValue('DESC').replace(/"/g, '\\"');
-  const cat = block.getFieldValue('CATEGORY');
-  const spriteCode = gen.valueToCode(block, 'SPRITE_REF', ORDER_ATOMIC) || '';
-  const spriteId = spriteCode.replace(/^"|"$/g, '') || null;
-  const itemId = id.replace(/^"|"$/g, '');
-  const json = JSON.stringify({Id: itemId, FullName: name, Description: desc, Category: cat, Weight: 0.4, Value: 1, DecayMinutes: 180, Recognition: 2, SpawnFrequency: 1, SpriteAssetId: spriteId, IsAdvanced: true});
-  return `//REGISTER_ITEM:${json}\n`;
-};
+// ═══ Item Property generators ═══════════════════════════════
 csharpGenerator.forBlock['cu_item_container'] = (block, gen) => {
   const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
   const itemId = id.replace(/^"|"$/g, '');

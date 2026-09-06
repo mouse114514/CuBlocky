@@ -83,9 +83,6 @@ const TOOLBOX = `
     <block type="cu_register_tile"></block>
     <block type="cu_register_locale"></block>
     <sep></sep>
-    <block type="cu_register_item_advanced">
-      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
-    </block>
     <block type="cu_register_liquid"></block>
     <block type="cu_liquid_flags"></block>
     <sep></sep>
