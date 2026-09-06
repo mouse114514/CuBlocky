@@ -130,7 +130,7 @@ class FieldSearchableDropdown extends Blockly.FieldDropdown {
       const input = document.createElement('input');
       input.type = 'text';
       input.placeholder = this.currentLang_ === 'zh' ? '搜索...' : 'Search...';
-      input.style.cssText = 'width:100%;box-sizing:border-box;padding:4px 6px;border:1px solid #ccc;border-radius:3px;font-size:13px;outline:none;font-family:sans-serif;';
+      input.style.cssText = 'width:100%;box-sizing:border-box;padding:4px 6px;border:1px solid #555;border-radius:6px;font-size:13px;outline:none;font-family:sans-serif;background:#2d5a2d;color:#e0e0e0;';
 
       // Prevent Blockly key handlers from eating our input
       input.addEventListener('keydown', (ev) => ev.stopPropagation());
