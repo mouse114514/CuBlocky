@@ -77,6 +77,179 @@ class FieldSpritePicker extends Blockly.Field {
 
 fieldRegistry.register('field_sprite_picker', FieldSpritePicker as any);
 
+// ── Searchable dropdown field ──────────────────────────────────────
+type SearchableOption = [string, string, string]; // [zhLabel, enLabel, value]
+
+class FieldSearchableDropdown extends Blockly.Field {
+  private options_: SearchableOption[] = [];
+  private currentLang_ = 'zh';
+  private searchText_ = '';
+  private popupEl_: HTMLDivElement | null = null;
+  private listDiv_: HTMLDivElement | null = null;
+
+  constructor(value?: string, options?: SearchableOption[], lang?: string) {
+    super(value || '');
+    this.options_ = options || [];
+    this.currentLang_ = lang || 'zh';
+    this.value_ = value || '';
+    this.SERIALIZABLE = true;
+  }
+
+  static fromJson<T extends Blockly.Field>(
+    this: new (...args: any[]) => T,
+    options: any
+  ): T {
+    return new FieldSearchableDropdown(options.value, options.options, options.lang) as unknown as T;
+  }
+
+  protected initView_(): void {
+    // Empty — we render display text in render_()
+  }
+
+  protected render_(): void {
+    if (!this.textElement_) return;
+    const lang = this.currentLang_;
+    const match = this.options_.find(([, , val]) => val === this.value_);
+    this.textElement_.textContent = match ? (lang === 'zh' ? match[0] : match[1]) : (this.value_ || '...');
+    if (this.fieldGroup_) this.fieldGroup_.style.cursor = 'pointer';
+  }
+
+  showEditor_(_e?: Event): void {
+    // Close any existing popup
+    this.closePopup_();
+
+    const block = this.getSourceBlock();
+    if (!block) return;
+
+    // Create popup
+    const popup = document.createElement('div');
+    popup.style.cssText = 'position:fixed;z-index:10000;width:280px;max-height:360px;display:flex;flex-direction:column;font-family:sans-serif;background:#fff;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.25);overflow:hidden;';
+
+    // Search input
+    const searchWrap = document.createElement('div');
+    searchWrap.style.cssText = 'padding:8px;border-bottom:1px solid #e0e0e0;';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = this.currentLang_ === 'zh' ? '搜索物品 (中/英)...' : 'Search items (EN/ZH)...';
+    input.value = this.searchText_;
+    input.style.cssText = 'width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #ccc;border-radius:4px;font-size:13px;outline:none;';
+    input.addEventListener('input', () => { this.searchText_ = input.value; this.renderList_(); });
+    input.addEventListener('keydown', (ev) => ev.stopPropagation());
+    input.addEventListener('mousedown', (ev) => ev.stopPropagation());
+    searchWrap.appendChild(input);
+    popup.appendChild(searchWrap);
+
+    // List
+    const list = document.createElement('div');
+    list.style.cssText = 'overflow-y:auto;max-height:310px;';
+    popup.appendChild(list);
+    this.listDiv_ = list;
+    this.popupEl_ = popup;
+
+    this.renderList_();
+
+    // Position near the field
+    document.body.appendChild(popup);
+    const fieldRect = this.fieldGroup_?.getBoundingClientRect();
+    if (fieldRect) {
+      popup.style.left = fieldRect.left + 'px';
+      popup.style.top = (fieldRect.bottom + 2) + 'px';
+    } else {
+      popup.style.left = '100px';
+      popup.style.top = '100px';
+    }
+
+    // Close on outside click
+    const onOutsideClick = (ev: MouseEvent) => {
+      if (!popup.contains(ev.target as Node)) {
+        this.closePopup_();
+        document.removeEventListener('mousedown', onOutsideClick, true);
+      }
+    };
+    setTimeout(() => document.addEventListener('mousedown', onOutsideClick, true), 0);
+
+    // Focus input
+    setTimeout(() => input.focus(), 10);
+  }
+
+  private closePopup_(): void {
+    if (this.popupEl_?.parentNode) {
+      this.popupEl_.parentNode.removeChild(this.popupEl_);
+    }
+    this.popupEl_ = null;
+    this.listDiv_ = null;
+  }
+
+  private renderList_(): void {
+    if (!this.listDiv_) return;
+    this.listDiv_.innerHTML = '';
+
+    const query = this.searchText_.toLowerCase();
+    const lang = this.currentLang_;
+    const currentVal = this.value_;
+
+    const filtered = this.options_.filter(([zh, en, val]) => {
+      if (!query) return true;
+      return zh.toLowerCase().includes(query) || en.toLowerCase().includes(query) || val.toLowerCase().includes(query);
+    });
+
+    if (filtered.length === 0) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'padding:12px 8px;text-align:center;color:#999;font-size:13px;';
+      empty.textContent = lang === 'zh' ? '未找到匹配项' : 'No matches found';
+      this.listDiv_.appendChild(empty);
+      return;
+    }
+
+    filtered.forEach(([zh, en, val]) => {
+      const item = document.createElement('div');
+      const isSelected = val === currentVal;
+      item.style.cssText = `padding:6px 10px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;${isSelected ? 'background:#e3f2fd;font-weight:600;' : ''}`;
+      item.addEventListener('mouseenter', () => { item.style.background = isSelected ? '#bbdefb' : '#f5f5f5'; });
+      item.addEventListener('mouseleave', () => { item.style.background = isSelected ? '#e3f2fd' : ''; });
+
+      const primary = document.createElement('span');
+      primary.textContent = lang === 'zh' ? zh : en;
+      primary.style.cssText = 'flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+      item.appendChild(primary);
+
+      const secondary = document.createElement('span');
+      secondary.textContent = lang === 'zh' ? en : zh;
+      secondary.style.cssText = 'color:#999;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;';
+      item.appendChild(secondary);
+
+      if (isSelected) {
+        const check = document.createElement('span');
+        check.textContent = '✓';
+        check.style.cssText = 'color:#1976d2;font-weight:700;';
+        item.appendChild(check);
+      }
+
+      item.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.setValue(val);
+        this.closePopup_();
+      });
+
+      this.listDiv_!.appendChild(item);
+    });
+  }
+
+  getLang(): string { return this.currentLang_; }
+  setLang(lang: string): void { this.currentLang_ = lang; this.render_(); }
+
+  protected doValueUpdate_(newValue: any): void {
+    this.value_ = newValue;
+    this.render_();
+  }
+
+  protected doValueInvalid_(_newValue: any): void {}
+  getEditorShowArrow_: () => false = () => false as false;
+}
+
+fieldRegistry.register('field_searchable_dropdown', FieldSearchableDropdown as any);
+
 // ── Color palette ──
 const C = {
   EVENT:    '#ff8c1a',
@@ -94,6 +267,122 @@ const C = {
   TILE:     '#8d6e63',
   LOCALE:   '#5c6bc0',
 };
+
+type DdOption = [string, string, string]; // [zhLabel, enLabel, value]
+
+const VANILLA_ITEMS: DdOption[] = [
+  ['绷带', 'Bandage', 'bandage'], ['医用绷带', 'Medical Gauze', 'analgesicgauze'],
+  ['消毒绷带', 'Sterilized Bandage', 'sterilizedbandage'],
+  ['塑料绷带', 'Plastic Bandage', 'plasticbandage'],
+  ['创可贴', 'Adhesive Bandage', 'adhesivebandage'],
+  ['藻酸盐绷带', 'Alginate Bandage', 'alginate'],
+  ['止痛药瓶', 'Painkillers', 'painkillers'],
+  ['镇痛膏瓶', 'Pain Cream', 'paincream'],
+  ['吗啡注射器', 'Morphine', 'morphine'],
+  ['抗生素药瓶', 'Antibiotics', 'antibiotics'],
+  ['抗血清注射器', 'Antiserum', 'antiserum'],
+  ['抗辐射剂药瓶', 'Antirad', 'antirad'],
+  ['纳洛酮注射器', 'Naloxone', 'naloxone'],
+  ['芬太尼注射器', 'Fentanyl', 'fentanyl'],
+  ['海洛因注射器', 'Heroin', 'heroin'],
+  ['鸦片注射器', 'Opium', 'opium'],
+  ['自动体外除颤仪', 'AED', 'aed'],
+  ['手动除颤仪', 'Manual Defibrillator', 'manualdefibrillator'],
+  ['局部复苏装置', 'LRD', 'lrd'],
+  ['简易局部复苏装置', 'Makeshift LRD', 'makeshiftlrd'],
+  ['自动泵', 'Auto Pump', 'autopump'],
+  ['医疗包', 'Medkit', 'medkit'], ['夹板', 'Splint', 'splint'],
+  ['血袋', 'Blood Bag', 'bloodbag'],
+  ['消毒液瓶', 'Disinfectant', 'disinfectant'],
+  ['注射器', 'Syringe', 'syringe'], ['止血带', 'Tourniquet', 'tourniquet'],
+  ['手枪', 'Pistol', 'pistol'], ['步枪', 'Rifle', 'rifle'],
+  ['霰弹枪', 'Shotgun', 'shotgun'],
+  ['9mm子弹', '9mm Round', '9mmround'],
+  ['5.56子弹', '5.56 Round', '556round'],
+  ['12号霰弹', '12 Gauge', '12gauge'],
+  ['简易步枪', 'Makeshift Rifle', 'makeshiftrifle'],
+  ['砍刀', 'Machete', 'machete'], ['十字镐', 'Pickaxe', 'pickaxe'],
+  ['大锤', 'Sledgehammer', 'sledgehammer'], ['爪子', 'Claws', 'claws'],
+  ['炸药', 'Dynamite', 'dynamite'], ['铲子', 'Shovel', 'shovel'],
+  ['木铲', 'Wood Shovel', 'woodshovel'], ['干草叉', 'Pitchfork', 'pitchfork'],
+  ['微型激光钻', 'Mini Laser Drill', 'minilaserdrill'],
+  ['重型钻', 'Heavy Drill', 'heavydrill'],
+  ['钛合金多功能工具', 'Titanium Multitool', 'titaniummultitool'],
+  ['扳手', 'Wrench', 'wrench'], ['简易扳手', 'Makeshift Wrench', 'makeshiftwrench'],
+  ['攀爬绳', 'Climbing Rope', 'climbingrope'],
+  ['攀爬爪', 'Climbing Claws', 'climbingclaws'],
+  ['抓钩', 'Grappling Hook', 'grapplinghook'],
+  ['手摇发电机', 'Hand Crank', 'handcrank'],
+  ['打火机', 'Lighter', 'lighter'], ['火把', 'Torch', 'torch'],
+  ['营地篝火', 'Campfire', 'campfire'],
+  ['地形扫描仪', 'Terrain Scanner', 'terrainscanner'],
+  ['盖革计数器', 'Geiger Counter', 'geigercounter'],
+  ['开锁工具包', 'Lockpicking Kit', 'lockpickingkit'],
+  ['废金属', 'Scrap Metal', 'scrapmetal'],
+  ['废料块', 'Scrap Cube', 'scrapcube'],
+  ['废料板', 'Scrap Panel', 'scrappanel'],
+  ['废料管', 'Scrap Tube', 'scraptube'],
+  ['木材碎片', 'Wood Scraps', 'woodscraps'],
+  ['木块', 'Wood Cube', 'woodcube'], ['木板', 'Wood Panel', 'woodpanel'],
+  ['绳子', 'Rope', 'rope'], ['细绳', 'String', 'string'],
+  ['木棍', 'Stick', 'stick'], ['钉子', 'Nails', 'nails'],
+  ['布料', 'Canvas', 'canvas'], ['铜矿石', 'Raw Copper', 'rawcopper'],
+  ['加工铜', 'Processed Copper', 'processedcopper'],
+  ['钛板', 'Titanium Slab', 'titaniumslab'],
+  ['钛棒', 'Titanium Rod', 'titaniumrod'],
+  ['钛片', 'Titanium Sheet', 'titaniumsheet'],
+  ['塑料块', 'Plastic Chunk', 'plasticchunk'],
+  ['柔性玻璃', 'Flexiglass', 'flexiglass'],
+  ['电路板', 'Circuit Board', 'circuitboard'],
+  ['一捆电线', 'Bundle of Wires', 'bundleofwires'],
+  ['煤炭', 'Charcoal', 'charcoal'],
+  ['易燃粉末', 'Flammable Powder', 'flammablepowder'],
+  ['水瓶', 'Water Bottle', 'waterbottle'], ['牛奶', 'Milk', 'milk'],
+  ['巧克力牛奶', 'Chocolate Milk', 'chocolatemilk'],
+  ['汤', 'Soup', 'soup'], ['能量饮料', 'Energy Drink', 'energydrink'],
+  ['咖啡', 'Coffee', 'coffee'], ['苹果汁', 'Apple Juice', 'applejuice'],
+  ['柠檬水', 'Lemonade', 'lemonade'], ['冰茶', 'Ice Tea', 'icetea'],
+  ['苏打水', 'Soda Bottle', 'sodabottle'], ['苏打罐', 'Soda Can', 'sodacan'],
+  ['酒精', 'Alcohol', 'alcohol'], ['汉堡', 'Burger', 'burger'],
+  ['牛排', 'Steak', 'steak'], ['披萨片', 'Pizza Slice', 'pizzaslice'],
+  ['饼干', 'Cookies', 'cookies'], ['薯片', 'Chips', 'chips'],
+  ['面包', 'Bread', 'bread'], ['蛋糕', 'Cake', 'cake'],
+  ['肉干', 'Pemmican', 'pemmican'],
+  ['营养棒', 'Nutrient Bar', 'nutrientbar'],
+  ['塑料袋', 'Plastic Bag', 'plasticbag'],
+  ['垃圾袋', 'Trash Bag', 'trashbag'],
+  ['植物纤维袋', 'Foliage Bag', 'foliagebag'],
+  ['植物纤维挎包', 'Sling Bag', 'slingbag'],
+  ['重力袋', 'Grav Bag', 'gravbag'], ['腿包', 'Leg Pouch', 'legpouch'],
+  ['随身水包', 'Liquid Pouch', 'liquidpouch'],
+  ['材料包', 'Material Pouch', 'materialpouch'],
+  ['小背包', 'Small Pack', 'smallpack'],
+  ['双肩大背包', 'Big Pack', 'bigpack'],
+  ['工具箱', 'Toolbox', 'toolbox'], ['纸箱', 'Box', 'box'],
+  ['小桶', 'Mini Barrel', 'minibarrel'], ['水壶', 'Canteen', 'canteen'],
+  ['水罐', 'Water Jug', 'waterjug'],
+  ['自行车头盔', 'Bike Helmet', 'bikehelmet'],
+  ['防毒面具', 'Dust Mask', 'dustmask'], ['围巾', 'Scarf', 'scarf'],
+  ['头灯', 'Headlamp', 'headlamp'],
+  ['安全眼镜', 'Safety Glasses', 'safetyglasses'],
+  ['巴拉克拉法帽', 'Balaclava', 'balaclava'],
+  ['手套', 'Latex Gloves', 'latexgloves'],
+  ['战术手套', 'Tactical Gloves', 'tacticalgloves'],
+  ['腰带', 'Belt', 'belt'], ['防弹衣', 'Belly Armor', 'bellyarmor'],
+  ['弹药带', 'Bandolier', 'bandolier'], ['腰包', 'Fanny Pack', 'fannypack'],
+  ['运动鞋', 'Sneakers', 'sneakers'],
+  ['战术靴', 'Tactical Boots', 'tacticalboots'],
+  ['护膝', 'Kneepads', 'kneepads'],
+  ['小型电池', 'Small Battery', 'smallbattery'],
+  ['中型电池', 'Medium Battery', 'mediumbattery'],
+  ['大型电池', 'Large Battery', 'largebattery'],
+  ['手电筒', 'Flashlight', 'flashlight'],
+  ['应急手电', 'Emergency Light', 'emergencylight'],
+  ['提灯', 'Lantern', 'lantern'], ['灯泡', 'Light Bulb', 'lightbulb'],
+  ['MP3播放器', 'MP3 Player', 'mp3player'], ['手表', 'Watch', 'watch'],
+  ['喷气背包', 'Jetpack', 'jetpack'],
+  ['等离子切割器', 'Plasma Cutter', 'plasmacutter'],
+];
 
 const BLOCK_JSON: any[] = [
   // ═══ Events (orange) ═════════════════════════════════════════
@@ -416,55 +705,7 @@ const BLOCK_JSON: any[] = [
     type: 'cu_item_vanilla',
     message0: '%{BKY_CU_ITEM_VANILLA} %1',
     args0: [
-      { type: 'field_dropdown', name: 'ID', options: [
-        ['绷带', 'bandage'], ['医用绷带', 'analgesicgauze'], ['消毒绷带', 'sterilizedbandage'],
-        ['塑料绷带', 'plasticbandage'], ['创可贴', 'adhesivebandage'], ['藻酸盐绷带', 'alginate'],
-        ['止痛药瓶', 'painkillers'], ['镇痛膏瓶', 'paincream'], ['吗啡注射器', 'morphine'],
-        ['抗生素药瓶', 'antibiotics'], ['抗血清注射器', 'antiserum'], ['抗辐射剂药瓶', 'antirad'],
-        ['纳洛酮注射器', 'naloxone'], ['芬太尼注射器', 'fentanyl'], ['海洛因注射器', 'heroin'],
-        ['鸦片注射器', 'opium'], ['自动体外除颤仪', 'aed'], ['手动除颤仪', 'manualdefibrillator'],
-        ['局部复苏装置', 'lrd'], ['简易局部复苏装置', 'makeshiftlrd'], ['自动泵', 'autopump'],
-        ['医疗包', 'medkit'], ['夹板', 'splint'], ['血袋', 'bloodbag'],
-        ['消毒液瓶', 'disinfectant'], ['注射器', 'syringe'], ['止血带', 'tourniquet'],
-        ['手枪', 'pistol'], ['步枪', 'rifle'], ['霰弹枪', 'shotgun'],
-        ['9mm子弹', '9mmround'], ['5.56子弹', '556round'], ['12号霰弹', '12gauge'],
-        ['简易步枪', 'makeshiftrifle'], ['砍刀', 'machete'], ['十字镐', 'pickaxe'],
-        ['大锤', 'sledgehammer'], ['爪子', 'claws'], ['炸药', 'dynamite'],
-        ['铲子', 'shovel'], ['木铲', 'woodshovel'], ['干草叉', 'pitchfork'],
-        ['微型激光钻', 'minilaserdrill'], ['重型钻', 'heavydrill'], ['钛合金多功能工具', 'titaniummultitool'],
-        ['扳手', 'wrench'], ['简易扳手', 'makeshiftwrench'], ['攀爬绳', 'climbingrope'],
-        ['攀爬爪', 'climbingclaws'], ['抓钩', 'grapplinghook'], ['手摇发电机', 'handcrank'],
-        ['打火机', 'lighter'], ['火把', 'torch'], ['营地篝火', 'campfire'],
-        ['地形扫描仪', 'terrainscanner'], ['盖革计数器', 'geigercounter'], ['开锁工具包', 'lockpickingkit'],
-        ['废金属', 'scrapmetal'], ['废料块', 'scrapcube'], ['废料板', 'scrappanel'], ['废料管', 'scraptube'],
-        ['木材碎片', 'woodscraps'], ['木块', 'woodcube'], ['木板', 'woodpanel'],
-        ['绳子', 'rope'], ['细绳', 'string'], ['木棍', 'stick'], ['钉子', 'nails'],
-        ['布料', 'canvas'], ['铜矿石', 'rawcopper'], ['加工铜', 'processedcopper'],
-        ['钛板', 'titaniumslab'], ['钛棒', 'titaniumrod'], ['钛片', 'titaniumsheet'],
-        ['塑料块', 'plasticchunk'], ['柔性玻璃', 'flexiglass'], ['电路板', 'circuitboard'],
-        ['一捆电线', 'bundleofwires'], ['煤炭', 'charcoal'], ['易燃粉末', 'flammablepowder'],
-        ['水瓶', 'waterbottle'], ['牛奶', 'milk'], ['巧克力牛奶', 'chocolatemilk'],
-        ['汤', 'soup'], ['能量饮料', 'energydrink'], ['咖啡', 'coffee'],
-        ['苹果汁', 'applejuice'], ['柠檬水', 'lemonade'], ['冰茶', 'icetea'],
-        ['苏打水', 'sodabottle'], ['苏打罐', 'sodacan'], ['酒精', 'alcohol'],
-        ['汉堡', 'burger'], ['牛排', 'steak'], ['披萨片', 'pizzaslice'],
-        ['饼干', 'cookies'], ['薯片', 'chips'], ['面包', 'bread'],
-        ['蛋糕', 'cake'], ['肉干', 'pemmican'], ['营养棒', 'nutrientbar'],
-        ['塑料袋', 'plasticbag'], ['垃圾袋', 'trashbag'], ['植物纤维袋', 'foliagebag'],
-        ['植物纤维挎包', 'slingbag'], ['重力袋', 'gravbag'], ['腿包', 'legpouch'],
-        ['随身水包', 'liquidpouch'], ['材料包', 'materialpouch'], ['小背包', 'smallpack'],
-        ['双肩大背包', 'bigpack'], ['工具箱', 'toolbox'], ['纸箱', 'box'],
-        ['小桶', 'minibarrel'], ['水壶', 'canteen'], ['水罐', 'waterjug'],
-        ['自行车头盔', 'bikehelmet'], ['防毒面具', 'dustmask'], ['围巾', 'scarf'],
-        ['头灯', 'headlamp'], ['安全眼镜', 'safetyglasses'], ['巴拉克拉法帽', 'balaclava'],
-        ['手套', 'latexgloves'], ['战术手套', 'tacticalgloves'], ['腰带', 'belt'],
-        ['防弹衣', 'bellyarmor'], ['弹药带', 'bandolier'], ['腰包', 'fannypack'],
-        ['运动鞋', 'sneakers'], ['战术靴', 'tacticalboots'], ['护膝', 'kneepads'],
-        ['小型电池', 'smallbattery'], ['中型电池', 'mediumbattery'], ['大型电池', 'largebattery'],
-        ['手电筒', 'flashlight'], ['应急手电', 'emergencylight'], ['提灯', 'lantern'],
-        ['灯泡', 'lightbulb'], ['MP3播放器', 'mp3player'], ['手表', 'watch'],
-        ['喷气背包', 'jetpack'], ['等离子切割器', 'plasmacutter'],
-      ]},
+      { type: 'field_searchable_dropdown', name: 'ID', options: VANILLA_ITEMS, lang: 'zh' },
     ],
     output: 'Item', colour: C.VALUE,
   },
@@ -2323,7 +2564,6 @@ csharpGenerator.forBlock['cu_item_syringe'] = (block, gen) => {
 };
 
 // ═══ Dropdown i18n ═══════════════════════════════════════════
-type DdOption = [string, string, string]; // [zhLabel, enLabel, value]
 let _blocksLang = 'zh';
 
 const PROP_OPTIONS: DdOption[] = [
@@ -2427,120 +2667,6 @@ const LIMB_OPTIONS: DdOption[] = [
   ['右腿', 'Right leg', '5'],
 ];
 
-const VANILLA_ITEMS: DdOption[] = [
-  ['绷带', 'Bandage', 'bandage'], ['医用绷带', 'Medical Gauze', 'analgesicgauze'],
-  ['消毒绷带', 'Sterilized Bandage', 'sterilizedbandage'],
-  ['塑料绷带', 'Plastic Bandage', 'plasticbandage'],
-  ['创可贴', 'Adhesive Bandage', 'adhesivebandage'],
-  ['藻酸盐绷带', 'Alginate Bandage', 'alginate'],
-  ['止痛药瓶', 'Painkillers', 'painkillers'],
-  ['镇痛膏瓶', 'Pain Cream', 'paincream'],
-  ['吗啡注射器', 'Morphine', 'morphine'],
-  ['抗生素药瓶', 'Antibiotics', 'antibiotics'],
-  ['抗血清注射器', 'Antiserum', 'antiserum'],
-  ['抗辐射剂药瓶', 'Antirad', 'antirad'],
-  ['纳洛酮注射器', 'Naloxone', 'naloxone'],
-  ['芬太尼注射器', 'Fentanyl', 'fentanyl'],
-  ['海洛因注射器', 'Heroin', 'heroin'],
-  ['鸦片注射器', 'Opium', 'opium'],
-  ['自动体外除颤仪', 'AED', 'aed'],
-  ['手动除颤仪', 'Manual Defibrillator', 'manualdefibrillator'],
-  ['局部复苏装置', 'LRD', 'lrd'],
-  ['简易局部复苏装置', 'Makeshift LRD', 'makeshiftlrd'],
-  ['自动泵', 'Auto Pump', 'autopump'],
-  ['医疗包', 'Medkit', 'medkit'], ['夹板', 'Splint', 'splint'],
-  ['血袋', 'Blood Bag', 'bloodbag'],
-  ['消毒液瓶', 'Disinfectant', 'disinfectant'],
-  ['注射器', 'Syringe', 'syringe'], ['止血带', 'Tourniquet', 'tourniquet'],
-  ['手枪', 'Pistol', 'pistol'], ['步枪', 'Rifle', 'rifle'],
-  ['霰弹枪', 'Shotgun', 'shotgun'],
-  ['9mm子弹', '9mm Round', '9mmround'],
-  ['5.56子弹', '5.56 Round', '556round'],
-  ['12号霰弹', '12 Gauge', '12gauge'],
-  ['简易步枪', 'Makeshift Rifle', 'makeshiftrifle'],
-  ['砍刀', 'Machete', 'machete'], ['十字镐', 'Pickaxe', 'pickaxe'],
-  ['大锤', 'Sledgehammer', 'sledgehammer'], ['爪子', 'Claws', 'claws'],
-  ['炸药', 'Dynamite', 'dynamite'], ['铲子', 'Shovel', 'shovel'],
-  ['木铲', 'Wood Shovel', 'woodshovel'], ['干草叉', 'Pitchfork', 'pitchfork'],
-  ['微型激光钻', 'Mini Laser Drill', 'minilaserdrill'],
-  ['重型钻', 'Heavy Drill', 'heavydrill'],
-  ['钛合金多功能工具', 'Titanium Multitool', 'titaniummultitool'],
-  ['扳手', 'Wrench', 'wrench'], ['简易扳手', 'Makeshift Wrench', 'makeshiftwrench'],
-  ['攀爬绳', 'Climbing Rope', 'climbingrope'],
-  ['攀爬爪', 'Climbing Claws', 'climbingclaws'],
-  ['抓钩', 'Grappling Hook', 'grapplinghook'],
-  ['手摇发电机', 'Hand Crank', 'handcrank'],
-  ['打火机', 'Lighter', 'lighter'], ['火把', 'Torch', 'torch'],
-  ['营地篝火', 'Campfire', 'campfire'],
-  ['地形扫描仪', 'Terrain Scanner', 'terrainscanner'],
-  ['盖革计数器', 'Geiger Counter', 'geigercounter'],
-  ['开锁工具包', 'Lockpicking Kit', 'lockpickingkit'],
-  ['废金属', 'Scrap Metal', 'scrapmetal'],
-  ['废料块', 'Scrap Cube', 'scrapcube'],
-  ['废料板', 'Scrap Panel', 'scrappanel'],
-  ['废料管', 'Scrap Tube', 'scraptube'],
-  ['木材碎片', 'Wood Scraps', 'woodscraps'],
-  ['木块', 'Wood Cube', 'woodcube'], ['木板', 'Wood Panel', 'woodpanel'],
-  ['绳子', 'Rope', 'rope'], ['细绳', 'String', 'string'],
-  ['木棍', 'Stick', 'stick'], ['钉子', 'Nails', 'nails'],
-  ['布料', 'Canvas', 'canvas'], ['铜矿石', 'Raw Copper', 'rawcopper'],
-  ['加工铜', 'Processed Copper', 'processedcopper'],
-  ['钛板', 'Titanium Slab', 'titaniumslab'],
-  ['钛棒', 'Titanium Rod', 'titaniumrod'],
-  ['钛片', 'Titanium Sheet', 'titaniumsheet'],
-  ['塑料块', 'Plastic Chunk', 'plasticchunk'],
-  ['柔性玻璃', 'Flexiglass', 'flexiglass'],
-  ['电路板', 'Circuit Board', 'circuitboard'],
-  ['一捆电线', 'Bundle of Wires', 'bundleofwires'],
-  ['煤炭', 'Charcoal', 'charcoal'],
-  ['易燃粉末', 'Flammable Powder', 'flammablepowder'],
-  ['水瓶', 'Water Bottle', 'waterbottle'], ['牛奶', 'Milk', 'milk'],
-  ['巧克力牛奶', 'Chocolate Milk', 'chocolatemilk'],
-  ['汤', 'Soup', 'soup'], ['能量饮料', 'Energy Drink', 'energydrink'],
-  ['咖啡', 'Coffee', 'coffee'], ['苹果汁', 'Apple Juice', 'applejuice'],
-  ['柠檬水', 'Lemonade', 'lemonade'], ['冰茶', 'Ice Tea', 'icetea'],
-  ['苏打水', 'Soda Bottle', 'sodabottle'], ['苏打罐', 'Soda Can', 'sodacan'],
-  ['酒精', 'Alcohol', 'alcohol'], ['汉堡', 'Burger', 'burger'],
-  ['牛排', 'Steak', 'steak'], ['披萨片', 'Pizza Slice', 'pizzaslice'],
-  ['饼干', 'Cookies', 'cookies'], ['薯片', 'Chips', 'chips'],
-  ['面包', 'Bread', 'bread'], ['蛋糕', 'Cake', 'cake'],
-  ['肉干', 'Pemmican', 'pemmican'],
-  ['营养棒', 'Nutrient Bar', 'nutrientbar'],
-  ['塑料袋', 'Plastic Bag', 'plasticbag'],
-  ['垃圾袋', 'Trash Bag', 'trashbag'],
-  ['植物纤维袋', 'Foliage Bag', 'foliagebag'],
-  ['植物纤维挎包', 'Sling Bag', 'slingbag'],
-  ['重力袋', 'Grav Bag', 'gravbag'], ['腿包', 'Leg Pouch', 'legpouch'],
-  ['随身水包', 'Liquid Pouch', 'liquidpouch'],
-  ['材料包', 'Material Pouch', 'materialpouch'],
-  ['小背包', 'Small Pack', 'smallpack'],
-  ['双肩大背包', 'Big Pack', 'bigpack'],
-  ['工具箱', 'Toolbox', 'toolbox'], ['纸箱', 'Box', 'box'],
-  ['小桶', 'Mini Barrel', 'minibarrel'], ['水壶', 'Canteen', 'canteen'],
-  ['水罐', 'Water Jug', 'waterjug'],
-  ['自行车头盔', 'Bike Helmet', 'bikehelmet'],
-  ['防毒面具', 'Dust Mask', 'dustmask'], ['围巾', 'Scarf', 'scarf'],
-  ['头灯', 'Headlamp', 'headlamp'],
-  ['安全眼镜', 'Safety Glasses', 'safetyglasses'],
-  ['巴拉克拉法帽', 'Balaclava', 'balaclava'],
-  ['手套', 'Latex Gloves', 'latexgloves'],
-  ['战术手套', 'Tactical Gloves', 'tacticalgloves'],
-  ['腰带', 'Belt', 'belt'], ['防弹衣', 'Belly Armor', 'bellyarmor'],
-  ['弹药带', 'Bandolier', 'bandolier'], ['腰包', 'Fanny Pack', 'fannypack'],
-  ['运动鞋', 'Sneakers', 'sneakers'],
-  ['战术靴', 'Tactical Boots', 'tacticalboots'],
-  ['护膝', 'Kneepads', 'kneepads'],
-  ['小型电池', 'Small Battery', 'smallbattery'],
-  ['中型电池', 'Medium Battery', 'mediumbattery'],
-  ['大型电池', 'Large Battery', 'largebattery'],
-  ['手电筒', 'Flashlight', 'flashlight'],
-  ['应急手电', 'Emergency Light', 'emergencylight'],
-  ['提灯', 'Lantern', 'lantern'], ['灯泡', 'Light Bulb', 'lightbulb'],
-  ['MP3播放器', 'MP3 Player', 'mp3player'], ['手表', 'Watch', 'watch'],
-  ['喷气背包', 'Jetpack', 'jetpack'],
-  ['等离子切割器', 'Plasma Cutter', 'plasmacutter'],
-];
-
 const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_item_set_property: { PROP: PROP_OPTIONS },
   cu_item_use: { TARGET: TARGET_OPTIONS, ACTION: ACTION_OPTIONS },
@@ -2572,11 +2698,16 @@ function applyLang(lang: string) {
   const defs: any[] = JSON.parse(JSON.stringify(BLOCK_JSON));
   for (const def of defs) {
     const fields = DROPDOWN_I18N[def.type];
-    if (!fields || !def.args0) continue;
+    if (!def.args0) continue;
     for (const arg of def.args0) {
-      if (arg.type !== 'field_dropdown') continue;
-      const opts = fields[arg.name];
-      if (opts) arg.options = dd(lang, opts);
+      if (arg.type === 'field_dropdown' && fields) {
+        const opts = fields[arg.name];
+        if (opts) arg.options = dd(lang, opts);
+      }
+      // Update searchable dropdown language
+      if (arg.type === 'field_searchable_dropdown') {
+        arg.lang = lang;
+      }
     }
   }
   return defs;
