@@ -591,7 +591,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
           }
         }
       }
-      if (hasMatch) result.appendChild(catClone);
+      result.appendChild(catClone);
     }
     ws.updateToolbox(result as any);
     requestAnimationFrame(() => injectCatIconsRef.current?.());
