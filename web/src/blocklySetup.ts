@@ -1143,7 +1143,7 @@ const BLOCK_JSON: any[] = [
   // ═══ Item Property blocks (pink) ═══════════════════════════
   {
     type: 'cu_item_container',
-    message0: '%{BKY_CU_ITEM_CONTAINER} %1 %2 %3 %4 %5 %6',
+    message0: '%{BKY_CU_ITEM_CONTAINER}',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'CAPACITY', check: 'Number', align: 'RIGHT' },
@@ -1156,7 +1156,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_tool',
-    message0: '%{BKY_CU_ITEM_TOOL} %1 %2 %3 %4 %5 %6 %7 %8',
+    message0: '%{BKY_CU_ITEM_TOOL}',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'DAMAGE', check: 'Number', align: 'RIGHT' },
@@ -1171,7 +1171,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_wearable',
-    message0: '%{BKY_CU_ITEM_WEARABLE} %1 %2 %3 %4 %5 %6',
+    message0: '%{BKY_CU_ITEM_WEARABLE}',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'field_dropdown', name: 'WEAR_LIMB', options: [
@@ -1187,7 +1187,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_register_liquid',
-    message0: '%{BKY_CU_REGISTER_LIQUID} %1 %2 %3 %4 %5 %6 %7',
+    message0: '%{BKY_CU_REGISTER_LIQUID}',
     args0: [
       { type: 'field_input', name: 'ID', text: 'myLiquid' },
       { type: 'field_input', name: 'NAME', text: 'My Liquid' },
@@ -1201,7 +1201,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_liquid_flags',
-    message0: '%{BKY_CU_LIQUID_FLAGS} %1 %2 %3 %4 %5',
+    message0: '%{BKY_CU_LIQUID_FLAGS}',
     args0: [
       { type: 'field_dropdown', name: 'DRINKABLE', options: [['true','true'],['false','false']] },
       { type: 'field_dropdown', name: 'HEALTH_USABLE', options: [['true','true'],['false','false']] },
@@ -1213,7 +1213,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_liquid_container',
-    message0: '%{BKY_CU_ITEM_LIQUID_CONTAINER} %1 %2 %3 %4 %5',
+    message0: '%{BKY_CU_ITEM_LIQUID_CONTAINER}',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'CAPACITY', check: 'Number', align: 'RIGHT' },
@@ -1225,7 +1225,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_battery',
-    message0: '%{BKY_CU_ITEM_BATTERY} %1 %2 %3 %4',
+    message0: '%{BKY_CU_ITEM_BATTERY}',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'field_dropdown', name: 'PRESET', options: [['Small','Small'],['Medium','Medium'],['Large','Large']] },
@@ -1236,7 +1236,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_light',
-    message0: '%{BKY_CU_ITEM_LIGHT} %1 %2 %3 %4 %5 %6',
+    message0: '%{BKY_CU_ITEM_LIGHT}',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'INTENSITY', check: 'Number', align: 'RIGHT' },
@@ -1249,7 +1249,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_bandage',
-    message0: '%{BKY_CU_ITEM_BANDAGE} %1 %2 %3 %4 %5 %6 %7',
+    message0: '%{BKY_CU_ITEM_BANDAGE}',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'EFFECTIVENESS', check: 'Number', align: 'RIGHT' },
@@ -1263,7 +1263,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_syringe',
-    message0: '%{BKY_CU_ITEM_SYRINGE} %1 %2 %3 %4 %5 %6',
+    message0: '%{BKY_CU_ITEM_SYRINGE}',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'CAPACITY', check: 'Number', align: 'RIGHT' },
