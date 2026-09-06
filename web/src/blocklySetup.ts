@@ -80,19 +80,15 @@ fieldRegistry.register('field_sprite_picker', FieldSpritePicker as any);
 // ── Searchable dropdown field ──────────────────────────────────────
 type SearchableOption = [string, string, string]; // [zhLabel, enLabel, value]
 
-class FieldSearchableDropdown extends Blockly.Field {
-  private options_: SearchableOption[] = [];
+class FieldSearchableDropdown extends Blockly.FieldDropdown {
+  private allOptions_: SearchableOption[] = [];
   private currentLang_ = 'zh';
-  private searchText_ = '';
-  private popupEl_: HTMLDivElement | null = null;
-  private listDiv_: HTMLDivElement | null = null;
 
   constructor(value?: string, options?: SearchableOption[], lang?: string) {
-    super(value || '');
-    this.options_ = options || [];
+    const ddOpts = (options || []).map(([zh, en, val]) => [lang === 'zh' ? zh : en, val]);
+    super(ddOpts as any);
+    this.allOptions_ = options || [];
     this.currentLang_ = lang || 'zh';
-    this.value_ = value || '';
-    this.SERIALIZABLE = true;
   }
 
   static fromJson<T extends Blockly.Field>(
@@ -102,150 +98,69 @@ class FieldSearchableDropdown extends Blockly.Field {
     return new FieldSearchableDropdown(options.value, options.options, options.lang) as unknown as T;
   }
 
-  protected initView_(): void {
-    // Empty — we render display text in render_()
+  setLang(lang: string): void {
+    this.currentLang_ = lang;
+    // Rebuild options list with correct language
+    const ddOpts = this.allOptions_.map(([zh, en, val]) => [lang === 'zh' ? zh : en, val]);
+    this.menu_?.dispose();
+    this.menu_ = null;
+    (this as any).options_ = ddOpts;
+    this.setValue(this.getValue()); // re-render
   }
 
-  protected render_(): void {
-    if (!this.textElement_) return;
-    const lang = this.currentLang_;
-    const match = this.options_.find(([, , val]) => val === this.value_);
-    this.textElement_.textContent = match ? (lang === 'zh' ? match[0] : match[1]) : (this.value_ || '...');
-    if (this.fieldGroup_) this.fieldGroup_.style.cursor = 'pointer';
-  }
+  /** Override showEditor_ to inject search input into Blockly's dropdown div */
+  showEditor_(e?: MouseEvent): void {
+    // Call parent to open standard Blockly dropdown
+    super.showEditor_(e);
 
-  showEditor_(_e?: Event): void {
-    // Close any existing popup
-    this.closePopup_();
+    // Wait for Blockly to render the dropdown
+    requestAnimationFrame(() => {
+      const dropDiv = Blockly.DropDownDiv as any;
+      const content = dropDiv?.getContentDiv?.();
+      if (!content) return;
 
-    const block = this.getSourceBlock();
-    if (!block) return;
+      // Find the scrollable menu container (Blockly wraps options in a div)
+      const menuEl = content.querySelector('.blocklyMenu, .blockly-dropdown-menu');
+      const scrollContainer = menuEl?.parentElement || content;
 
-    // Create popup
-    const popup = document.createElement('div');
-    popup.style.cssText = 'position:fixed;z-index:10000;width:280px;max-height:360px;display:flex;flex-direction:column;font-family:sans-serif;background:#fff;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.25);overflow:hidden;';
+      // Create search input
+      const searchWrap = document.createElement('div');
+      searchWrap.style.cssText = 'padding:6px 8px;border-bottom:1px solid #aaa;background:inherit;';
 
-    // Search input
-    const searchWrap = document.createElement('div');
-    searchWrap.style.cssText = 'padding:8px;border-bottom:1px solid #e0e0e0;';
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.placeholder = this.currentLang_ === 'zh' ? '搜索物品 (中/英)...' : 'Search items (EN/ZH)...';
-    input.value = this.searchText_;
-    input.style.cssText = 'width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #ccc;border-radius:4px;font-size:13px;outline:none;';
-    input.addEventListener('input', () => { this.searchText_ = input.value; this.renderList_(); });
-    input.addEventListener('keydown', (ev) => ev.stopPropagation());
-    input.addEventListener('mousedown', (ev) => ev.stopPropagation());
-    searchWrap.appendChild(input);
-    popup.appendChild(searchWrap);
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = this.currentLang_ === 'zh' ? '搜索...' : 'Search...';
+      input.style.cssText = 'width:100%;box-sizing:border-box;padding:4px 6px;border:1px solid #ccc;border-radius:3px;font-size:13px;outline:none;font-family:sans-serif;';
 
-    // List
-    const list = document.createElement('div');
-    list.style.cssText = 'overflow-y:auto;max-height:310px;';
-    popup.appendChild(list);
-    this.listDiv_ = list;
-    this.popupEl_ = popup;
+      // Prevent Blockly key handlers from eating our input
+      input.addEventListener('keydown', (ev) => ev.stopPropagation());
+      input.addEventListener('mousedown', (ev) => ev.stopPropagation());
 
-    this.renderList_();
-
-    // Position near the field
-    document.body.appendChild(popup);
-    const fieldRect = this.fieldGroup_?.getBoundingClientRect();
-    if (fieldRect) {
-      popup.style.left = fieldRect.left + 'px';
-      popup.style.top = (fieldRect.bottom + 2) + 'px';
-    } else {
-      popup.style.left = '100px';
-      popup.style.top = '100px';
-    }
-
-    // Close on outside click
-    const onOutsideClick = (ev: MouseEvent) => {
-      if (!popup.contains(ev.target as Node)) {
-        this.closePopup_();
-        document.removeEventListener('mousedown', onOutsideClick, true);
-      }
-    };
-    setTimeout(() => document.addEventListener('mousedown', onOutsideClick, true), 0);
-
-    // Focus input
-    setTimeout(() => input.focus(), 10);
-  }
-
-  private closePopup_(): void {
-    if (this.popupEl_?.parentNode) {
-      this.popupEl_.parentNode.removeChild(this.popupEl_);
-    }
-    this.popupEl_ = null;
-    this.listDiv_ = null;
-  }
-
-  private renderList_(): void {
-    if (!this.listDiv_) return;
-    this.listDiv_.innerHTML = '';
-
-    const query = this.searchText_.toLowerCase();
-    const lang = this.currentLang_;
-    const currentVal = this.value_;
-
-    const filtered = this.options_.filter(([zh, en, val]) => {
-      if (!query) return true;
-      return zh.toLowerCase().includes(query) || en.toLowerCase().includes(query) || val.toLowerCase().includes(query);
-    });
-
-    if (filtered.length === 0) {
-      const empty = document.createElement('div');
-      empty.style.cssText = 'padding:12px 8px;text-align:center;color:#999;font-size:13px;';
-      empty.textContent = lang === 'zh' ? '未找到匹配项' : 'No matches found';
-      this.listDiv_.appendChild(empty);
-      return;
-    }
-
-    filtered.forEach(([zh, en, val]) => {
-      const item = document.createElement('div');
-      const isSelected = val === currentVal;
-      item.style.cssText = `padding:6px 10px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;${isSelected ? 'background:#e3f2fd;font-weight:600;' : ''}`;
-      item.addEventListener('mouseenter', () => { item.style.background = isSelected ? '#bbdefb' : '#f5f5f5'; });
-      item.addEventListener('mouseleave', () => { item.style.background = isSelected ? '#e3f2fd' : ''; });
-
-      const primary = document.createElement('span');
-      primary.textContent = lang === 'zh' ? zh : en;
-      primary.style.cssText = 'flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-      item.appendChild(primary);
-
-      const secondary = document.createElement('span');
-      secondary.textContent = lang === 'zh' ? en : zh;
-      secondary.style.cssText = 'color:#999;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;';
-      item.appendChild(secondary);
-
-      if (isSelected) {
-        const check = document.createElement('span');
-        check.textContent = '✓';
-        check.style.cssText = 'color:#1976d2;font-weight:700;';
-        item.appendChild(check);
-      }
-
-      item.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.setValue(val);
-        this.closePopup_();
+      input.addEventListener('input', () => {
+        const query = input.value.toLowerCase();
+        // Filter Blockly menu items
+        if (menuEl) {
+          const items = menuEl.querySelectorAll('.blocklyMenuItem, .blockly-option');
+          items.forEach((item: Element) => {
+            const text = item.textContent?.toLowerCase() || '';
+            (item as HTMLElement).style.display = text.includes(query) ? '' : 'none';
+          });
+        }
       });
 
-      this.listDiv_!.appendChild(item);
+      searchWrap.appendChild(input);
+
+      // Insert search at the top of the dropdown content
+      if (scrollContainer.firstChild) {
+        scrollContainer.insertBefore(searchWrap, scrollContainer.firstChild);
+      } else {
+        scrollContainer.appendChild(searchWrap);
+      }
+
+      // Focus after dropdown is positioned
+      setTimeout(() => input.focus(), 20);
     });
   }
-
-  getLang(): string { return this.currentLang_; }
-  setLang(lang: string): void { this.currentLang_ = lang; this.render_(); }
-
-  protected doValueUpdate_(newValue: any): void {
-    this.value_ = newValue;
-    this.render_();
-  }
-
-  protected doValueInvalid_(_newValue: any): void {}
-  getEditorShowArrow_: () => false = () => false as false;
 }
 
 fieldRegistry.register('field_searchable_dropdown', FieldSearchableDropdown as any);
