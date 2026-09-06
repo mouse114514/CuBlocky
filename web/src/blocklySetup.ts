@@ -1143,7 +1143,7 @@ const BLOCK_JSON: any[] = [
   // ═══ Advanced Item Registration (pink) ═══════════════════════
   {
     type: 'cu_register_item_advanced',
-    message0: '%{BKY_CU_REGISTER_ITEM_ADV} id %1 名称 %2 描述 %3 分类 %4 精灵图 %5',
+    message0: '%{BKY_CU_REGISTER_ITEM_ADV} %1 %2 %3 %4 %5',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'field_input', name: 'FULL_NAME', text: 'My Item', align: 'RIGHT' },
@@ -1159,7 +1159,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_container',
-    message0: '%{BKY_CU_ITEM_CONTAINER} id %1 容量 %2 单物品最大重量 %3 减重 %4 物品可见 %5 标签限制 %6',
+    message0: '%{BKY_CU_ITEM_CONTAINER} %1 %2 %3 %4 %5 %6',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'CAPACITY', check: 'Number', align: 'RIGHT' },
@@ -1172,7 +1172,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_tool',
-    message0: '%{BKY_CU_ITEM_TOOL} id %1 伤害 %2 结构伤害 %3 距离 %4 击退 %5 冷却 %6 体力消耗 %7 穿透 %8',
+    message0: '%{BKY_CU_ITEM_TOOL} %1 %2 %3 %4 %5 %6 %7 %8',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'DAMAGE', check: 'Number', align: 'RIGHT' },
@@ -1187,7 +1187,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_wearable',
-    message0: '%{BKY_CU_ITEM_WEARABLE} id %1 部位 %2 插槽 %3 护甲 %4 隔离 %5 耐久损失倍率 %6',
+    message0: '%{BKY_CU_ITEM_WEARABLE} %1 %2 %3 %4 %5 %6',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'field_dropdown', name: 'WEAR_LIMB', options: [
@@ -1203,7 +1203,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_register_liquid',
-    message0: '%{BKY_CU_REGISTER_LIQUID} id %1 名称 %2 描述 %3 颜色R %4 G %5 B %6 每升价值 %7',
+    message0: '%{BKY_CU_REGISTER_LIQUID} %1 %2 %3 %4 %5 %6 %7',
     args0: [
       { type: 'field_input', name: 'ID', text: 'myLiquid' },
       { type: 'field_input', name: 'NAME', text: 'My Liquid' },
@@ -1217,7 +1217,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_liquid_flags',
-    message0: '%{BKY_CU_LIQUID_FLAGS} 可饮用 %1 可外用 %2 可注射 %3 注射不适 %4 不可获得 %5',
+    message0: '%{BKY_CU_LIQUID_FLAGS} %1 %2 %3 %4 %5',
     args0: [
       { type: 'field_dropdown', name: 'DRINKABLE', options: [['true','true'],['false','false']] },
       { type: 'field_dropdown', name: 'HEALTH_USABLE', options: [['true','true'],['false','false']] },
@@ -1229,7 +1229,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_liquid_container',
-    message0: '%{BKY_CU_ITEM_LIQUID_CONTAINER} id %1 容量 %2 自动填充 %3 液体ID %4 液体量 %5',
+    message0: '%{BKY_CU_ITEM_LIQUID_CONTAINER} %1 %2 %3 %4 %5',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'CAPACITY', check: 'Number', align: 'RIGHT' },
@@ -1241,7 +1241,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_battery',
-    message0: '%{BKY_CU_ITEM_BATTERY} id %1 预设 %2 初始电量 %3 随机带电池 %4',
+    message0: '%{BKY_CU_ITEM_BATTERY} %1 %2 %3 %4',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'field_dropdown', name: 'PRESET', options: [['Small','Small'],['Medium','Medium'],['Large','Large']] },
@@ -1252,7 +1252,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_light',
-    message0: '%{BKY_CU_ITEM_LIGHT} id %1 强度 %2 外半径 %3 R %4 G %5 B %6',
+    message0: '%{BKY_CU_ITEM_LIGHT} %1 %2 %3 %4 %5 %6',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'INTENSITY', check: 'Number', align: 'RIGHT' },
@@ -1265,7 +1265,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_bandage',
-    message0: '%{BKY_CU_ITEM_BANDAGE} id %1 效力 %2 皮肤治疗 %3 止血 %4 止痛 %5 骨恢复 %6 脱臼恢复 %7',
+    message0: '%{BKY_CU_ITEM_BANDAGE} %1 %2 %3 %4 %5 %6 %7',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'EFFECTIVENESS', check: 'Number', align: 'RIGHT' },
@@ -1279,7 +1279,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_syringe',
-    message0: '%{BKY_CU_ITEM_SYRINGE} id %1 容量 %2 每次注射 %3 自动填充 %4 液体ID %5 液体量 %6',
+    message0: '%{BKY_CU_ITEM_SYRINGE} %1 %2 %3 %4 %5 %6',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'input_value', name: 'CAPACITY', check: 'Number', align: 'RIGHT' },
@@ -1450,17 +1450,17 @@ const MSG_ZH: Record<string, string> = {
   // World
   CU_WORLD_DEPTH: '玩家深度(米)',
   // Advanced items
-  CU_REGISTER_ITEM_ADV: '注册高级物品(CCL)',
-  CU_ITEM_CONTAINER: '设置容器属性',
-  CU_ITEM_TOOL: '设置武器/工具属性',
-  CU_ITEM_WEARABLE: '设置可穿戴属性',
-  CU_REGISTER_LIQUID: '注册液体',
-  CU_LIQUID_FLAGS: '液体标志',
-  CU_ITEM_LIQUID_CONTAINER: '设置液体容器',
-  CU_ITEM_BATTERY: '设置电池属性',
-  CU_ITEM_LIGHT: '设置光源属性',
-  CU_ITEM_BANDAGE: '设置绷带属性',
-  CU_ITEM_SYRINGE: '设置注射器属性',
+  CU_REGISTER_ITEM_ADV: '注册高级物品(CCL) id %1 名称 %2 描述 %3 分类 %4 精灵图 %5',
+  CU_ITEM_CONTAINER: '设置容器属性 id %1 容量 %2 单物品最大重量 %3 减重 %4 物品可见 %5 标签限制 %6',
+  CU_ITEM_TOOL: '设置武器/工具属性 id %1 伤害 %2 结构伤害 %3 距离 %4 击退 %5 冷却 %6 体力消耗 %7 穿透 %8',
+  CU_ITEM_WEARABLE: '设置可穿戴属性 id %1 部位 %2 插槽 %3 护甲 %4 隔离 %5 耐久损失倍率 %6',
+  CU_REGISTER_LIQUID: '注册液体 id %1 名称 %2 描述 %3 颜色R %4 G %5 B %6 每升价值 %7',
+  CU_LIQUID_FLAGS: '液体标志 可饮用 %1 可外用 %2 可注射 %3 注射不适 %4 不可获得 %5',
+  CU_ITEM_LIQUID_CONTAINER: '设置液体容器 id %1 容量 %2 自动填充 %3 液体ID %4 液体量 %5',
+  CU_ITEM_BATTERY: '设置电池属性 id %1 预设 %2 初始电量 %3 随机带电池 %4',
+  CU_ITEM_LIGHT: '设置光源属性 id %1 强度 %2 外半径 %3 R %4 G %5 B %6',
+  CU_ITEM_BANDAGE: '设置绷带属性 id %1 效力 %2 皮肤治疗 %3 止血 %4 止痛 %5 骨恢复 %6 脱臼恢复 %7',
+  CU_ITEM_SYRINGE: '设置注射器属性 id %1 容量 %2 每次注射 %3 自动填充 %4 液体ID %5 液体量 %6',
 };
 
 const MSG_EN: Record<string, string> = {
@@ -1620,17 +1620,17 @@ const MSG_EN: Record<string, string> = {
   // World
   CU_WORLD_DEPTH: 'player depth (meters)',
   // Advanced items
-  CU_REGISTER_ITEM_ADV: 'register advanced item (CCL)',
-  CU_ITEM_CONTAINER: 'set container properties',
-  CU_ITEM_TOOL: 'set weapon/tool properties',
-  CU_ITEM_WEARABLE: 'set wearable properties',
-  CU_REGISTER_LIQUID: 'register liquid',
-  CU_LIQUID_FLAGS: 'liquid flags',
-  CU_ITEM_LIQUID_CONTAINER: 'set liquid container',
-  CU_ITEM_BATTERY: 'set battery properties',
-  CU_ITEM_LIGHT: 'set light properties',
-  CU_ITEM_BANDAGE: 'set bandage properties',
-  CU_ITEM_SYRINGE: 'set syringe properties',
+  CU_REGISTER_ITEM_ADV: 'register advanced item (CCL) id %1 name %2 desc %3 category %4 sprite %5',
+  CU_ITEM_CONTAINER: 'set container properties id %1 capacity %2 max weight %3 encumbrance %4 visible %5 tag restriction %6',
+  CU_ITEM_TOOL: 'set weapon/tool properties id %1 damage %2 structural %3 distance %4 knockback %5 cooldown %6 stamina %7 piercing %8',
+  CU_ITEM_WEARABLE: 'set wearable properties id %1 limb %2 slot %3 armor %4 isolation %5 durability loss %6',
+  CU_REGISTER_LIQUID: 'register liquid id %1 name %2 desc %3 R %4 G %5 B %6 value per liter %7',
+  CU_LIQUID_FLAGS: 'liquid flags drinkable %1 medical %2 injectable %3 injection sickness %4 unobtainable %5',
+  CU_ITEM_LIQUID_CONTAINER: 'set liquid container id %1 capacity %2 auto fill %3 liquid id %4 amount %5',
+  CU_ITEM_BATTERY: 'set battery properties id %1 preset %2 initial charge %3 spawn with battery %4',
+  CU_ITEM_LIGHT: 'set light properties id %1 intensity %2 radius %3 R %4 G %5 B %6',
+  CU_ITEM_BANDAGE: 'set bandage properties id %1 effectiveness %2 skin heal %3 bandage slow %4 pain %5 bone %6 dislocation %7',
+  CU_ITEM_SYRINGE: 'set syringe properties id %1 capacity %2 per use %3 auto fill %4 liquid id %5 amount %6',
 };
 
 export function setMessages(lang: string) {
