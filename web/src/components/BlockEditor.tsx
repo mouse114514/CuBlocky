@@ -568,32 +568,33 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
       return;
     }
     const q = term.toLowerCase();
-    const doc = new DOMParser().parseFromString(origToolboxRef.current, 'text/html');
-    const root = doc.getElementById('toolbox');
+    const doc = new DOMParser().parseFromString(origToolboxRef.current, 'text/xml');
+    const root = doc.documentElement;
     if (!root) return;
     const result = doc.createElement('xml');
     result.id = 'toolbox';
-    for (const cat of Array.from(root.children)) {
-      if (cat.tagName !== 'category') continue;
-      const catClone = cat.cloneNode(false) as Element;
-      let hasMatch = false;
-      for (const child of Array.from(cat.children)) {
-        if (child.tagName === 'sep') {
-          if (hasMatch) catClone.appendChild(child.cloneNode(true));
-          continue;
-        }
+    for (const cat of Array.from(root.children) as Element[]) {
+      if (cat.tagName !== 'category') {
+        if (cat.tagName === 'sep') result.appendChild(cat.cloneNode(true));
+        continue;
+      }
+      const catClone = doc.createElement('category');
+      for (const attr of Array.from(cat.attributes)) {
+        catClone.setAttribute(attr.name, attr.value);
+      }
+      for (const child of Array.from(cat.children) as Element[]) {
         if (child.tagName === 'block') {
           const type = child.getAttribute('type') || '';
           const display = blockNameMapRef.current[type] || '';
           if (type.toLowerCase().includes(q) || display.toLowerCase().includes(q)) {
             catClone.appendChild(child.cloneNode(true));
-            hasMatch = true;
           }
         }
       }
       result.appendChild(catClone);
     }
-    ws.updateToolbox(result as any);
+    const serializer = new XMLSerializer();
+    ws.updateToolbox(serializer.serializeToString(result));
     requestAnimationFrame(() => injectCatIconsRef.current?.());
   }, []);
 
