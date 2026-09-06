@@ -9,6 +9,7 @@
     <Version>0.1.4</Version>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <EnableDefaultContentItems>true</EnableDefaultContentItems>
   </PropertyGroup>
 
   <!-- Frontend (web/) builds into server/wwwroot via vite.config.ts outDir -->
