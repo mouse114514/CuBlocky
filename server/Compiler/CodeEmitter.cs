@@ -200,6 +200,26 @@ public static class CodeEmitter
             sb.AppendLine("                },");
         }
 
+        // Advanced: Gun
+        if (it.Gun != null)
+        {
+            sb.AppendLine($"                Gun = new GunProperties");
+            sb.AppendLine("                {");
+            sb.AppendLine($"                    AmmoType = GunScript.AmmoType.{it.Gun.AmmoType},");
+            sb.AppendLine($"                    FiringMode = GunScript.FiringMode.{it.Gun.FiringMode},");
+            sb.AppendLine($"                    FeedType = GunScript.FeedType.{it.Gun.FeedType},");
+            sb.AppendLine($"                    MagCapacity = {it.Gun.MagCapacity},");
+            sb.AppendLine($"                    KnockBack = {it.Gun.KnockBack}f,");
+            sb.AppendLine($"                    StructureDamage = {it.Gun.StructureDamage}f,");
+            sb.AppendLine($"                    AnimalDamage = {it.Gun.AnimalDamage}f,");
+            sb.AppendLine($"                    Loudness = {it.Gun.Loudness}f,");
+            sb.AppendLine($"                    DesiredGasTime = {it.Gun.DesiredGasTime}f,");
+            sb.AppendLine($"                    ShotsPerFire = {it.Gun.ShotsPerFire},");
+            sb.AppendLine($"                    VerticalSpread = {it.Gun.VerticalSpread}f,");
+            sb.AppendLine($"                    ConditionLossPerShot = {it.Gun.ConditionLossPerShot}f,");
+            sb.AppendLine("                },");
+        }
+
         // useAction from Blockly-generated C# code
         if (!string.IsNullOrEmpty(it.UseAction))
         {

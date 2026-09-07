@@ -253,6 +253,23 @@ public static class ProjectEmitter
                 if (sy.TryGetProperty("LiquidAmount", out var v5)) item.Syringe.LiquidAmount = Raw(v5);
                 item.IsAdvanced = true;
             }
+            if (json.TryGetProperty("Gun", out var gu))
+            {
+                item.Gun = new GunProps();
+                if (gu.TryGetProperty("AmmoType", out var v)) item.Gun.AmmoType = v.GetString() ?? "Pistol";
+                if (gu.TryGetProperty("FiringMode", out var v2)) item.Gun.FiringMode = v2.GetString() ?? "SemiAuto";
+                if (gu.TryGetProperty("FeedType", out var v3)) item.Gun.FeedType = v3.GetString() ?? "Mag";
+                if (gu.TryGetProperty("MagCapacity", out var v4)) item.Gun.MagCapacity = Raw(v4);
+                if (gu.TryGetProperty("KnockBack", out var v5)) item.Gun.KnockBack = Raw(v5);
+                if (gu.TryGetProperty("StructureDamage", out var v6)) item.Gun.StructureDamage = Raw(v6);
+                if (gu.TryGetProperty("AnimalDamage", out var v7)) item.Gun.AnimalDamage = Raw(v7);
+                if (gu.TryGetProperty("Loudness", out var v8)) item.Gun.Loudness = Raw(v8);
+                if (gu.TryGetProperty("DesiredGasTime", out var v9)) item.Gun.DesiredGasTime = Raw(v9);
+                if (gu.TryGetProperty("ShotsPerFire", out var v10)) item.Gun.ShotsPerFire = Raw(v10);
+                if (gu.TryGetProperty("VerticalSpread", out var v11)) item.Gun.VerticalSpread = Raw(v11);
+                if (gu.TryGetProperty("ConditionLossPerShot", out var v12)) item.Gun.ConditionLossPerShot = Raw(v12);
+                item.IsAdvanced = true;
+            }
         }
 
         return (string.Join('\n', remainingLines), items, recipes, buildings, tiles, locales, liquids);

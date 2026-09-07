@@ -56,6 +56,7 @@ public class ItemEntry
     public LightProps? Light { get; set; }
     public BandageProps? Bandage { get; set; }
     public SyringeProps? Syringe { get; set; }
+    public GunProps? Gun { get; set; }
 }
 
 public class ContainerProps
@@ -128,6 +129,22 @@ public class SyringeProps
     public bool AutoFill { get; set; } = false;
     public string LiquidId { get; set; } = "morphine";
     public string LiquidAmount { get; set; } = "100";
+}
+
+public class GunProps
+{
+    public string AmmoType { get; set; } = "Pistol";
+    public string FiringMode { get; set; } = "SemiAuto";
+    public string FeedType { get; set; } = "Mag";
+    public string MagCapacity { get; set; } = "12";
+    public string KnockBack { get; set; } = "100";
+    public string StructureDamage { get; set; } = "10";
+    public string AnimalDamage { get; set; } = "25";
+    public string Loudness { get; set; } = "5";
+    public string DesiredGasTime { get; set; } = "0";
+    public string ShotsPerFire { get; set; } = "1";
+    public string VerticalSpread { get; set; } = "0";
+    public string ConditionLossPerShot { get; set; } = "0.01";
 }
 
 public class LiquidEntry

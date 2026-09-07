@@ -1274,6 +1274,26 @@ const BLOCK_JSON: any[] = [
     ],
     colour: C.REGISTER, inputsInline: true,
   },
+  {
+    type: 'cu_item_gun',
+    message0: '%{BKY_CU_ITEM_GUN}',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'AMMO_TYPE', options: [['手枪','Pistol'],['步枪','Rifle'],['霰弹','Shotgun']] },
+      { type: 'field_dropdown', name: 'FIRING_MODE', options: [['泵动','Pump'],['半自动','SemiAuto'],['全自动','Auto']] },
+      { type: 'field_dropdown', name: 'FEED_TYPE', options: [['弹匣供弹','Mag'],['直推供弹','Direct']] },
+      { type: 'input_value', name: 'MAG_CAPACITY', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'ANIMAL_DAMAGE', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'STRUCTURAL_DAMAGE', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'KNOCKBACK', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'CONDITION_LOSS', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'LOUDNESS', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'GAS_TIME', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'SHOTS_PER_FIRE', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'VERTICAL_SPREAD', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.REGISTER, inputsInline: true,
+  },
 ];
 
 // ── Messages ──
@@ -1444,6 +1464,7 @@ const MSG_ZH: Record<string, string> = {
   CU_ITEM_LIGHT: '设置光源属性 id %1 强度 %2 外半径 %3 R %4 G %5 B %6',
   CU_ITEM_BANDAGE: '设置绷带属性 id %1 效力 %2 皮肤治疗 %3 止血 %4 止痛 %5 骨恢复 %6 脱臼恢复 %7',
   CU_ITEM_SYRINGE: '设置注射器属性 id %1 容量 %2 每次注射 %3 自动填充 %4 液体ID %5 液体量 %6',
+  CU_ITEM_GUN: '设置枪械属性 id %1 弹药类型 %2 射击模式 %3 供弹方式 %4 弹匣容量 %5 动物伤害 %6 结构伤害 %7 击退 %8 耐久消耗 %9 响度 %10 气体循环 %11 每次射弹数 %12 垂直散布 %13',
 };
 
 const MSG_EN: Record<string, string> = {
@@ -1613,6 +1634,7 @@ const MSG_EN: Record<string, string> = {
   CU_ITEM_LIGHT: 'set light properties id %1 intensity %2 radius %3 R %4 G %5 B %6',
   CU_ITEM_BANDAGE: 'set bandage properties id %1 effectiveness %2 skin heal %3 bandage slow %4 pain %5 bone %6 dislocation %7',
   CU_ITEM_SYRINGE: 'set syringe properties id %1 capacity %2 per use %3 auto fill %4 liquid id %5 amount %6',
+  CU_ITEM_GUN: 'set gun properties id %1 ammo type %2 firing mode %3 feed type %4 mag capacity %5 animal dmg %6 struct dmg %7 knockback %8 condition loss %9 loudness %10 gas time %11 shots per fire %12 vertical spread %13',
 };
 
 export function setMessages(lang: string) {
@@ -2447,6 +2469,24 @@ csharpGenerator.forBlock['cu_item_syringe'] = (block, gen) => {
   const liquidId = block.getFieldValue('LIQUID_ID') || 'morphine';
   const liquidAmt = gen.valueToCode(block, 'LIQUID_AMOUNT', ORDER_ATOMIC) || '100';
   const json = JSON.stringify({Id: itemId, Syringe: {Capacity: cap, AmountPerFullUse: perUse, AutoFill: autoFill, LiquidId: liquidId, LiquidAmount: liquidAmt}});
+  return `//ITEM_PROP:${json}\n`;
+};
+csharpGenerator.forBlock['cu_item_gun'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
+  const itemId = id.replace(/^"|"$/g, '');
+  const ammoType = block.getFieldValue('AMMO_TYPE');
+  const firingMode = block.getFieldValue('FIRING_MODE');
+  const feedType = block.getFieldValue('FEED_TYPE');
+  const magCap = gen.valueToCode(block, 'MAG_CAPACITY', ORDER_ATOMIC) || '12';
+  const animalDmg = gen.valueToCode(block, 'ANIMAL_DAMAGE', ORDER_ATOMIC) || '25';
+  const structDmg = gen.valueToCode(block, 'STRUCTURAL_DAMAGE', ORDER_ATOMIC) || '10';
+  const kb = gen.valueToCode(block, 'KNOCKBACK', ORDER_ATOMIC) || '100';
+  const condLoss = gen.valueToCode(block, 'CONDITION_LOSS', ORDER_ATOMIC) || '0.01';
+  const loudness = gen.valueToCode(block, 'LOUDNESS', ORDER_ATOMIC) || '5';
+  const gasTime = gen.valueToCode(block, 'GAS_TIME', ORDER_ATOMIC) || '0';
+  const shots = gen.valueToCode(block, 'SHOTS_PER_FIRE', ORDER_ATOMIC) || '1';
+  const spread = gen.valueToCode(block, 'VERTICAL_SPREAD', ORDER_ATOMIC) || '0';
+  const json = JSON.stringify({Id: itemId, Gun: {AmmoType: ammoType, FiringMode: firingMode, FeedType: feedType, MagCapacity: magCap, KnockBack: kb, StructureDamage: structDmg, AnimalDamage: animalDmg, Loudness: loudness, DesiredGasTime: gasTime, ShotsPerFire: shots, VerticalSpread: spread, ConditionLossPerShot: condLoss}});
   return `//ITEM_PROP:${json}\n`;
 };
 
