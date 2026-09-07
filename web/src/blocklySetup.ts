@@ -1136,7 +1136,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_dropdown', name: 'VISIBLE', options: [['true','true'],['false','false']] },
       { type: 'field_input', name: 'TAG_RESTRICTION', text: '' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_item_tool',
@@ -1151,7 +1151,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'STAMINA', check: 'Number', align: 'RIGHT' },
       { type: 'field_dropdown', name: 'PIERCING', options: [['true','true'],['false','false']] },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_item_wearable',
@@ -1167,7 +1167,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'ISOLATION', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'DURABILITY_LOSS', check: 'Number', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_register_liquid',
@@ -1210,7 +1210,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'INJECTION_SICKNESS', check: 'Number', align: 'RIGHT' },
       { type: 'field_dropdown', name: 'UNOBTAINABLE', options: [['false','false'],['true','true']] },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_item_liquid_container',
@@ -1222,7 +1222,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'LIQUID_ID', text: 'water' },
       { type: 'input_value', name: 'LIQUID_AMOUNT', check: 'Number', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_item_battery',
@@ -1233,7 +1233,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'START_CHARGE', check: 'Number', align: 'RIGHT' },
       { type: 'field_dropdown', name: 'SPAWN_WITH_BATTERY', options: [['true','true'],['false','false']] },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_item_light',
@@ -1246,7 +1246,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'COLOR_G', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'COLOR_B', check: 'Number', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_item_bandage',
@@ -1260,7 +1260,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'BONE_HEAL', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'DISLOCATION', check: 'Number', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_item_syringe',
@@ -1273,7 +1273,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'LIQUID_ID', text: 'morphine' },
       { type: 'input_value', name: 'LIQUID_AMOUNT', check: 'Number', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_item_gun',
@@ -1293,7 +1293,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'SHOTS_PER_FIRE', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'VERTICAL_SPREAD', check: 'Number', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_set_item_category',
@@ -1319,7 +1319,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'RECOGNITION', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'SPAWN_FREQ', check: 'Number', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
 ];
 
