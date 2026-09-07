@@ -1127,7 +1127,7 @@ const BLOCK_JSON: any[] = [
   // ═══ Item Property blocks (pink) ═══════════════════════════
   {
     type: 'cu_item_container',
-    message0: '%{BKY_CU_ITEM_CONTAINER}',
+    message0: '%{BKY_CU_ITEM_CONTAINER} %5 %6 %7 %8',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item' },
       { type: 'input_value', name: 'CAPACITY', check: 'Number' },
@@ -1142,7 +1142,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_tool',
-    message0: '%{BKY_CU_ITEM_TOOL}',
+    message0: '%{BKY_CU_ITEM_TOOL} %8 %9',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item' },
       { type: 'input_value', name: 'DAMAGE', check: 'Number' },
@@ -1158,7 +1158,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_wearable',
-    message0: '%{BKY_CU_ITEM_WEARABLE}',
+    message0: '%{BKY_CU_ITEM_WEARABLE} %5 %6 %7 %8',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item' },
       { type: 'dummy_input' },
@@ -1206,7 +1206,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_liquid_flags',
-    message0: '%{BKY_CU_LIQUID_FLAGS}',
+    message0: '%{BKY_CU_LIQUID_FLAGS} %1 %2 %3 %4 %5 %6 %7 %8 %9 %10',
     args0: [
       { type: 'field_input', name: 'ID', text: 'myLiquid' },
       { type: 'dummy_input' },
@@ -1223,7 +1223,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_liquid_container',
-    message0: '%{BKY_CU_ITEM_LIQUID_CONTAINER}',
+    message0: '%{BKY_CU_ITEM_LIQUID_CONTAINER} %5 %6 %7',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item' },
       { type: 'input_value', name: 'CAPACITY', check: 'Number' },
@@ -1237,7 +1237,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_battery',
-    message0: '%{BKY_CU_ITEM_BATTERY}',
+    message0: '%{BKY_CU_ITEM_BATTERY} %5 %6',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item' },
       { type: 'dummy_input' },
@@ -1277,7 +1277,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_syringe',
-    message0: '%{BKY_CU_ITEM_SYRINGE}',
+    message0: '%{BKY_CU_ITEM_SYRINGE} %7 %8',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item' },
       { type: 'input_value', name: 'CAPACITY', check: 'Number' },
@@ -1292,7 +1292,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_item_gun',
-    message0: '%{BKY_CU_ITEM_GUN}',
+    message0: '%{BKY_CU_ITEM_GUN} %10 %11 %12',
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item' },
       { type: 'dummy_input' },
