@@ -176,9 +176,9 @@ public static class ProjectEmitter
             if (json.TryGetProperty("Container", out var c))
             {
                 item.Container = new ContainerProps();
-                if (c.TryGetProperty("Capacity", out var v)) item.Container.Capacity = v.GetRawText();
-                if (c.TryGetProperty("MaxWeightPerItem", out var v2)) item.Container.MaxWeightPerItem = v2.GetRawText();
-                if (c.TryGetProperty("EncumbranceReduction", out var v3)) item.Container.EncumbranceReduction = v3.GetRawText();
+                if (c.TryGetProperty("Capacity", out var v)) item.Container.Capacity = Raw(v);
+                if (c.TryGetProperty("MaxWeightPerItem", out var v2)) item.Container.MaxWeightPerItem = Raw(v2);
+                if (c.TryGetProperty("EncumbranceReduction", out var v3)) item.Container.EncumbranceReduction = Raw(v3);
                 if (c.TryGetProperty("ItemsVisible", out var v4)) item.Container.ItemsVisible = v4.GetBoolean();
                 if (c.TryGetProperty("TagRestriction", out var v5)) item.Container.TagRestriction = v5.GetString() ?? "";
                 item.IsAdvanced = true;
@@ -186,12 +186,12 @@ public static class ProjectEmitter
             if (json.TryGetProperty("Tool", out var t))
             {
                 item.Tool = new ToolProps();
-                if (t.TryGetProperty("Damage", out var v)) item.Tool.Damage = v.GetRawText();
-                if (t.TryGetProperty("StructuralDamage", out var v2)) item.Tool.StructuralDamage = v2.GetRawText();
-                if (t.TryGetProperty("Distance", out var v3)) item.Tool.Distance = v3.GetRawText();
-                if (t.TryGetProperty("KnockBack", out var v4)) item.Tool.KnockBack = v4.GetRawText();
-                if (t.TryGetProperty("Cooldown", out var v5)) item.Tool.Cooldown = v5.GetRawText();
-                if (t.TryGetProperty("StaminaUse", out var v6)) item.Tool.StaminaUse = v6.GetRawText();
+                if (t.TryGetProperty("Damage", out var v)) item.Tool.Damage = Raw(v);
+                if (t.TryGetProperty("StructuralDamage", out var v2)) item.Tool.StructuralDamage = Raw(v2);
+                if (t.TryGetProperty("Distance", out var v3)) item.Tool.Distance = Raw(v3);
+                if (t.TryGetProperty("KnockBack", out var v4)) item.Tool.KnockBack = Raw(v4);
+                if (t.TryGetProperty("Cooldown", out var v5)) item.Tool.Cooldown = Raw(v5);
+                if (t.TryGetProperty("StaminaUse", out var v6)) item.Tool.StaminaUse = Raw(v6);
                 if (t.TryGetProperty("Piercing", out var v7)) item.Tool.Piercing = v7.GetBoolean();
                 item.IsAdvanced = true;
             }
@@ -200,62 +200,70 @@ public static class ProjectEmitter
                 item.Wearable = new WearableProps();
                 if (w.TryGetProperty("DesiredWearLimb", out var v)) item.Wearable.DesiredWearLimb = v.GetString() ?? "UpTorso";
                 if (w.TryGetProperty("WearSlotId", out var v2)) item.Wearable.WearSlotId = v2.GetString() ?? "back";
-                if (w.TryGetProperty("WearableArmor", out var v3)) item.Wearable.WearableArmor = v3.GetRawText();
-                if (w.TryGetProperty("WearableIsolation", out var v4)) item.Wearable.WearableIsolation = v4.GetRawText();
-                if (w.TryGetProperty("WearableHitDurabilityLossMultiplier", out var v5)) item.Wearable.WearableHitDurabilityLossMultiplier = v5.GetRawText();
+                if (w.TryGetProperty("WearableArmor", out var v3)) item.Wearable.WearableArmor = Raw(v3);
+                if (w.TryGetProperty("WearableIsolation", out var v4)) item.Wearable.WearableIsolation = Raw(v4);
+                if (w.TryGetProperty("WearableHitDurabilityLossMultiplier", out var v5)) item.Wearable.WearableHitDurabilityLossMultiplier = Raw(v5);
                 item.IsAdvanced = true;
             }
             if (json.TryGetProperty("LiquidContainer", out var lc))
             {
                 item.LiquidContainer = new LiquidContainerProps();
-                if (lc.TryGetProperty("Capacity", out var v)) item.LiquidContainer.Capacity = v.GetRawText();
+                if (lc.TryGetProperty("Capacity", out var v)) item.LiquidContainer.Capacity = Raw(v);
                 if (lc.TryGetProperty("AutoFill", out var v2)) item.LiquidContainer.AutoFill = v2.GetBoolean();
                 if (lc.TryGetProperty("LiquidId", out var v3)) item.LiquidContainer.LiquidId = v3.GetString() ?? "water";
-                if (lc.TryGetProperty("LiquidAmount", out var v4)) item.LiquidContainer.LiquidAmount = v4.GetRawText();
+                if (lc.TryGetProperty("LiquidAmount", out var v4)) item.LiquidContainer.LiquidAmount = Raw(v4);
                 item.IsAdvanced = true;
             }
             if (json.TryGetProperty("Battery", out var bat))
             {
                 item.Battery = new BatteryProps();
                 if (bat.TryGetProperty("Preset", out var v)) item.Battery.Preset = v.GetString() ?? "Medium";
-                if (bat.TryGetProperty("StartCharge", out var v2)) item.Battery.StartCharge = v2.GetRawText();
+                if (bat.TryGetProperty("StartCharge", out var v2)) item.Battery.StartCharge = Raw(v2);
                 if (bat.TryGetProperty("SpawnWithBattery", out var v3)) item.Battery.SpawnWithBattery = v3.GetBoolean();
                 item.IsAdvanced = true;
             }
             if (json.TryGetProperty("Light", out var lt))
             {
                 item.Light = new LightProps();
-                if (lt.TryGetProperty("Intensity", out var v)) item.Light.Intensity = v.GetRawText();
-                if (lt.TryGetProperty("Radius", out var v2)) item.Light.Radius = v2.GetRawText();
-                if (lt.TryGetProperty("ColorR", out var v3)) item.Light.ColorR = v3.GetRawText();
-                if (lt.TryGetProperty("ColorG", out var v4)) item.Light.ColorG = v4.GetRawText();
-                if (lt.TryGetProperty("ColorB", out var v5)) item.Light.ColorB = v5.GetRawText();
+                if (lt.TryGetProperty("Intensity", out var v)) item.Light.Intensity = Raw(v);
+                if (lt.TryGetProperty("Radius", out var v2)) item.Light.Radius = Raw(v2);
+                if (lt.TryGetProperty("ColorR", out var v3)) item.Light.ColorR = Raw(v3);
+                if (lt.TryGetProperty("ColorG", out var v4)) item.Light.ColorG = Raw(v4);
+                if (lt.TryGetProperty("ColorB", out var v5)) item.Light.ColorB = Raw(v5);
                 item.IsAdvanced = true;
             }
             if (json.TryGetProperty("Bandage", out var bd))
             {
                 item.Bandage = new BandageProps();
-                if (bd.TryGetProperty("Effectiveness", out var v)) item.Bandage.Effectiveness = v.GetRawText();
-                if (bd.TryGetProperty("SkinHealAmount", out var v2)) item.Bandage.SkinHealAmount = v2.GetRawText();
-                if (bd.TryGetProperty("BandageSlowAmount", out var v3)) item.Bandage.BandageSlowAmount = v3.GetRawText();
-                if (bd.TryGetProperty("PainReduction", out var v4)) item.Bandage.PainReduction = v4.GetRawText();
-                if (bd.TryGetProperty("BoneHealTimerReduction", out var v5)) item.Bandage.BoneHealTimerReduction = v5.GetRawText();
-                if (bd.TryGetProperty("DislocationTimerReduction", out var v6)) item.Bandage.DislocationTimerReduction = v6.GetRawText();
+                if (bd.TryGetProperty("Effectiveness", out var v)) item.Bandage.Effectiveness = Raw(v);
+                if (bd.TryGetProperty("SkinHealAmount", out var v2)) item.Bandage.SkinHealAmount = Raw(v2);
+                if (bd.TryGetProperty("BandageSlowAmount", out var v3)) item.Bandage.BandageSlowAmount = Raw(v3);
+                if (bd.TryGetProperty("PainReduction", out var v4)) item.Bandage.PainReduction = Raw(v4);
+                if (bd.TryGetProperty("BoneHealTimerReduction", out var v5)) item.Bandage.BoneHealTimerReduction = Raw(v5);
+                if (bd.TryGetProperty("DislocationTimerReduction", out var v6)) item.Bandage.DislocationTimerReduction = Raw(v6);
                 item.IsAdvanced = true;
             }
             if (json.TryGetProperty("Syringe", out var sy))
             {
                 item.Syringe = new SyringeProps();
-                if (sy.TryGetProperty("Capacity", out var v)) item.Syringe.Capacity = v.GetRawText();
-                if (sy.TryGetProperty("AmountPerFullUse", out var v2)) item.Syringe.AmountPerFullUse = v2.GetRawText();
+                if (sy.TryGetProperty("Capacity", out var v)) item.Syringe.Capacity = Raw(v);
+                if (sy.TryGetProperty("AmountPerFullUse", out var v2)) item.Syringe.AmountPerFullUse = Raw(v2);
                 if (sy.TryGetProperty("AutoFill", out var v3)) item.Syringe.AutoFill = v3.GetBoolean();
                 if (sy.TryGetProperty("LiquidId", out var v4)) item.Syringe.LiquidId = v4.GetString() ?? "morphine";
-                if (sy.TryGetProperty("LiquidAmount", out var v5)) item.Syringe.LiquidAmount = v5.GetRawText();
+                if (sy.TryGetProperty("LiquidAmount", out var v5)) item.Syringe.LiquidAmount = Raw(v5);
                 item.IsAdvanced = true;
             }
         }
 
         return (string.Join('\n', remainingLines), items, recipes, buildings, tiles, locales, liquids);
+    }
+
+    // Strip quotes from JSON string values; pass through numbers/booleans as-is.
+    static string Raw(JsonElement el)
+    {
+        if (el.ValueKind == JsonValueKind.String)
+            return el.GetString() ?? "";
+        return el.GetRawText();
     }
 
     private static string EmitPlugin(string ns, string guid, string name, string ver, string desc, bool hasEvents)
