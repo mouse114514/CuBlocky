@@ -131,7 +131,7 @@ public static class ProjectEmitter
                         if (doc.RootElement.TryGetProperty("Drinkable", out var d)) last.Drinkable = d.GetBoolean();
                         if (doc.RootElement.TryGetProperty("HealthUsable", out var h)) last.HealthUsable = h.GetBoolean();
                         if (doc.RootElement.TryGetProperty("Injectable", out var i)) last.Injectable = i.GetBoolean();
-                        if (doc.RootElement.TryGetProperty("InjectionSickness", out var s)) last.InjectionSickness = s.GetRawText();
+                        if (doc.RootElement.TryGetProperty("InjectionSickness", out var s)) last.InjectionSickness = Raw(s);
                         if (doc.RootElement.TryGetProperty("Unobtainable", out var u)) last.Unobtainable = u.GetBoolean();
                     }
                 } catch { }
