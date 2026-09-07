@@ -391,9 +391,7 @@ public static class CodeEmitter
         var sb = new StringBuilder();
         sb.AppendLine($"            BuildingEntityRegistry.Register(\"{Escape(b.Id)}\", new CustomBuildingEntityDefinition {{");
         sb.AppendLine($"                Name = \"{Escape(b.Name)}\",");
-        sb.AppendLine($"                Description = \"{Escape(b.Desc)}\",");
-        sb.AppendLine($"                Health = {b.Health}f,");
-        sb.AppendLine($"                Placement = BuildingPlacementType.{b.Placement}");
+        sb.AppendLine($"                Description = \"{Escape(b.Desc)}\"");
         sb.AppendLine("            });");
         sb.AppendLine();
         return sb.ToString();
@@ -403,10 +401,7 @@ public static class CodeEmitter
     {
         var sb = new StringBuilder();
         sb.AppendLine($"            TileRegistry.Register(\"{Escape(t.Id)}\", new CustomTileDefinition {{");
-        sb.AppendLine($"                Name = \"{Escape(t.Name)}\",");
-        sb.AppendLine($"                Health = {t.Health}f,");
-        sb.AppendLine($"                ColliderType = TileColliderType.{t.Collider},");
-        sb.AppendLine($"                GenerationStyle = TileGenerationStyle.{t.GenStyle}");
+        sb.AppendLine($"                Name = \"{Escape(t.Name)}\"");
         sb.AppendLine("            });");
         sb.AppendLine();
         return sb.ToString();

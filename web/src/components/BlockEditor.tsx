@@ -85,7 +85,21 @@ const TOOLBOX = `
     <block type="cu_register_locale"></block>
     <sep></sep>
     <block type="cu_register_liquid"></block>
+    <block type="cu_liquid_color"></block>
+    <block type="cu_liquid_value"></block>
     <block type="cu_liquid_flags"></block>
+    <sep></sep>
+    <block type="cu_set_item_category">
+      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+    </block>
+    <block type="cu_set_item_base_stats">
+      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+      <value name="WEIGHT"><shadow type="cu_number"><field name="NUM">0.4</field></shadow></value>
+      <value name="VALUE"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="DECAY"><shadow type="cu_number"><field name="NUM">180</field></shadow></value>
+      <value name="RECOGNITION"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
+      <value name="SPAWN_FREQ"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+    </block>
     <sep></sep>
     <block type="cu_item_container">
       <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>

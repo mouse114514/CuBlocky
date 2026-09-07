@@ -125,14 +125,32 @@ public static class ProjectEmitter
                 try
                 {
                     var doc = JsonDocument.Parse(json);
-                    if (liquids.Count > 0)
+                    var liqId = doc.RootElement.TryGetProperty("Id", out var idEl) ? idEl.GetString() : null;
+                    var target = !string.IsNullOrEmpty(liqId) ? liquids.FirstOrDefault(l => l.Id == liqId) : (liquids.Count > 0 ? liquids[^1] : null);
+                    if (target != null)
                     {
-                        var last = liquids[^1];
-                        if (doc.RootElement.TryGetProperty("Drinkable", out var d)) last.Drinkable = d.GetBoolean();
-                        if (doc.RootElement.TryGetProperty("HealthUsable", out var h)) last.HealthUsable = h.GetBoolean();
-                        if (doc.RootElement.TryGetProperty("Injectable", out var i)) last.Injectable = i.GetBoolean();
-                        if (doc.RootElement.TryGetProperty("InjectionSickness", out var s)) last.InjectionSickness = Raw(s);
-                        if (doc.RootElement.TryGetProperty("Unobtainable", out var u)) last.Unobtainable = u.GetBoolean();
+                        if (doc.RootElement.TryGetProperty("Drinkable", out var d)) target.Drinkable = d.GetBoolean();
+                        if (doc.RootElement.TryGetProperty("HealthUsable", out var h)) target.HealthUsable = h.GetBoolean();
+                        if (doc.RootElement.TryGetProperty("Injectable", out var i)) target.Injectable = i.GetBoolean();
+                        if (doc.RootElement.TryGetProperty("InjectionSickness", out var s)) target.InjectionSickness = Raw(s);
+                        if (doc.RootElement.TryGetProperty("Unobtainable", out var u)) target.Unobtainable = u.GetBoolean();
+                    }
+                } catch { }
+            }
+            else if (line.StartsWith("//LIQUID_PROP:"))
+            {
+                var json = line.Substring(14).Trim();
+                try
+                {
+                    var doc = JsonDocument.Parse(json);
+                    var liqId = doc.RootElement.TryGetProperty("Id", out var idEl) ? idEl.GetString() : null;
+                    var target = !string.IsNullOrEmpty(liqId) ? liquids.FirstOrDefault(l => l.Id == liqId) : (liquids.Count > 0 ? liquids[^1] : null);
+                    if (target != null)
+                    {
+                        if (doc.RootElement.TryGetProperty("ColorR", out var cr)) target.ColorR = Raw(cr);
+                        if (doc.RootElement.TryGetProperty("ColorG", out var cg)) target.ColorG = Raw(cg);
+                        if (doc.RootElement.TryGetProperty("ColorB", out var cb)) target.ColorB = Raw(cb);
+                        if (doc.RootElement.TryGetProperty("ValuePerLiter", out var vp)) target.ValuePerLiter = Raw(vp);
                     }
                 } catch { }
             }
@@ -270,6 +288,16 @@ public static class ProjectEmitter
                 if (gu.TryGetProperty("ConditionLossPerShot", out var v12)) item.Gun.ConditionLossPerShot = Raw(v12);
                 item.IsAdvanced = true;
             }
+            if (json.TryGetProperty("Category", out var catEl))
+            {
+                item.Category = catEl.GetString() ?? "food";
+                item.IsAdvanced = true;
+            }
+            if (json.TryGetProperty("Weight", out var wEl)) { item.Weight = float.TryParse(Raw(wEl), out var wVal) ? wVal : 0.4f; item.IsAdvanced = true; }
+            if (json.TryGetProperty("Value", out var vEl)) { item.Value = int.TryParse(Raw(vEl), out var vVal) ? vVal : 1; item.IsAdvanced = true; }
+            if (json.TryGetProperty("DecayMinutes", out var dEl)) { item.DecayMinutes = float.TryParse(Raw(dEl), out var dVal) ? dVal : 180f; item.IsAdvanced = true; }
+            if (json.TryGetProperty("Recognition", out var rEl)) { item.Recognition = int.TryParse(Raw(rEl), out var rVal) ? rVal : 2; item.IsAdvanced = true; }
+            if (json.TryGetProperty("SpawnFrequency", out var sEl)) { item.SpawnFrequency = int.TryParse(Raw(sEl), out var sVal) ? sVal : 1; item.IsAdvanced = true; }
         }
 
         return (string.Join('\n', remainingLines), items, recipes, buildings, tiles, locales, liquids);

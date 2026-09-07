@@ -322,11 +322,6 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
       { type: 'field_input', name: 'FULL_NAME', text: 'My Item', align: 'RIGHT' },
       { type: 'field_input', name: 'DESC', text: 'A description', align: 'RIGHT' },
-      { type: 'field_dropdown', name: 'CATEGORY', options: [
-        ['nospawn','nospawn'],['weapon','weapon'],['tool','tool'],
-        ['medical','medical'],['food','food'],['material','material'],
-        ['armor','armor'],['container','container'],['misc','misc'],
-      ]},
       { type: 'input_value', name: 'SPRITE_REF', check: 'Sprite', align: 'RIGHT' },
     ],
     colour: C.REGISTER, inputsInline: true,
@@ -798,10 +793,6 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'ID', text: 'myBuilding' },
       { type: 'field_input', name: 'NAME', text: 'My Building' },
       { type: 'field_input', name: 'DESC', text: 'A building' },
-      { type: 'field_number', name: 'HEALTH', value: 250, min: 0, precision: 1 },
-      { type: 'field_dropdown', name: 'PLACEMENT', options: [
-        ['地面','Floor'],['墙壁','Wall'],['天花板','Ceiling'],
-      ]},
     ],
     colour: C.REGISTER, inputsInline: true,
   },
@@ -830,15 +821,7 @@ const BLOCK_JSON: any[] = [
     args0: [
       { type: 'field_input', name: 'ID', text: 'myTile' },
       { type: 'field_input', name: 'NAME', text: 'My Tile' },
-      { type: 'field_number', name: 'HEALTH', value: 100, min: 0, precision: 1 },
-      { type: 'field_dropdown', name: 'COLLIDER', options: [
-        ['网格(Grid)','Grid'],['精灵(Sprite)','Sprite'],['无(None)','None'],
-      ]},
-      { type: 'field_dropdown', name: 'GEN_STYLE', options: [
-        ['矿脉(Vein)','Vein'],['重矿脉(HeavyVeins)','HeavyVeins'],
-        ['单独(Singular)','Singular'],['条纹(Stripe)','Stripe'],
-        ['内部(Inner)','Inner'],['外围(Outskirt)','Outskirt'],
-      ]},
+      { type: 'field_input', name: 'DESC', text: 'A tile' },
     ],
     colour: C.REGISTER, inputsInline: true,
   },
@@ -853,6 +836,7 @@ const BLOCK_JSON: any[] = [
         ['毒性(toxicity)','toxicity'],['滑(slippery)','slippery'],
         ['睡眠质量(sleepQuality)','sleepQuality'],
         ['生成量(spawnAmount)','spawnAmount'],
+        ['碰撞体(collider)','collider'],['生成风格(genStyle)','genStyle'],
       ]},
       { type: 'input_value', name: 'VALUE', check: ['Number','String','Boolean'], align: 'RIGHT' },
     ],
@@ -1192,9 +1176,25 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'ID', text: 'myLiquid' },
       { type: 'field_input', name: 'NAME', text: 'My Liquid' },
       { type: 'field_input', name: 'DESC', text: 'A custom liquid' },
+    ],
+    colour: C.REGISTER, inputsInline: true,
+  },
+  {
+    type: 'cu_liquid_color',
+    message0: '%{BKY_CU_LIQUID_COLOR}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myLiquid' },
       { type: 'input_value', name: 'COLOR_R', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'COLOR_G', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'COLOR_B', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.REGISTER, inputsInline: true,
+  },
+  {
+    type: 'cu_liquid_value',
+    message0: '%{BKY_CU_LIQUID_VALUE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myLiquid' },
       { type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' },
     ],
     colour: C.REGISTER, inputsInline: true,
@@ -1203,6 +1203,7 @@ const BLOCK_JSON: any[] = [
     type: 'cu_liquid_flags',
     message0: '%{BKY_CU_LIQUID_FLAGS}',
     args0: [
+      { type: 'field_input', name: 'ID', text: 'myLiquid' },
       { type: 'field_dropdown', name: 'DRINKABLE', options: [['true','true'],['false','false']] },
       { type: 'field_dropdown', name: 'HEALTH_USABLE', options: [['true','true'],['false','false']] },
       { type: 'field_dropdown', name: 'INJECTABLE', options: [['true','true'],['false','false']] },
@@ -1294,6 +1295,32 @@ const BLOCK_JSON: any[] = [
     ],
     colour: C.REGISTER, inputsInline: true,
   },
+  {
+    type: 'cu_set_item_category',
+    message0: '%{BKY_CU_SET_ITEM_CATEGORY}',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'CATEGORY', options: [
+        ['nospawn','nospawn'],['weapon','weapon'],['tool','tool'],
+        ['medical','medical'],['food','food'],['material','material'],
+        ['armor','armor'],['container','container'],['misc','misc'],
+      ]},
+    ],
+    colour: C.REGISTER, inputsInline: true,
+  },
+  {
+    type: 'cu_set_item_base_stats',
+    message0: '%{BKY_CU_SET_ITEM_BASE_STATS}',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Item', align: 'RIGHT' },
+      { type: 'input_value', name: 'WEIGHT', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'DECAY', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'RECOGNITION', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'SPAWN_FREQ', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.REGISTER, inputsInline: true,
+  },
 ];
 
 // ── Messages ──
@@ -1308,7 +1335,7 @@ const MSG_ZH: Record<string, string> = {
   CU_WHEN_HEAL: '当被治疗',
   CU_WHEN_LASTSTAND: '当濒死战起',
   CU_WHEN_ENTER_WORLD: '当进入世界',
-  CU_REGISTER_ITEM: '注册物品 id %1 名称 %2 描述 %3 分类 %4 精灵图 %5',
+  CU_REGISTER_ITEM: '注册物品 id %1 名称 %2 描述 %3 精灵图 %4',
   CU_SPRITE_REF: '精灵图 %1',
   CU_DEFINE_ITEM_USE: '物品 %1 使用时',
   CU_DEFINE_ITEM_LIMB_USE: '物品 %1 肢体使用时',
@@ -1365,9 +1392,9 @@ const MSG_ZH: Record<string, string> = {
   CU_LIST_GET: '列表 %1 第 %2 项',
   CU_LIST_LENGTH: '列表 %1 长度',
   CU_LIST_ADD: '向列表 %1 添加 %2',
-  CU_REGISTER_BUILDING: '注册建筑 id %1 名称 %2 描述 %3 血量 %4 放置 %5',
+  CU_REGISTER_BUILDING: '注册建筑 id %1 名称 %2 描述 %3',
   CU_BUILDING_SET_PROPERTY: '建筑 %1 设置 %2 为 %3',
-  CU_REGISTER_TILE: '注册地块 id %1 名称 %2 血量 %3 碰撞 %4 生成 %5',
+  CU_REGISTER_TILE: '注册地块 id %1 名称 %2 描述 %3',
   CU_TILE_SET_PROPERTY: '地块 %1 设置 %2 为 %3',
   CU_REGISTER_LOCALE: '本地化 %1 id %2 中文 %3 英文 %4',
   CU_PLAYER_HEALTH: '玩家血量',
@@ -1454,11 +1481,15 @@ const MSG_ZH: Record<string, string> = {
   // World
   CU_WORLD_DEPTH: '玩家深度(米)',
   // Item properties
+  CU_SET_ITEM_CATEGORY: '设置物品分类 id %1 分类 %2',
+  CU_SET_ITEM_BASE_STATS: '设置物品基础属性 id %1 重量 %2 价值 %3 腐烂时间 %4 识别 %5 生成频率 %6',
   CU_ITEM_CONTAINER: '设置容器属性 id %1 容量 %2 单物品最大重量 %3 减重 %4 物品可见 %5 标签限制 %6',
   CU_ITEM_TOOL: '设置武器/工具属性 id %1 伤害 %2 结构伤害 %3 距离 %4 击退 %5 冷却 %6 体力消耗 %7 穿透 %8',
   CU_ITEM_WEARABLE: '设置可穿戴属性 id %1 部位 %2 插槽 %3 护甲 %4 隔离 %5 耐久损失倍率 %6',
-  CU_REGISTER_LIQUID: '注册液体 id %1 名称 %2 描述 %3 颜色R %4 G %5 B %6 每升价值 %7',
-  CU_LIQUID_FLAGS: '液体标志 可饮用 %1 可外用 %2 可注射 %3 注射不适 %4 不可获得 %5',
+  CU_REGISTER_LIQUID: '注册液体 id %1 名称 %2 描述 %3',
+  CU_LIQUID_COLOR: '设置液体颜色 id %1 R %2 G %3 B %4',
+  CU_LIQUID_VALUE: '设置液体价值 id %1 每升价值 %2',
+  CU_LIQUID_FLAGS: '液体标志 id %1 可饮用 %2 可外用 %3 可注射 %4 注射不适 %5 不可获得 %6',
   CU_ITEM_LIQUID_CONTAINER: '设置液体容器 id %1 容量 %2 自动填充 %3 液体ID %4 液体量 %5',
   CU_ITEM_BATTERY: '设置电池属性 id %1 预设 %2 初始电量 %3 随机带电池 %4',
   CU_ITEM_LIGHT: '设置光源属性 id %1 强度 %2 外半径 %3 R %4 G %5 B %6',
@@ -1478,7 +1509,7 @@ const MSG_EN: Record<string, string> = {
   CU_WHEN_HEAL: 'when healed',
   CU_WHEN_LASTSTAND: 'when last stand',
   CU_WHEN_ENTER_WORLD: 'when enter world',
-  CU_REGISTER_ITEM: 'register item id %1 name %2 desc %3 category %4 sprite %5',
+  CU_REGISTER_ITEM: 'register item id %1 name %2 desc %3 sprite %4',
   CU_SPRITE_REF: 'sprite %1',
   CU_DEFINE_ITEM_USE: 'when %1 item used',
   CU_DEFINE_ITEM_LIMB_USE: 'when %1 item limb used',
@@ -1535,9 +1566,9 @@ const MSG_EN: Record<string, string> = {
   CU_LIST_GET: 'list %1 item %2',
   CU_LIST_LENGTH: 'list %1 length',
   CU_LIST_ADD: 'add %2 to list %1',
-  CU_REGISTER_BUILDING: 'register building id %1 name %2 desc %3 health %4 placement %5',
+  CU_REGISTER_BUILDING: 'register building id %1 name %2 desc %3',
   CU_BUILDING_SET_PROPERTY: 'building %1 set %2 to %3',
-  CU_REGISTER_TILE: 'register tile id %1 name %2 health %3 collider %4 gen %5',
+  CU_REGISTER_TILE: 'register tile id %1 name %2 desc %3',
   CU_TILE_SET_PROPERTY: 'tile %1 set %2 to %3',
   CU_REGISTER_LOCALE: 'locale %1 id %2 zh %3 en %4',
   CU_PLAYER_HEALTH: 'player health',
@@ -1624,11 +1655,15 @@ const MSG_EN: Record<string, string> = {
   // World
   CU_WORLD_DEPTH: 'player depth (meters)',
   // Item properties
+  CU_SET_ITEM_CATEGORY: 'set item category id %1 category %2',
+  CU_SET_ITEM_BASE_STATS: 'set item base stats id %1 weight %2 value %3 decay %4 recognition %5 spawn freq %6',
   CU_ITEM_CONTAINER: 'set container properties id %1 capacity %2 max weight %3 encumbrance %4 visible %5 tag restriction %6',
   CU_ITEM_TOOL: 'set weapon/tool properties id %1 damage %2 structural %3 distance %4 knockback %5 cooldown %6 stamina %7 piercing %8',
   CU_ITEM_WEARABLE: 'set wearable properties id %1 limb %2 slot %3 armor %4 isolation %5 durability loss %6',
-  CU_REGISTER_LIQUID: 'register liquid id %1 name %2 desc %3 R %4 G %5 B %6 value per liter %7',
-  CU_LIQUID_FLAGS: 'liquid flags drinkable %1 medical %2 injectable %3 injection sickness %4 unobtainable %5',
+  CU_REGISTER_LIQUID: 'register liquid id %1 name %2 desc %3',
+  CU_LIQUID_COLOR: 'set liquid color id %1 R %2 G %3 B %4',
+  CU_LIQUID_VALUE: 'set liquid value id %1 value per liter %2',
+  CU_LIQUID_FLAGS: 'liquid flags id %1 drinkable %2 medical %3 injectable %4 injection sickness %5 unobtainable %6',
   CU_ITEM_LIQUID_CONTAINER: 'set liquid container id %1 capacity %2 auto fill %3 liquid id %4 amount %5',
   CU_ITEM_BATTERY: 'set battery properties id %1 preset %2 initial charge %3 spawn with battery %4',
   CU_ITEM_LIGHT: 'set light properties id %1 intensity %2 radius %3 R %4 G %5 B %6',
@@ -1715,10 +1750,9 @@ csharpGenerator.forBlock['cu_register_item'] = (block, gen) => {
   const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
   const name = block.getFieldValue('FULL_NAME').replace(/"/g, '\\"');
   const desc = block.getFieldValue('DESC').replace(/"/g, '\\"');
-  const cat = block.getFieldValue('CATEGORY');
   const spriteCode = gen.valueToCode(block, 'SPRITE_REF', ORDER_ATOMIC) || '';
   const spriteId = spriteCode.replace(/^"|"$/g, '') || null;
-  const json = JSON.stringify({Id: id.replace(/^"|"$/g, ''), FullName: name, Description: desc, Category: cat, Weight: 0.4, Value: 1, DecayMinutes: 180, Recognition: 2, SpawnFrequency: 1, SpriteAssetId: spriteId});
+  const json = JSON.stringify({Id: id.replace(/^"|"$/g, ''), FullName: name, Description: desc, SpriteAssetId: spriteId});
   return `//REGISTER_ITEM:${json}\n`;
 };
 csharpGenerator.forBlock['cu_sprite_ref'] = (block, gen) => {
@@ -2105,9 +2139,7 @@ csharpGenerator.forBlock['cu_register_building'] = (block) => {
   const id = block.getFieldValue('ID');
   const name = block.getFieldValue('NAME').replace(/"/g, '\\"');
   const desc = block.getFieldValue('DESC').replace(/"/g, '\\"');
-  const health = block.getFieldValue('HEALTH');
-  const placement = block.getFieldValue('PLACEMENT');
-  const json = JSON.stringify({Id: id, Name: name, Desc: desc, Health: parseFloat(health), Placement: placement});
+  const json = JSON.stringify({Id: id, Name: name, Desc: desc});
   return `//REGISTER_BUILDING:${json}\n`;
 };
 csharpGenerator.forBlock['cu_building_set_property'] = (block, gen) => {
@@ -2121,10 +2153,8 @@ csharpGenerator.forBlock['cu_building_set_property'] = (block, gen) => {
 csharpGenerator.forBlock['cu_register_tile'] = (block) => {
   const id = block.getFieldValue('ID');
   const name = block.getFieldValue('NAME').replace(/"/g, '\\"');
-  const health = block.getFieldValue('HEALTH');
-  const collider = block.getFieldValue('COLLIDER');
-  const genStyle = block.getFieldValue('GEN_STYLE');
-  const json = JSON.stringify({Id: id, Name: name, Health: parseFloat(health), Collider: collider, GenStyle: genStyle});
+  const desc = block.getFieldValue('DESC').replace(/"/g, '\\"');
+  const json = JSON.stringify({Id: id, Name: name, Desc: desc});
   return `//REGISTER_TILE:${json}\n`;
 };
 csharpGenerator.forBlock['cu_tile_set_property'] = (block, gen) => {
@@ -2363,6 +2393,24 @@ csharpGenerator.forBlock['cu_item_category'] = () => ['item.Stats.category', ORD
 csharpGenerator.forBlock['cu_world_depth'] = () => ['WorldGeneration.world.PlayerTotalDepthMeters()', ORDER_ATOMIC];
 
 // ═══ Item Property generators ═══════════════════════════════
+csharpGenerator.forBlock['cu_set_item_category'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
+  const itemId = id.replace(/^"|"$/g, '');
+  const cat = block.getFieldValue('CATEGORY');
+  const json = JSON.stringify({Id: itemId, Category: cat});
+  return `//ITEM_PROP:${json}\n`;
+};
+csharpGenerator.forBlock['cu_set_item_base_stats'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
+  const itemId = id.replace(/^"|"$/g, '');
+  const weight = gen.valueToCode(block, 'WEIGHT', ORDER_ATOMIC) || '0.4';
+  const value = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '1';
+  const decay = gen.valueToCode(block, 'DECAY', ORDER_ATOMIC) || '180';
+  const rec = gen.valueToCode(block, 'RECOGNITION', ORDER_ATOMIC) || '2';
+  const spawn = gen.valueToCode(block, 'SPAWN_FREQ', ORDER_ATOMIC) || '1';
+  const json = JSON.stringify({Id: itemId, Weight: weight, Value: value, DecayMinutes: decay, Recognition: rec, SpawnFrequency: spawn});
+  return `//ITEM_PROP:${json}\n`;
+};
 csharpGenerator.forBlock['cu_item_container'] = (block, gen) => {
   const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myItem"';
   const itemId = id.replace(/^"|"$/g, '');
@@ -2402,20 +2450,31 @@ csharpGenerator.forBlock['cu_register_liquid'] = (block, gen) => {
   const id = block.getFieldValue('ID') || 'myLiquid';
   const name = block.getFieldValue('NAME').replace(/"/g, '\\"');
   const desc = block.getFieldValue('DESC').replace(/"/g, '\\"');
+  const json = JSON.stringify({Id: id, Name: name, Description: desc});
+  return `//REGISTER_LIQUID:${json}\n`;
+};
+csharpGenerator.forBlock['cu_liquid_color'] = (block, gen) => {
+  const id = block.getFieldValue('ID') || 'myLiquid';
   const r = gen.valueToCode(block, 'COLOR_R', ORDER_ATOMIC) || '1';
   const g = gen.valueToCode(block, 'COLOR_G', ORDER_ATOMIC) || '1';
   const b = gen.valueToCode(block, 'COLOR_B', ORDER_ATOMIC) || '1';
+  const json = JSON.stringify({Id: id, ColorR: r, ColorG: g, ColorB: b});
+  return `//LIQUID_PROP:${json}\n`;
+};
+csharpGenerator.forBlock['cu_liquid_value'] = (block, gen) => {
+  const id = block.getFieldValue('ID') || 'myLiquid';
   const val = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '10';
-  const json = JSON.stringify({Id: id, Name: name, Description: desc, ColorR: r, ColorG: g, ColorB: b, ValuePerLiter: val});
-  return `//REGISTER_LIQUID:${json}\n`;
+  const json = JSON.stringify({Id: id, ValuePerLiter: val});
+  return `//LIQUID_PROP:${json}\n`;
 };
 csharpGenerator.forBlock['cu_liquid_flags'] = (block, gen) => {
+  const id = block.getFieldValue('ID') || 'myLiquid';
   const drinkable = block.getFieldValue('DRINKABLE') === 'true';
   const healthUsable = block.getFieldValue('HEALTH_USABLE') === 'true';
   const injectable = block.getFieldValue('INJECTABLE') === 'true';
   const sickness = gen.valueToCode(block, 'INJECTION_SICKNESS', ORDER_ATOMIC) || '1';
   const unobtainable = block.getFieldValue('UNOBTAINABLE') === 'true';
-  const json = JSON.stringify({Drinkable: drinkable, HealthUsable: healthUsable, Injectable: injectable, InjectionSickness: sickness, Unobtainable: unobtainable});
+  const json = JSON.stringify({Id: id, Drinkable: drinkable, HealthUsable: healthUsable, Injectable: injectable, InjectionSickness: sickness, Unobtainable: unobtainable});
   return `//LIQUID_FLAGS:${json}\n`;
 };
 csharpGenerator.forBlock['cu_item_liquid_container'] = (block, gen) => {
@@ -2541,6 +2600,12 @@ const LOGIC_OP_OPTIONS: DdOption[] = [
   ['或', 'Or', 'OR'],
 ];
 
+const CATEGORY_OPTIONS: DdOption[] = [
+  ['无生成', 'nospawn', 'nospawn'], ['武器', 'weapon', 'weapon'], ['工具', 'tool', 'tool'],
+  ['医疗', 'medical', 'medical'], ['食物', 'food', 'food'], ['材料', 'material', 'material'],
+  ['护甲', 'armor', 'armor'], ['容器', 'container', 'container'], ['其他', 'misc', 'misc'],
+];
+
 const PLACEMENT_OPTIONS: DdOption[] = [
   ['地面', 'Floor', 'Floor'],
   ['墙壁', 'Wall', 'Wall'],
@@ -2577,6 +2642,7 @@ const TILE_PROP_OPTIONS: DdOption[] = [
   ['毒性', 'Toxicity', 'toxicity'], ['滑', 'Slippery', 'slippery'],
   ['睡眠质量', 'SleepQuality', 'sleepQuality'],
   ['生成量', 'SpawnAmount', 'spawnAmount'],
+  ['碰撞体', 'Collider', 'collider'], ['生成风格', 'GenStyle', 'genStyle'],
 ];
 
 const LOCALE_TYPE_OPTIONS: DdOption[] = [
@@ -2615,6 +2681,7 @@ const FEED_TYPE_OPTIONS: DdOption[] = [
 ];
 
 const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
+  cu_set_item_category: { CATEGORY: CATEGORY_OPTIONS },
   cu_item_gun: { AMMO_TYPE: AMMO_TYPE_OPTIONS, FIRING_MODE: FIRING_MODE_OPTIONS, FEED_TYPE: FEED_TYPE_OPTIONS },
   cu_item_set_property: { PROP: PROP_OPTIONS },
   cu_item_use: { TARGET: TARGET_OPTIONS, ACTION: ACTION_OPTIONS },
@@ -2628,9 +2695,7 @@ const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_math_op: { OP: MATH_OP_OPTIONS },
   cu_string_op: { OP: STRING_OP_OPTIONS },
   cu_logic_compare: { OP: LOGIC_OP_OPTIONS },
-  cu_register_building: { PLACEMENT: PLACEMENT_OPTIONS },
   cu_building_set_property: { PROP: BUILDING_PROP_OPTIONS },
-  cu_register_tile: { COLLIDER: COLLIDER_OPTIONS, GEN_STYLE: GEN_STYLE_OPTIONS },
   cu_tile_set_property: { PROP: TILE_PROP_OPTIONS },
   cu_register_locale: { TYPE: LOCALE_TYPE_OPTIONS },
   cu_limb_index: { LIMB: LIMB_OPTIONS },
