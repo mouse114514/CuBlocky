@@ -2604,7 +2604,18 @@ const WEAR_LIMB_OPTIONS: DdOption[] = [
   ['右腿', 'Right Leg', 'LegB'],
 ];
 
+const AMMO_TYPE_OPTIONS: DdOption[] = [
+  ['手枪', 'Pistol', 'Pistol'], ['步枪', 'Rifle', 'Rifle'], ['霰弹', 'Shotgun', 'Shotgun'],
+];
+const FIRING_MODE_OPTIONS: DdOption[] = [
+  ['泵动', 'Pump', 'Pump'], ['半自动', 'SemiAuto', 'SemiAuto'], ['全自动', 'Auto', 'Auto'],
+];
+const FEED_TYPE_OPTIONS: DdOption[] = [
+  ['弹匣供弹', 'Mag', 'Mag'], ['直推供弹', 'Direct', 'Direct'],
+];
+
 const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
+  cu_item_gun: { AMMO_TYPE: AMMO_TYPE_OPTIONS, FIRING_MODE: FIRING_MODE_OPTIONS, FEED_TYPE: FEED_TYPE_OPTIONS },
   cu_item_set_property: { PROP: PROP_OPTIONS },
   cu_item_use: { TARGET: TARGET_OPTIONS, ACTION: ACTION_OPTIONS },
   cu_item_consume: { TARGET: TARGET_OPTIONS },

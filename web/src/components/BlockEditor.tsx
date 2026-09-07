@@ -140,6 +140,18 @@ const TOOLBOX = `
       <value name="AMOUNT_PER_USE"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
       <value name="LIQUID_AMOUNT"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
     </block>
+    <block type="cu_item_gun">
+      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+      <value name="MAG_CAPACITY"><shadow type="cu_number"><field name="NUM">12</field></shadow></value>
+      <value name="ANIMAL_DAMAGE"><shadow type="cu_number"><field name="NUM">25</field></shadow></value>
+      <value name="STRUCTURAL_DAMAGE"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
+      <value name="KNOCKBACK"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
+      <value name="CONDITION_LOSS"><shadow type="cu_number"><field name="NUM">0.01</field></shadow></value>
+      <value name="LOUDNESS"><shadow type="cu_number"><field name="NUM">5</field></shadow></value>
+      <value name="GAS_TIME"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+      <value name="SHOTS_PER_FIRE"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="VERTICAL_SPREAD"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
   </category>
   <category name="%{BKY_CAT_BODY}" colour="#4caf50" icon="🧍">
     <block type="cu_eat">
