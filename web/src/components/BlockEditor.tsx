@@ -73,12 +73,17 @@ const TOOLBOX = `
       <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
     </block>
     <block type="cu_sprite_ref"></block>
+    <sep></sep>
+    <block type="cu_register_status">
+      <value name="ID"><shadow type="cu_status_ref"><field name="ID">myStatus</field></shadow></value>
+    </block>
     <block type="cu_register_recipe">
       <value name="INPUTS"><shadow type="lists_create_with"></shadow></value>
       <value name="OUTPUT"><shadow type="cu_item_vanilla"><field name="ID">bandage</field></shadow></value>
       <value name="AMOUNT"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
       <value name="RESULT_CONDITION"><shadow type="cu_number"><field name="NUM">-1</field></shadow></value>
       <value name="IS_REPAIR"><shadow type="cu_false"></shadow></value>
+      <value name="INT"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
     </block>
     <block type="cu_register_building"></block>
     <block type="cu_register_tile"></block>
@@ -226,6 +231,11 @@ const TOOLBOX = `
     </block>
     <block type="cu_set_radiation">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_status_set">
+      <value name="STATUS"><shadow type="cu_status_ref"><field name="ID">myStatus</field></shadow></value>
+      <value name="LEVEL"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="REMAINING"><shadow type="cu_number"><field name="NUM">5</field></shadow></value>
     </block>
     <sep></sep>
     <block type="cu_set_limb_skin_health">
@@ -426,6 +436,11 @@ const TOOLBOX = `
     <block type="cu_position_x"></block>
     <block type="cu_position_y"></block>
     <sep></sep>
+    <block type="cu_status_ref"></block>
+    <block type="cu_status_get">
+      <value name="STATUS"><shadow type="cu_status_ref"><field name="ID">myStatus</field></shadow></value>
+    </block>
+    <sep></sep>
     <block type="cu_item_condition"></block>
     <block type="cu_item_name"></block>
     <sep></sep>
@@ -591,7 +606,8 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
     const toolbox = ws.getToolbox?.();
     const flyout = ws.getFlyout?.();
     if (!toolbox || !flyout) return;
-    if (!term.trim()) {
+    const t = term.trim();
+    if (!t) {
       const sel = toolbox.getSelectedItem?.();
       if (sel) {
         const contents = (sel as any).getContents?.() || (sel as any).flyoutItems_ || [];
@@ -599,32 +615,23 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
       }
       return;
     }
-    const q = term.toLowerCase();
-    const sel = toolbox.getSelectedItem?.();
-    if (sel) {
-      const contents: any[] = (sel as any).getContents?.() || (sel as any).flyoutItems_ || [];
-      const filtered = contents.filter((item: any) => {
+    const q = t.toLowerCase();
+    // Search across ALL categories, not just the currently selected one.
+    const allItems: any[] = [];
+    for (const cat of (toolbox as any).getToolboxItems?.() || []) {
+      const contents: any[] = (cat as any).getContents?.() || (cat as any).flyoutItems_ || [];
+      for (const item of contents) {
         const el = item.getElement?.() || item;
         const type = el.type || el.getAttribute?.('type') || '';
-        const display = blockNameMapRef.current[type] || '';
-        return type.toLowerCase().includes(q) || display.toLowerCase().includes(q);
-      });
-      flyout.show(filtered);
-    } else {
-      const allItems: any[] = [];
-      for (const cat of (toolbox as any).getToolboxItems?.() || []) {
-        const contents: any[] = (cat as any).getContents?.() || (cat as any).flyoutItems_ || [];
-        for (const item of contents) {
-          const el = item.getElement?.() || item;
-          const type = el.type || el.getAttribute?.('type') || '';
-          const display = blockNameMapRef.current[type] || '';
-          if (type.toLowerCase().includes(q) || display.toLowerCase().includes(q)) {
-            allItems.push(item);
-          }
+        // Normalize display name: strip %N placeholders so prefix keywords stay searchable
+        const raw = blockNameMapRef.current[type] || '';
+        const display = raw.replace(/\s*%\d+\s*/g, ' ');
+        if (type.toLowerCase().includes(q) || display.toLowerCase().includes(q)) {
+          allItems.push(item);
         }
       }
-      if (allItems.length > 0) flyout.show(allItems);
     }
+    if (allItems.length > 0) flyout.show(allItems);
   }, []);
 
   useLayoutEffect(() => {
@@ -726,7 +733,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
       for (const key of Object.keys(Blockly.Blocks)) {
         const msgKey = 'CU_' + key.replace(/^cu_/, '').toUpperCase();
         const msg = (Blockly.Msg as Record<string, string>)[msgKey];
-        if (msg) bMap[key] = msg.replace(/\s*%\d+.*$/, '');
+        if (msg) bMap[key] = msg;
       }
       blockNameMapRef.current = bMap;
 
@@ -786,7 +793,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
     for (const key of Object.keys(Blockly.Blocks)) {
       const msgKey = 'CU_' + key.replace(/^cu_/, '').toUpperCase();
       const msg = (Blockly.Msg as Record<string, string>)[msgKey];
-      if (msg) bMap[key] = msg.replace(/\s*%\d+.*$/, '');
+      if (msg) bMap[key] = msg;
     }
     blockNameMapRef.current = bMap;
 

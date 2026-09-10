@@ -201,6 +201,18 @@ public class AssetRef
     public string SourcePath { get; set; } = "";
 }
 
+// ── Status Effects ────────────────────────────────────────────────
+public class StatusEntry
+{
+    public string Id { get; set; } = "mystatus";
+    public string FullName { get; set; } = "My Status";
+    public string Description { get; set; } = "";
+    public string Type { get; set; } = "debuff"; // "buff" or "debuff"
+    public string? SpriteAssetId { get; set; }
+    public int Intensity { get; set; } = 2;
+    public bool Important { get; set; } = true;
+}
+
 // ── Buildings ──────────────────────────────────────────────────────
 public class BuildingEntry
 {

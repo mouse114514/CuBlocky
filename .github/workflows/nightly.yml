@@ -1,0 +1,79 @@
+name: Nightly Build
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  nightly:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Build web frontend
+        working-directory: web
+        run: npm run build
+
+      - name: Build server
+        run: dotnet publish server -c Release --nologo -v q
+
+      - name: Get short SHA
+        id: sha
+        shell: pwsh
+        run: |
+          $sha = git rev-parse --short HEAD
+          echo "short=$sha" >> $env:GITHUB_OUTPUT
+
+      - name: Package release
+        shell: pwsh
+        run: |
+          $tag = "N-${{ steps.sha.outputs.short }}"
+          $publishDir = "server/bin/Release/net9.0/win-x64/publish"
+          $zipFile = "CuBlocky-$tag.zip"
+
+          # Copy extra files into publish dir
+          Copy-Item "Launch.ps1" "$publishDir/"
+          Copy-Item "README.md" "$publishDir/"
+
+          Compress-Archive -Path "$publishDir/*" -DestinationPath $zipFile -Force
+
+          # Create release
+          $token = "${{ secrets.GITHUB_TOKEN }}"
+          $headers = @{ Authorization = "Bearer $token"; "Accept" = "application/vnd.github+json" }
+
+          $body = @{
+            tag_name    = $tag
+            name        = $tag
+            prerelease = $true
+            body        = "This is a night build version, which may be somewhat unstable and has not been fully tested. You can try out the latest exciting features."
+          } | ConvertTo-Json
+
+          $release = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" `
+            -Method Post -Headers $headers -ContentType "application/json" -Body $body
+
+          $uploadUrl = $release.upload_url -replace "\{\?name,label\}", "?name=$zipFile"
+          $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path $zipFile).Path)
+
+          Invoke-RestMethod -Uri $uploadUrl -Method Post `
+            -Headers $headers -ContentType "application/zip" -Body $bytes
+
+          Write-Host "Published $tag (release id: $($release.id))"

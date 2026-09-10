@@ -183,12 +183,14 @@ app.MapPost("/api/build", async (HttpRequest req) =>
             }
         }
 
-        // Also scan RegisterContent.cs for AssetLoader.LoadEmbeddedSprite calls
-        var rcPath = Path.Combine(buildDir, "RegisterContent.cs");
-        if (File.Exists(rcPath))
+        // Also scan RegisterContent.cs and Statuses.cs for AssetLoader.LoadEmbeddedSprite calls
+        var scanFiles = new[] { "RegisterContent.cs", "Statuses.cs" };
+        var marker = "AssetLoader.LoadEmbeddedSprite(\"";
+        foreach (var scanFile in scanFiles)
         {
+            var rcPath = Path.Combine(buildDir, scanFile);
+            if (!File.Exists(rcPath)) continue;
             var rcContent = await File.ReadAllTextAsync(rcPath);
-            var marker = "AssetLoader.LoadEmbeddedSprite(\"";
             var idx = 0;
             while ((idx = rcContent.IndexOf(marker, idx)) >= 0)
             {

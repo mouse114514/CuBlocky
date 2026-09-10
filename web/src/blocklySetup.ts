@@ -338,6 +338,57 @@ const BLOCK_JSON: any[] = [
     colour: C.REGISTER,
   },
 
+  // Status reference value block
+  {
+    type: 'cu_status_ref',
+    message0: '%{BKY_CU_STATUS_REF}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myStatus' },
+    ],
+    output: 'Status',
+    colour: C.VALUE,
+  },
+
+  // Status effect registration: id, name, type (buff/debuff), description, sprite
+  {
+    type: 'cu_register_status',
+    message0: '%{BKY_CU_REGISTER_STATUS}',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Status', align: 'RIGHT' },
+      { type: 'field_input', name: 'NAME', text: 'My Status', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'TYPE', options: [['正面效果','buff'],['负面效果','debuff']], align: 'RIGHT' },
+      { type: 'field_input', name: 'DESC', text: 'A status effect', align: 'RIGHT' },
+      { type: 'input_value', name: 'SPRITE_REF', check: 'Sprite', align: 'RIGHT' },
+    ],
+    colour: C.REGISTER, inputsInline: true,
+  },
+
+  // Status value reader: level or remaining duration of a body status
+  {
+    type: 'cu_status_get',
+    message0: '%{BKY_CU_STATUS_GET}',
+    args0: [
+      { type: 'input_value', name: 'STATUS', check: 'Status', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'FIELD', options: [['等级','level'],['剩余时长','remaining']], align: 'RIGHT' },
+    ],
+    output: 'Number',
+    colour: C.VALUE, inputsInline: true,
+  },
+
+  // Apply / set a status effect on the player body: level + remaining seconds
+  {
+    type: 'cu_status_set',
+    message0: '%{BKY_CU_STATUS_SET}',
+    args0: [
+      { type: 'input_value', name: 'STATUS', check: 'Status', align: 'RIGHT' },
+      { type: 'input_value', name: 'LEVEL', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'REMAINING', check: 'Number', align: 'RIGHT' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.BODY, inputsInline: true,
+  },
+
   // Item use behavior container (event-style hat)
   {
     type: 'cu_define_item_use',
@@ -385,6 +436,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'AMOUNT', check: 'Number' },
       { type: 'input_value', name: 'RESULT_CONDITION', check: 'Number' },
       { type: 'input_value', name: 'IS_REPAIR', check: 'Boolean' },
+      { type: 'input_value', name: 'INT', check: 'Number' },
     ],
     colour: C.REGISTER, inputsInline: true,
   },
@@ -1337,10 +1389,14 @@ const MSG_ZH: Record<string, string> = {
   CU_WHEN_ENTER_WORLD: '当进入世界',
   CU_REGISTER_ITEM: '注册物品 id %1 名称 %2 描述 %3 精灵图 %4',
   CU_SPRITE_REF: '精灵图 %1',
+  CU_REGISTER_STATUS: '注册状态效果 id %1 名称 %2 类型 %3 描述 %4 精灵图 %5',
+  CU_STATUS_REF: '状态 %1',
+  CU_STATUS_GET: '状态 %1 的 %2',
+  CU_STATUS_SET: '设置状态 %1 等级 %2 持续 %3',
   CU_DEFINE_ITEM_USE: '物品 %1 使用时',
   CU_DEFINE_ITEM_LIMB_USE: '物品 %1 肢体使用时',
   CU_ITEM_SET_PROPERTY: '设置物品 %1 属性 %2 为 %3',
-  CU_REGISTER_RECIPE: '配方 %1 → %2 ×%3 耐久%4 修理%5',
+  CU_REGISTER_RECIPE: '配方 %1 → %2 ×%3 耐久%4 修理%5 智力%6',
   CU_EAT: '吃 饥饿 %1 体重增益 %2',
   CU_DRINK: '喝水 量 %1',
   CU_SET_HAPPINESS: '设置快乐度 %1',
@@ -1511,10 +1567,14 @@ const MSG_EN: Record<string, string> = {
   CU_WHEN_ENTER_WORLD: 'when enter world',
   CU_REGISTER_ITEM: 'register item id %1 name %2 desc %3 sprite %4',
   CU_SPRITE_REF: 'sprite %1',
+  CU_REGISTER_STATUS: 'register status effect id %1 name %2 type %3 desc %4 sprite %5',
+  CU_STATUS_REF: 'status %1',
+  CU_STATUS_GET: '%2 of status %1',
+  CU_STATUS_SET: 'set status %1 level %2 for %3',
   CU_DEFINE_ITEM_USE: 'when %1 item used',
   CU_DEFINE_ITEM_LIMB_USE: 'when %1 item limb used',
   CU_ITEM_SET_PROPERTY: 'set item %1 property %2 to %3',
-  CU_REGISTER_RECIPE: 'recipe %1 → %2 ×%3 cond%4 repair%5',
+  CU_REGISTER_RECIPE: 'recipe %1 → %2 ×%3 cond%4 repair%5 int%6',
   CU_EAT: 'eat hunger %1 weight gain %2',
   CU_DRINK: 'drink amount %1',
   CU_SET_HAPPINESS: 'set happiness %1',
@@ -1759,6 +1819,40 @@ csharpGenerator.forBlock['cu_sprite_ref'] = (block, gen) => {
   const asset = block.getFieldValue('ASSET') || '';
   return [`"${asset}"`, ORDER_ATOMIC];
 };
+// safe ident: matches backend CodeEmitter.SafeIdent (alnum kept, others -> '_', M-prefix if empty/leading digit)
+const statusClassName = (id: string) => {
+  let s = id.replace(/[^a-zA-Z0-9]/g, '_');
+  if (!s || /^[0-9]/.test(s)) s = 'M' + s;
+  return 'Status_' + s;
+};
+csharpGenerator.forBlock['cu_status_ref'] = (block, gen) => {
+  const id = block.getFieldValue('ID') || 'myStatus';
+  return [`"${id}"`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_register_status'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myStatus"';
+  const name = block.getFieldValue('NAME').replace(/"/g, '\\"');
+  const type = block.getFieldValue('TYPE');
+  const desc = block.getFieldValue('DESC').replace(/"/g, '\\"');
+  const spriteCode = gen.valueToCode(block, 'SPRITE_REF', ORDER_ATOMIC) || '';
+  const spriteId = spriteCode.replace(/^"|"$/g, '') || null;
+  const json = JSON.stringify({Id: id.replace(/^"|"$/g, ''), FullName: name, Type: type, Description: desc, SpriteAssetId: spriteId});
+  return `//REGISTER_STATUS:${json}\n`;
+};
+csharpGenerator.forBlock['cu_status_get'] = (block, gen) => {
+  const statusCode = gen.valueToCode(block, 'STATUS', ORDER_ATOMIC) || '"myStatus"';
+  const statusId = statusCode.replace(/^"|"$/g, '');
+  const field = block.getFieldValue('FIELD');
+  const prop = field === 'remaining' ? 'RemainingSeconds' : 'Level';
+  return [`body.GetStatus<${statusClassName(statusId)}>().${prop}`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_status_set'] = (block, gen) => {
+  const statusCode = gen.valueToCode(block, 'STATUS', ORDER_ATOMIC) || '"myStatus"';
+  const statusId = statusCode.replace(/^"|"$/g, '');
+  const level = gen.valueToCode(block, 'LEVEL', ORDER_ATOMIC) || '1';
+  const remaining = gen.valueToCode(block, 'REMAINING', ORDER_ATOMIC) || '5';
+  return `body.GetStatus<${statusClassName(statusId)}>().Level = ${float(level)}; body.GetStatus<${statusClassName(statusId)}>().RemainingSeconds = ${float(remaining)};\n`;
+};
 csharpGenerator.forBlock['cu_define_item_use'] = (block, gen) => {
   const item = gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || '"myItem"';
   const itemId = item.replace(/^"|"$/g, '');
@@ -1822,6 +1916,7 @@ csharpGenerator.forBlock['cu_register_recipe'] = (block, gen) => {
   const amt = gen.valueToCode(block, 'AMOUNT', ORDER_ATOMIC) || '1';
   const cond = gen.valueToCode(block, 'RESULT_CONDITION', ORDER_ATOMIC) || '-1';
   const repair = gen.valueToCode(block, 'IS_REPAIR', ORDER_ATOMIC) || 'false';
+  const intReq = gen.valueToCode(block, 'INT', ORDER_ATOMIC) || '2';
 
   // Walk the connected INPUTS list to extract real ingredient data
   const listBlock = block.getInputTargetBlock('INPUTS');
@@ -1834,7 +1929,7 @@ csharpGenerator.forBlock['cu_register_recipe'] = (block, gen) => {
   const inputsCode = `new List<RecipeItem> { ${recipeItems} }`;
 
   // Build code
-  let code = `RecipeRegistry.Register(new Recipe {\n  result = new RecipeResult { id = ${out}, amount = ${amt}`;
+  let code = `RecipeRegistry.Register(new Recipe {\n  INT = ${intReq},\n  result = new RecipeResult { id = ${out}, amount = ${amt}`;
   if (cond !== '-1') code += `, resultCondition = ${cond}`;
   code += ` },\n  items = ${inputsCode},\n  isRepair = ${repair}\n});\n`;
 
@@ -1849,7 +1944,7 @@ csharpGenerator.forBlock['cu_register_recipe'] = (block, gen) => {
   const json = JSON.stringify({
     ResultId: out.replace(/^"|"$/g, ''),
     Category: 'Tools',
-    IntRequirement: 2,
+    IntRequirement: parseInt(intReq) || 2,
     ResultAmount: parseInt(amt),
     ResultCondition: cond === '-1' ? 1 : parseFloat(cond),
     IsLiquidResult: false,
@@ -2680,6 +2775,14 @@ const FEED_TYPE_OPTIONS: DdOption[] = [
   ['弹匣供弹', 'Mag', 'Mag'], ['直推供弹', 'Direct', 'Direct'],
 ];
 
+const STATUS_TYPE_OPTIONS: DdOption[] = [
+  ['正面效果', 'Buff', 'buff'], ['负面效果', 'Debuff', 'debuff'],
+];
+
+const STATUS_FIELD_OPTIONS: DdOption[] = [
+  ['等级', 'Level', 'level'], ['剩余时长', 'Remaining time', 'remaining'],
+];
+
 const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_set_item_category: { CATEGORY: CATEGORY_OPTIONS },
   cu_item_gun: { AMMO_TYPE: AMMO_TYPE_OPTIONS, FIRING_MODE: FIRING_MODE_OPTIONS, FEED_TYPE: FEED_TYPE_OPTIONS },
@@ -2701,6 +2804,8 @@ const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_limb_index: { LIMB: LIMB_OPTIONS },
   cu_item_wearable: { WEAR_LIMB: WEAR_LIMB_OPTIONS },
   cu_item_vanilla: { ID: VANILLA_ITEMS },
+  cu_register_status: { TYPE: STATUS_TYPE_OPTIONS },
+  cu_status_get: { FIELD: STATUS_FIELD_OPTIONS },
 };
 
 function dd(lang: string, opts: DdOption[]): [string, string][] {
