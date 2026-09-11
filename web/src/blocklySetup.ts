@@ -1377,7 +1377,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'MAX_ROUNDS', check: 'Number' },
       { type: 'input_value', name: 'START_ROUNDS', check: 'Number' },
     ],
-    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
+    colour: C.REGISTER, inputsInline: true,
   },
   {
     type: 'cu_set_item_category',
