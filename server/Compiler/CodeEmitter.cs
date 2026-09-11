@@ -217,8 +217,6 @@ public static class CodeEmitter
             sb.AppendLine($"                    ShotsPerFire = {it.Gun.ShotsPerFire},");
             sb.AppendLine($"                    VerticalSpread = {it.Gun.VerticalSpread}f,");
             sb.AppendLine($"                    ConditionLossPerShot = {it.Gun.ConditionLossPerShot}f,");
-            if (!string.IsNullOrEmpty(it.Gun.NormalSprite))
-                sb.AppendLine($"                    NormalSprite = AssetLoader.LoadEmbeddedSprite(\"{Escape(it.Gun.NormalSprite)}\"),");
             if (!string.IsNullOrEmpty(it.Gun.RackedSprite))
                 sb.AppendLine($"                    RackedSprite = AssetLoader.LoadEmbeddedSprite(\"{Escape(it.Gun.RackedSprite)}\"),");
             if (!string.IsNullOrEmpty(it.Gun.NormalSpriteNoMag))

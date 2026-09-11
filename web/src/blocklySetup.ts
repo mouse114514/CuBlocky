@@ -1358,13 +1358,12 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'GAS_TIME', check: 'Number' },
       { type: 'input_value', name: 'SHOTS_PER_FIRE', check: 'Number' },
       { type: 'input_value', name: 'VERTICAL_SPREAD', check: 'Number' },
-      { type: 'input_value', name: 'SPRITE_NORMAL', check: 'String', align: 'RIGHT' },
-      { type: 'input_value', name: 'SPRITE_RACKED', check: 'String', align: 'RIGHT' },
-      { type: 'input_value', name: 'SPRITE_NORMAL_NOMAG', check: 'String', align: 'RIGHT' },
-      { type: 'input_value', name: 'SPRITE_RACKED_NOMAG', check: 'String', align: 'RIGHT' },
-      { type: 'input_value', name: 'SOUND_FIRE', check: 'String', align: 'RIGHT' },
-      { type: 'input_value', name: 'SOUND_RACK', check: 'String', align: 'RIGHT' },
-      { type: 'input_value', name: 'SOUND_UNRACK', check: 'String', align: 'RIGHT' },
+      { type: 'input_value', name: 'SPRITE_RACKED', check: 'String' },
+      { type: 'input_value', name: 'SPRITE_NORMAL_NOMAG', check: 'String' },
+      { type: 'input_value', name: 'SPRITE_RACKED_NOMAG', check: 'String' },
+      { type: 'input_value', name: 'SOUND_FIRE', check: 'String' },
+      { type: 'input_value', name: 'SOUND_RACK', check: 'String' },
+      { type: 'input_value', name: 'SOUND_UNRACK', check: 'String' },
     ],
     colour: C.REGISTER, inputsInline: false,
   },
@@ -1590,7 +1589,7 @@ const MSG_ZH: Record<string, string> = {
   CU_ITEM_LIGHT: '设置光源属性 id %1 强度 %2 外半径 %3 R %4 G %5 B %6',
   CU_ITEM_BANDAGE: '设置绷带属性 id %1 效力 %2 皮肤治疗 %3 止血 %4 止痛 %5 骨恢复 %6 脱臼恢复 %7',
   CU_ITEM_SYRINGE: '设置注射器属性\nid %1\n容量 %2\n每次注射 %3\n自动填充 %4\n液体ID %5\n液体量 %6',
-  CU_ITEM_GUN: '设置枪械属性\nid %1\n弹药类型 %2\n射击模式 %3\n供弹方式 %4\n弹匣容量 %5\n动物伤害 %6\n结构伤害 %7\n击退 %8\n耐久消耗 %9\n响度 %10\n气体循环 %11\n每次射弹数 %12\n垂直散布 %13\n正常精灵 %14\n上膛精灵 %15\n无弹匣正常 %16\n无弹匣上膛 %17\n开火音效 %18\n上膛音效 %19\n退膛音效 %20',
+  CU_ITEM_GUN: '设置枪械属性\nid %1\n弹药类型 %2\n射击模式 %3\n供弹方式 %4\n弹匣容量 %5\n动物伤害 %6\n结构伤害 %7\n击退 %8\n耐久消耗 %9\n响度 %10\n气体循环 %11\n每次射弹数 %12\n垂直散布 %13\n上膛精灵 %14\n无弹匣正常 %15\n无弹匣上膛 %16\n开火音效 %17\n上膛音效 %18\n退膛音效 %19',
   CU_ITEM_MAGAZINE: '设置弹匣属性\nid %1\n弹药类型 %2\n最大容量 %3\n初始弹药 %4',
 };
 
@@ -1776,7 +1775,7 @@ const MSG_EN: Record<string, string> = {
   CU_ITEM_LIGHT: 'set light properties id %1 intensity %2 radius %3 R %4 G %5 B %6',
   CU_ITEM_BANDAGE: 'set bandage properties id %1 effectiveness %2 skin heal %3 bandage slow %4 pain %5 bone %6 dislocation %7',
   CU_ITEM_SYRINGE: 'set syringe properties\nid %1\ncapacity %2\nper use %3\nauto fill %4\nliquid id %5\namount %6',
-  CU_ITEM_GUN: 'set gun properties\nid %1\nammo type %2\nfiring mode %3\nfeed type %4\nmag capacity %5\nanimal dmg %6\nstruct dmg %7\nknockback %8\ncondition loss %9\nloudness %10\ngas time %11\nshots per fire %12\nvertical spread %13\nnormal sprite %14\nracked sprite %15\nnormal no-mag %16\nracked no-mag %17\nfire sound %18\nrack sound %19\nunrack sound %20',
+  CU_ITEM_GUN: 'set gun properties\nid %1\nammo type %2\nfiring mode %3\nfeed type %4\nmag capacity %5\nanimal dmg %6\nstruct dmg %7\nknockback %8\ncondition loss %9\nloudness %10\ngas time %11\nshots per fire %12\nvertical spread %13\nracked sprite %14\nnormal no-mag %15\nracked no-mag %16\nfire sound %17\nrack sound %18\nunrack sound %19',
   CU_ITEM_MAGAZINE: 'set magazine properties\nid %1\nammo type %2\nmax rounds %3\nstart rounds %4',
 };
 
@@ -2700,7 +2699,6 @@ csharpGenerator.forBlock['cu_item_gun'] = (block, gen) => {
   const gasTime = gen.valueToCode(block, 'GAS_TIME', ORDER_ATOMIC) || '0';
   const shots = gen.valueToCode(block, 'SHOTS_PER_FIRE', ORDER_ATOMIC) || '1';
   const spread = gen.valueToCode(block, 'VERTICAL_SPREAD', ORDER_ATOMIC) || '0';
-  const spriteNormal = gen.valueToCode(block, 'SPRITE_NORMAL', ORDER_ATOMIC) || '';
   const spriteRacked = gen.valueToCode(block, 'SPRITE_RACKED', ORDER_ATOMIC) || '';
   const spriteNormalNoMag = gen.valueToCode(block, 'SPRITE_NORMAL_NOMAG', ORDER_ATOMIC) || '';
   const spriteRackedNoMag = gen.valueToCode(block, 'SPRITE_RACKED_NOMAG', ORDER_ATOMIC) || '';
@@ -2708,7 +2706,6 @@ csharpGenerator.forBlock['cu_item_gun'] = (block, gen) => {
   const soundRack = gen.valueToCode(block, 'SOUND_RACK', ORDER_ATOMIC) || '';
   const soundUnrack = gen.valueToCode(block, 'SOUND_UNRACK', ORDER_ATOMIC) || '';
   const gun: Record<string, unknown> = {AmmoType: ammoType, FiringMode: firingMode, FeedType: feedType, MagCapacity: magCap, KnockBack: kb, StructureDamage: structDmg, AnimalDamage: animalDmg, Loudness: loudness, DesiredGasTime: gasTime, ShotsPerFire: shots, VerticalSpread: spread, ConditionLossPerShot: condLoss};
-  if (spriteNormal) gun.NormalSprite = spriteNormal;
   if (spriteRacked) gun.RackedSprite = spriteRacked;
   if (spriteNormalNoMag) gun.NormalSpriteNoMag = spriteNormalNoMag;
   if (spriteRackedNoMag) gun.RackedSpriteNoMag = spriteRackedNoMag;
