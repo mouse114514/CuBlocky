@@ -57,6 +57,7 @@ public class ItemEntry
     public BandageProps? Bandage { get; set; }
     public SyringeProps? Syringe { get; set; }
     public GunProps? Gun { get; set; }
+    public MagazineProps? Magazine { get; set; }
 }
 
 public class ContainerProps
@@ -145,6 +146,20 @@ public class GunProps
     public string ShotsPerFire { get; set; } = "1";
     public string VerticalSpread { get; set; } = "0";
     public string ConditionLossPerShot { get; set; } = "0.01";
+    public string NormalSprite { get; set; } = "";
+    public string RackedSprite { get; set; } = "";
+    public string NormalSpriteNoMag { get; set; } = "";
+    public string RackedSpriteNoMag { get; set; } = "";
+    public string FireSound { get; set; } = "";
+    public string CustomRack { get; set; } = "";
+    public string CustomUnrack { get; set; } = "";
+}
+
+public class MagazineProps
+{
+    public string AmmoType { get; set; } = "Pistol";
+    public string MaxRounds { get; set; } = "12";
+    public string StartRounds { get; set; } = "0";
 }
 
 public class LiquidEntry

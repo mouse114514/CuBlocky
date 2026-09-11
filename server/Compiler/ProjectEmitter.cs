@@ -296,6 +296,21 @@ public static class ProjectEmitter
                 if (gu.TryGetProperty("ShotsPerFire", out var v10)) item.Gun.ShotsPerFire = Raw(v10);
                 if (gu.TryGetProperty("VerticalSpread", out var v11)) item.Gun.VerticalSpread = Raw(v11);
                 if (gu.TryGetProperty("ConditionLossPerShot", out var v12)) item.Gun.ConditionLossPerShot = Raw(v12);
+                if (gu.TryGetProperty("NormalSprite", out var v13)) item.Gun.NormalSprite = v13.GetString() ?? "";
+                if (gu.TryGetProperty("RackedSprite", out var v14)) item.Gun.RackedSprite = v14.GetString() ?? "";
+                if (gu.TryGetProperty("NormalSpriteNoMag", out var v15)) item.Gun.NormalSpriteNoMag = v15.GetString() ?? "";
+                if (gu.TryGetProperty("RackedSpriteNoMag", out var v16)) item.Gun.RackedSpriteNoMag = v16.GetString() ?? "";
+                if (gu.TryGetProperty("FireSound", out var v17)) item.Gun.FireSound = v17.GetString() ?? "";
+                if (gu.TryGetProperty("CustomRack", out var v18)) item.Gun.CustomRack = v18.GetString() ?? "";
+                if (gu.TryGetProperty("CustomUnrack", out var v19)) item.Gun.CustomUnrack = v19.GetString() ?? "";
+                item.IsAdvanced = true;
+            }
+            if (json.TryGetProperty("Magazine", out var mag))
+            {
+                item.Magazine = new MagazineProps();
+                if (mag.TryGetProperty("AmmoType", out var mt)) item.Magazine.AmmoType = mt.GetString() ?? "Pistol";
+                if (mag.TryGetProperty("MaxRounds", out var mr)) item.Magazine.MaxRounds = Raw(mr);
+                if (mag.TryGetProperty("StartRounds", out var sr)) item.Magazine.StartRounds = Raw(sr);
                 item.IsAdvanced = true;
             }
             if (json.TryGetProperty("Category", out var catEl))

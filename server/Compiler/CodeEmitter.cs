@@ -217,8 +217,33 @@ public static class CodeEmitter
             sb.AppendLine($"                    ShotsPerFire = {it.Gun.ShotsPerFire},");
             sb.AppendLine($"                    VerticalSpread = {it.Gun.VerticalSpread}f,");
             sb.AppendLine($"                    ConditionLossPerShot = {it.Gun.ConditionLossPerShot}f,");
+            if (!string.IsNullOrEmpty(it.Gun.NormalSprite))
+                sb.AppendLine($"                    NormalSprite = AssetLoader.LoadEmbeddedSprite(\"{Escape(it.Gun.NormalSprite)}\"),");
+            if (!string.IsNullOrEmpty(it.Gun.RackedSprite))
+                sb.AppendLine($"                    RackedSprite = AssetLoader.LoadEmbeddedSprite(\"{Escape(it.Gun.RackedSprite)}\"),");
+            if (!string.IsNullOrEmpty(it.Gun.NormalSpriteNoMag))
+                sb.AppendLine($"                    NormalSpriteNoMag = AssetLoader.LoadEmbeddedSprite(\"{Escape(it.Gun.NormalSpriteNoMag)}\"),");
+            if (!string.IsNullOrEmpty(it.Gun.RackedSpriteNoMag))
+                sb.AppendLine($"                    RackedSpriteNoMag = AssetLoader.LoadEmbeddedSprite(\"{Escape(it.Gun.RackedSpriteNoMag)}\"),");
+            if (!string.IsNullOrEmpty(it.Gun.FireSound))
+                sb.AppendLine($"                    FireSound = AssetLoader.LoadEmbeddedAudio(\"{Escape(it.Gun.FireSound)}\"),");
+            if (!string.IsNullOrEmpty(it.Gun.CustomRack))
+                sb.AppendLine($"                    CustomRack = AssetLoader.LoadEmbeddedAudio(\"{Escape(it.Gun.CustomRack)}\"),");
+            if (!string.IsNullOrEmpty(it.Gun.CustomUnrack))
+                sb.AppendLine($"                    CustomUnrack = AssetLoader.LoadEmbeddedAudio(\"{Escape(it.Gun.CustomUnrack)}\"),");
             sb.AppendLine("                },");
             sb.AppendLine($"                slotRotation = -90f,");
+        }
+
+        // Advanced: Magazine
+        if (it.Magazine != null)
+        {
+            sb.AppendLine($"                Magazine = new MagazineProperties");
+            sb.AppendLine("                {");
+            sb.AppendLine($"                    AmmoType = GunScript.AmmoType.{it.Magazine.AmmoType},");
+            sb.AppendLine($"                    MaxRounds = {it.Magazine.MaxRounds},");
+            sb.AppendLine($"                    StartRounds = {it.Magazine.StartRounds},");
+            sb.AppendLine("                },");
         }
 
         // useAction from Blockly-generated C# code

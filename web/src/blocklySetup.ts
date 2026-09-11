@@ -476,6 +476,12 @@ const BLOCK_JSON: any[] = [
     colour: C.BODY, previousStatement: null, nextStatement: null,
   },
   {
+    type: 'cu_run_command',
+    message0: '%{BKY_CU_RUN_COMMAND}',
+    args0: [{ type: 'input_value', name: 'COMMAND', check: 'String', align: 'RIGHT' }],
+    colour: C.BODY, previousStatement: null, nextStatement: null,
+  },
+  {
     type: 'cu_set_pain',
     message0: '%{BKY_CU_SET_PAIN}',
     args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
@@ -923,6 +929,14 @@ const BLOCK_JSON: any[] = [
   { type: 'cu_player_immunity', message0: '%{BKY_CU_PLAYER_IMMUNITY}', output: 'Number', colour: C.BODY },
   { type: 'cu_player_thirst', message0: '%{BKY_CU_PLAYER_THIRST}', output: 'Number', colour: C.BODY },
 
+  // ═══ Player skills ═══════════════════════════════════════════
+  { type: 'cu_player_str', message0: '%{BKY_CU_PLAYER_STR}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_res', message0: '%{BKY_CU_PLAYER_RES}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_int_skill', message0: '%{BKY_CU_PLAYER_INT_SKILL}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_exp_str', message0: '%{BKY_CU_PLAYER_EXP_STR}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_exp_res', message0: '%{BKY_CU_PLAYER_EXP_RES}', output: 'Number', colour: C.BODY },
+  { type: 'cu_player_exp_int', message0: '%{BKY_CU_PLAYER_EXP_INT}', output: 'Number', colour: C.BODY },
+
   // ═══ Item getters (blue) ═════════════════════════════════════
   { type: 'cu_item_max_condition', message0: '%{BKY_CU_ITEM_MAX_CONDITION}', output: 'Number', colour: C.ITEM },
   { type: 'cu_item_weight', message0: '%{BKY_CU_ITEM_WEIGHT}', output: 'Number', colour: C.ITEM },
@@ -1344,8 +1358,26 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'GAS_TIME', check: 'Number' },
       { type: 'input_value', name: 'SHOTS_PER_FIRE', check: 'Number' },
       { type: 'input_value', name: 'VERTICAL_SPREAD', check: 'Number' },
+      { type: 'input_value', name: 'SPRITE_NORMAL', check: 'String', align: 'RIGHT' },
+      { type: 'input_value', name: 'SPRITE_RACKED', check: 'String', align: 'RIGHT' },
+      { type: 'input_value', name: 'SPRITE_NORMAL_NOMAG', check: 'String', align: 'RIGHT' },
+      { type: 'input_value', name: 'SPRITE_RACKED_NOMAG', check: 'String', align: 'RIGHT' },
+      { type: 'input_value', name: 'SOUND_FIRE', check: 'String', align: 'RIGHT' },
+      { type: 'input_value', name: 'SOUND_RACK', check: 'String', align: 'RIGHT' },
+      { type: 'input_value', name: 'SOUND_UNRACK', check: 'String', align: 'RIGHT' },
     ],
     colour: C.REGISTER, inputsInline: false,
+  },
+  {
+    type: 'cu_item_magazine',
+    message0: '%{BKY_CU_ITEM_MAGAZINE}',
+    args0: [
+      { type: 'input_value', name: 'ID', check: 'Item' },
+      { type: 'field_dropdown', name: 'AMMO_TYPE', options: [['手枪','Pistol'],['步枪','Rifle'],['霰弹','Shotgun']] },
+      { type: 'input_value', name: 'MAX_ROUNDS', check: 'Number' },
+      { type: 'input_value', name: 'START_ROUNDS', check: 'Number' },
+    ],
+    colour: C.REGISTER, previousStatement: null, nextStatement: null, inputsInline: true,
   },
   {
     type: 'cu_set_item_category',
@@ -1402,6 +1434,7 @@ const MSG_ZH: Record<string, string> = {
   CU_SET_HAPPINESS: '设置快乐度 %1',
   CU_SET_TEMPERATURE: '设置体温 %1',
   CU_TALK: '说话 %1',
+  CU_RUN_COMMAND: '执行命令 %1',
   CU_SET_PAIN: '设置疼痛 %1',
   CU_SET_STRESS: '设置压力 %1',
   CU_SET_HEART_RATE: '设置心率 %1',
@@ -1464,6 +1497,12 @@ const MSG_ZH: Record<string, string> = {
   CU_PLAYER_BLOOD_PRESSURE: '玩家血压',
   CU_PLAYER_IMMUNITY: '玩家免疫力',
   CU_PLAYER_THIRST: '玩家口渴',
+  CU_PLAYER_STR: '玩家力量(STR)',
+  CU_PLAYER_RES: '玩家韧性(RES)',
+  CU_PLAYER_INT_SKILL: '玩家智力(INT)',
+  CU_PLAYER_EXP_STR: '力量经验值',
+  CU_PLAYER_EXP_RES: '韧性经验值',
+  CU_PLAYER_EXP_INT: '智力经验值',
   CU_ITEM_MAX_CONDITION: '物品最大耐久',
   CU_ITEM_WEIGHT: '物品重量',
   CU_ITEM_VALUE: '物品价值',
@@ -1551,7 +1590,8 @@ const MSG_ZH: Record<string, string> = {
   CU_ITEM_LIGHT: '设置光源属性 id %1 强度 %2 外半径 %3 R %4 G %5 B %6',
   CU_ITEM_BANDAGE: '设置绷带属性 id %1 效力 %2 皮肤治疗 %3 止血 %4 止痛 %5 骨恢复 %6 脱臼恢复 %7',
   CU_ITEM_SYRINGE: '设置注射器属性\nid %1\n容量 %2\n每次注射 %3\n自动填充 %4\n液体ID %5\n液体量 %6',
-  CU_ITEM_GUN: '设置枪械属性\nid %1\n弹药类型 %2\n射击模式 %3\n供弹方式 %4\n弹匣容量 %5\n动物伤害 %6\n结构伤害 %7\n击退 %8\n耐久消耗 %9\n响度 %10\n气体循环 %11\n每次射弹数 %12\n垂直散布 %13',
+  CU_ITEM_GUN: '设置枪械属性\nid %1\n弹药类型 %2\n射击模式 %3\n供弹方式 %4\n弹匣容量 %5\n动物伤害 %6\n结构伤害 %7\n击退 %8\n耐久消耗 %9\n响度 %10\n气体循环 %11\n每次射弹数 %12\n垂直散布 %13\n正常精灵 %14\n上膛精灵 %15\n无弹匣正常 %16\n无弹匣上膛 %17\n开火音效 %18\n上膛音效 %19\n退膛音效 %20',
+  CU_ITEM_MAGAZINE: '设置弹匣属性\nid %1\n弹药类型 %2\n最大容量 %3\n初始弹药 %4',
 };
 
 const MSG_EN: Record<string, string> = {
@@ -1580,6 +1620,7 @@ const MSG_EN: Record<string, string> = {
   CU_SET_HAPPINESS: 'set happiness %1',
   CU_SET_TEMPERATURE: 'set temperature %1',
   CU_TALK: 'talk %1',
+  CU_RUN_COMMAND: 'run command %1',
   CU_SET_PAIN: 'set pain %1',
   CU_SET_STRESS: 'set stress %1',
   CU_SET_HEART_RATE: 'set heart rate %1',
@@ -1642,6 +1683,12 @@ const MSG_EN: Record<string, string> = {
   CU_PLAYER_BLOOD_PRESSURE: 'player blood pressure',
   CU_PLAYER_IMMUNITY: 'player immunity',
   CU_PLAYER_THIRST: 'player thirst',
+  CU_PLAYER_STR: 'player STR',
+  CU_PLAYER_RES: 'player RES',
+  CU_PLAYER_INT_SKILL: 'player INT',
+  CU_PLAYER_EXP_STR: 'STR experience',
+  CU_PLAYER_EXP_RES: 'RES experience',
+  CU_PLAYER_EXP_INT: 'INT experience',
   CU_ITEM_MAX_CONDITION: 'item max condition',
   CU_ITEM_WEIGHT: 'item weight',
   CU_ITEM_VALUE: 'item value',
@@ -1729,7 +1776,8 @@ const MSG_EN: Record<string, string> = {
   CU_ITEM_LIGHT: 'set light properties id %1 intensity %2 radius %3 R %4 G %5 B %6',
   CU_ITEM_BANDAGE: 'set bandage properties id %1 effectiveness %2 skin heal %3 bandage slow %4 pain %5 bone %6 dislocation %7',
   CU_ITEM_SYRINGE: 'set syringe properties\nid %1\ncapacity %2\nper use %3\nauto fill %4\nliquid id %5\namount %6',
-  CU_ITEM_GUN: 'set gun properties\nid %1\nammo type %2\nfiring mode %3\nfeed type %4\nmag capacity %5\nanimal dmg %6\nstruct dmg %7\nknockback %8\ncondition loss %9\nloudness %10\ngas time %11\nshots per fire %12\nvertical spread %13',
+  CU_ITEM_GUN: 'set gun properties\nid %1\nammo type %2\nfiring mode %3\nfeed type %4\nmag capacity %5\nanimal dmg %6\nstruct dmg %7\nknockback %8\ncondition loss %9\nloudness %10\ngas time %11\nshots per fire %12\nvertical spread %13\nnormal sprite %14\nracked sprite %15\nnormal no-mag %16\nracked no-mag %17\nfire sound %18\nrack sound %19\nunrack sound %20',
+  CU_ITEM_MAGAZINE: 'set magazine properties\nid %1\nammo type %2\nmax rounds %3\nstart rounds %4',
 };
 
 export function setMessages(lang: string) {
@@ -1975,6 +2023,10 @@ csharpGenerator.forBlock['cu_set_temperature'] = (block, gen) => {
 csharpGenerator.forBlock['cu_talk'] = (block, gen) => {
   const t = gen.valueToCode(block, 'TEXT', ORDER_ATOMIC) || '"Hello"';
   return `body.talker.Talk(${t});\n`;
+};
+csharpGenerator.forBlock['cu_run_command'] = (block, gen) => {
+  const cmd = gen.valueToCode(block, 'COMMAND', ORDER_ATOMIC) || '"help"';
+  return `ConsoleScript.ExecuteCommand(${cmd});\n`;
 };
 csharpGenerator.forBlock['cu_set_pain'] = (block, gen) => {
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
@@ -2281,6 +2333,14 @@ csharpGenerator.forBlock['cu_player_heart_rate'] = () => ['body.heartRate', ORDE
 csharpGenerator.forBlock['cu_player_blood_pressure'] = () => ['body.bloodPressure', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_player_immunity'] = () => ['body.immunity', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_player_thirst'] = () => ['body.thirst', ORDER_ATOMIC];
+
+// Player skills
+csharpGenerator.forBlock['cu_player_str'] = () => ['body.skills.STR', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_res'] = () => ['body.skills.RES', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_int_skill'] = () => ['body.skills.INT', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_exp_str'] = () => ['body.skills.expSTR', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_exp_res'] = () => ['body.skills.expRES', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_exp_int'] = () => ['body.skills.expINT', ORDER_ATOMIC];
 
 // Item getters
 csharpGenerator.forBlock['cu_item_max_condition'] = () => ['1f', ORDER_ATOMIC];
@@ -2640,7 +2700,32 @@ csharpGenerator.forBlock['cu_item_gun'] = (block, gen) => {
   const gasTime = gen.valueToCode(block, 'GAS_TIME', ORDER_ATOMIC) || '0';
   const shots = gen.valueToCode(block, 'SHOTS_PER_FIRE', ORDER_ATOMIC) || '1';
   const spread = gen.valueToCode(block, 'VERTICAL_SPREAD', ORDER_ATOMIC) || '0';
-  const json = JSON.stringify({Id: itemId, Gun: {AmmoType: ammoType, FiringMode: firingMode, FeedType: feedType, MagCapacity: magCap, KnockBack: kb, StructureDamage: structDmg, AnimalDamage: animalDmg, Loudness: loudness, DesiredGasTime: gasTime, ShotsPerFire: shots, VerticalSpread: spread, ConditionLossPerShot: condLoss}});
+  const spriteNormal = gen.valueToCode(block, 'SPRITE_NORMAL', ORDER_ATOMIC) || '';
+  const spriteRacked = gen.valueToCode(block, 'SPRITE_RACKED', ORDER_ATOMIC) || '';
+  const spriteNormalNoMag = gen.valueToCode(block, 'SPRITE_NORMAL_NOMAG', ORDER_ATOMIC) || '';
+  const spriteRackedNoMag = gen.valueToCode(block, 'SPRITE_RACKED_NOMAG', ORDER_ATOMIC) || '';
+  const soundFire = gen.valueToCode(block, 'SOUND_FIRE', ORDER_ATOMIC) || '';
+  const soundRack = gen.valueToCode(block, 'SOUND_RACK', ORDER_ATOMIC) || '';
+  const soundUnrack = gen.valueToCode(block, 'SOUND_UNRACK', ORDER_ATOMIC) || '';
+  const gun: Record<string, unknown> = {AmmoType: ammoType, FiringMode: firingMode, FeedType: feedType, MagCapacity: magCap, KnockBack: kb, StructureDamage: structDmg, AnimalDamage: animalDmg, Loudness: loudness, DesiredGasTime: gasTime, ShotsPerFire: shots, VerticalSpread: spread, ConditionLossPerShot: condLoss};
+  if (spriteNormal) gun.NormalSprite = spriteNormal;
+  if (spriteRacked) gun.RackedSprite = spriteRacked;
+  if (spriteNormalNoMag) gun.NormalSpriteNoMag = spriteNormalNoMag;
+  if (spriteRackedNoMag) gun.RackedSpriteNoMag = spriteRackedNoMag;
+  if (soundFire) gun.FireSound = soundFire;
+  if (soundRack) gun.CustomRack = soundRack;
+  if (soundUnrack) gun.CustomUnrack = soundUnrack;
+  const json = JSON.stringify({Id: itemId, Gun: gun});
+  return `//ITEM_PROP:${json}\n`;
+};
+
+csharpGenerator.forBlock['cu_item_magazine'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'ID', ORDER_ATOMIC) || '"myMagazine"';
+  const itemId = id.replace(/^"|"$/g, '');
+  const ammoType = block.getFieldValue('AMMO_TYPE');
+  const maxRounds = gen.valueToCode(block, 'MAX_ROUNDS', ORDER_ATOMIC) || '12';
+  const startRounds = gen.valueToCode(block, 'START_ROUNDS', ORDER_ATOMIC) || '0';
+  const json = JSON.stringify({Id: itemId, Magazine: {AmmoType: ammoType, MaxRounds: maxRounds, StartRounds: startRounds}});
   return `//ITEM_PROP:${json}\n`;
 };
 

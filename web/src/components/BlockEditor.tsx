@@ -171,6 +171,11 @@ const TOOLBOX = `
       <value name="SHOTS_PER_FIRE"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
       <value name="VERTICAL_SPREAD"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
+    <block type="cu_item_magazine">
+      <value name="ID"><shadow type="cu_item_custom"><field name="ID">myMagazine</field></shadow></value>
+      <value name="MAX_ROUNDS"><shadow type="cu_number"><field name="NUM">12</field></shadow></value>
+      <value name="START_ROUNDS"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
   </category>
   <category name="%{BKY_CAT_BODY}" colour="#4caf50" icon="🧍">
     <block type="cu_eat">
@@ -182,6 +187,9 @@ const TOOLBOX = `
     </block>
     <block type="cu_talk">
       <value name="TEXT"><shadow type="cu_text"><field name="TEXT">你好!</field></shadow></value>
+    </block>
+    <block type="cu_run_command">
+      <value name="COMMAND"><shadow type="cu_text"><field name="COMMAND">help</field></shadow></value>
     </block>
     <block type="cu_sleep"></block>
     <block type="cu_wake"></block>
@@ -293,6 +301,13 @@ const TOOLBOX = `
     <block type="cu_player_clothing_temp"></block>
     <block type="cu_player_encumbrance"></block>
     <block type="cu_player_bleed_speed"></block>
+    <sep></sep>
+    <block type="cu_player_str"></block>
+    <block type="cu_player_res"></block>
+    <block type="cu_player_int_skill"></block>
+    <block type="cu_player_exp_str"></block>
+    <block type="cu_player_exp_res"></block>
+    <block type="cu_player_exp_int"></block>
     <sep></sep>
     <block type="cu_limb_index"></block>
     <block type="cu_limb_skin_health">
@@ -460,6 +475,13 @@ const TOOLBOX = `
     <block type="cu_player_clothing_temp"></block>
     <block type="cu_player_encumbrance"></block>
     <block type="cu_player_bleed_speed"></block>
+    <sep></sep>
+    <block type="cu_player_str"></block>
+    <block type="cu_player_res"></block>
+    <block type="cu_player_int_skill"></block>
+    <block type="cu_player_exp_str"></block>
+    <block type="cu_player_exp_res"></block>
+    <block type="cu_player_exp_int"></block>
     <sep></sep>
     <block type="cu_limb_index"></block>
     <block type="cu_limb_skin_health">
