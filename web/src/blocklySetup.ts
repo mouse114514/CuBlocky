@@ -435,6 +435,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'OUTPUT', check: 'Item' },
       { type: 'input_value', name: 'AMOUNT', check: 'Number' },
       { type: 'input_value', name: 'RESULT_CONDITION', check: 'Number' },
+      { type: 'input_value', name: 'INGREDIENT_CONDITION', check: 'Number' },
       { type: 'input_value', name: 'IS_REPAIR', check: 'Boolean' },
       { type: 'input_value', name: 'INT', check: 'Number' },
     ],
@@ -1427,7 +1428,7 @@ const MSG_ZH: Record<string, string> = {
   CU_DEFINE_ITEM_USE: '物品 %1 使用时',
   CU_DEFINE_ITEM_LIMB_USE: '物品 %1 肢体使用时',
   CU_ITEM_SET_PROPERTY: '设置物品 %1 属性 %2 为 %3',
-  CU_REGISTER_RECIPE: '配方 %1 → %2 ×%3 耐久%4 修理%5 智力%6',
+  CU_REGISTER_RECIPE: '配方 %1 → %2 ×%3 耐久%4 材料耐久%5 修理%6 智力%7',
   CU_EAT: '吃 饥饿 %1 体重增益 %2',
   CU_DRINK: '喝水 量 %1',
   CU_SET_HAPPINESS: '设置快乐度 %1',
@@ -1613,7 +1614,7 @@ const MSG_EN: Record<string, string> = {
   CU_DEFINE_ITEM_USE: 'when %1 item used',
   CU_DEFINE_ITEM_LIMB_USE: 'when %1 item limb used',
   CU_ITEM_SET_PROPERTY: 'set item %1 property %2 to %3',
-  CU_REGISTER_RECIPE: 'recipe %1 → %2 ×%3 cond%4 repair%5 int%6',
+  CU_REGISTER_RECIPE: 'recipe %1 → %2 ×%3 cond%4 ing cond%5 repair%6 int%7',
   CU_EAT: 'eat hunger %1 weight gain %2',
   CU_DRINK: 'drink amount %1',
   CU_SET_HAPPINESS: 'set happiness %1',
@@ -1962,6 +1963,7 @@ csharpGenerator.forBlock['cu_register_recipe'] = (block, gen) => {
   const out = gen.valueToCode(block, 'OUTPUT', ORDER_ATOMIC) || '"ironBar"';
   const amt = gen.valueToCode(block, 'AMOUNT', ORDER_ATOMIC) || '1';
   const cond = gen.valueToCode(block, 'RESULT_CONDITION', ORDER_ATOMIC) || '-1';
+  const ingCond = gen.valueToCode(block, 'INGREDIENT_CONDITION', ORDER_ATOMIC) || '0.9';
   const repair = gen.valueToCode(block, 'IS_REPAIR', ORDER_ATOMIC) || 'false';
   const intReq = gen.valueToCode(block, 'INT', ORDER_ATOMIC) || '2';
 
@@ -1971,7 +1973,7 @@ csharpGenerator.forBlock['cu_register_recipe'] = (block, gen) => {
 
   // Build List<RecipeItem> code from extracted IDs
   const recipeItems = itemIds.map(id =>
-    `new RecipeItem(0.9f) { specificId = "${id}" }`
+    `new RecipeItem(${ingCond}f) { specificId = "${id}" }`
   ).join(', ');
   const inputsCode = `new List<RecipeItem> { ${recipeItems} }`;
 
@@ -1987,6 +1989,7 @@ csharpGenerator.forBlock['cu_register_recipe'] = (block, gen) => {
     Amount: 1,
     IsLiquid: false,
     DestroyItem: true,
+    MinimumCondition: parseFloat(ingCond) || 0.9,
   }));
   const json = JSON.stringify({
     ResultId: out.replace(/^"|"$/g, ''),

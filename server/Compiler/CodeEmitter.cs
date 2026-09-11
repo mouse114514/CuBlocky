@@ -395,9 +395,9 @@ public static class CodeEmitter
         foreach (var ing in r.Ingredients)
         {
             if (ing.Mode == "specific")
-                sb.AppendLine($"                    new RecipeItem({F(ing.Amount)}f) {{ specificId = \"{Escape(ing.Id)}\", isLiquid = {B(ing.IsLiquid)}, destroyItem = {B(ing.DestroyItem)} }},");
+                sb.AppendLine($"                    new RecipeItem({F(ing.MinimumCondition)}f) {{ specificId = \"{Escape(ing.Id)}\", isLiquid = {B(ing.IsLiquid)}, destroyItem = {B(ing.DestroyItem)} }},");
             else
-                sb.AppendLine($"                    new RecipeItem({F(ing.Amount)}f) {{ quality = new CraftingQuality(\"{Escape(ing.Id)}\", {F(ing.Amount)}f), isLiquid = {B(ing.IsLiquid)}, destroyItem = {B(ing.DestroyItem)} }},");
+                sb.AppendLine($"                    new RecipeItem({F(ing.MinimumCondition)}f) {{ quality = new CraftingQuality(\"{Escape(ing.Id)}\", {F(ing.Amount)}f), isLiquid = {B(ing.IsLiquid)}, destroyItem = {B(ing.DestroyItem)} }},");
         }
         sb.AppendLine("                }");
         sb.AppendLine("            });");

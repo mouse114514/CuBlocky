@@ -82,6 +82,7 @@ const TOOLBOX = `
       <value name="OUTPUT"><shadow type="cu_item_vanilla"><field name="ID">bandage</field></shadow></value>
       <value name="AMOUNT"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
       <value name="RESULT_CONDITION"><shadow type="cu_number"><field name="NUM">-1</field></shadow></value>
+      <value name="INGREDIENT_CONDITION"><shadow type="cu_number"><field name="NUM">0.9</field></shadow></value>
       <value name="IS_REPAIR"><shadow type="cu_false"></shadow></value>
       <value name="INT"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
     </block>

@@ -206,6 +206,7 @@ public class RecipeIngredient
     public float Amount { get; set; } = 1f;
     public bool IsLiquid { get; set; } = false;
     public bool DestroyItem { get; set; } = true;
+    public float MinimumCondition { get; set; } = 0.9f;
 }
 
 // ── Assets ─────────────────────────────────────────────────────────
