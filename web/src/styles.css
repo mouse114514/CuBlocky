@@ -305,7 +305,7 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 }
 .asset-card:hover{border-color:#1a8a1a}
 .asset-card.selected{border-color:#1a8a1a;background:#e8f5e9}
-.asset-thumb{width:48px;height:48px;object-fit:contain;border-radius:4px;background:#f0f0f0;image-rendering:pixelated}
+.asset-thumb{width:48px;height:48px;object-fit:contain;border-radius:4px;background:#f0f0f0;image-rendering:pixelated}.asset-thumb-audio{display:flex;align-items:center;justify-content:center;font-size:24px;background:#e8e8e8}
 .asset-name{font-size:10px;color:#666;text-align:center;word-break:break-all;max-height:28px;overflow:hidden}
 .asset-del{
   position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;

@@ -50,6 +50,8 @@ export default function AssetManager({ projectName, mode, onSelect, onGenerate, 
     onClose();
   };
 
+  const isAudio = (name: string) => /\.(wav|mp3|ogg)$/i.test(name);
+
   const handleCardClick = (name: string) => {
     if (mode === 'pick') { handleSelect(name); return; }
     setSelected(selected === name ? null : name);
@@ -60,7 +62,7 @@ export default function AssetManager({ projectName, mode, onSelect, onGenerate, 
       <div className="modal asset-modal">
         <h3>{mode === 'pick' ? t('asset.pickTitle') : t('asset.manageTitle')}</h3>
         <div className="asset-toolbar">
-          <input ref={fileRef} type="file" accept=".png,.jpg,.jpeg,.bmp,image/*" style={{ display: 'none' }} onChange={handleUpload} />
+          <input ref={fileRef} type="file" accept=".png,.jpg,.jpeg,.bmp,image/*,.wav,.mp3,.ogg,audio/*" style={{ display: 'none' }} onChange={handleUpload} />
           <button className="build-btn" onClick={() => fileRef.current?.click()} disabled={uploading}>
             {uploading ? t('asset.uploading') : t('asset.upload')}
           </button>
@@ -81,7 +83,11 @@ export default function AssetManager({ projectName, mode, onSelect, onGenerate, 
           <div className="asset-grid">
             {assets.map(a => (
               <div key={a.name} className={`asset-card${selected === a.name ? ' selected' : ''}`} onClick={() => handleCardClick(a.name)}>
-                <img src={assetRawUrl(projectName, a.name)} alt={a.name} className="asset-thumb" />
+                {isAudio(a.name) ? (
+                  <div className="asset-thumb asset-thumb-audio">🎵</div>
+                ) : (
+                  <img src={assetRawUrl(projectName, a.name)} alt={a.name} className="asset-thumb" />
+                )}
                 <div className="asset-name" title={a.name}>{a.name}</div>
               </div>
             ))}
