@@ -260,10 +260,7 @@ public static class CodeEmitter
         }
 
         // Advanced: Magazine (stored in static dict, applied via Harmony patch)
-        if (it.Magazine != null)
-        {
-            sb.AppendLine($"                _magazineConfigs[\"{Escape(it.Id)}\"] = (\"{Escape(it.Magazine.AmmoType)}\", {it.Magazine.MaxRounds}, {it.Magazine.StartRounds});");
-        }
+        // NOTE: must be outside ItemRegistry.Register() call
 
         // useAction from Blockly-generated C# code
         if (!string.IsNullOrEmpty(it.UseAction))
@@ -318,6 +315,11 @@ public static class CodeEmitter
         if (it.SpawnFrequency != 1)
             sb.AppendLine($"            , {it.SpawnFrequency}");
         sb.AppendLine("            );");
+        // Magazine config: stored in static dict, applied via Harmony patch on Item.Start
+        if (it.Magazine != null)
+        {
+            sb.AppendLine($"            _magazineConfigs[\"{Escape(it.Id)}\"] = (\"{Escape(it.Magazine.AmmoType)}\", {it.Magazine.MaxRounds}, {it.Magazine.StartRounds});");
+        }
         sb.AppendLine();
         return sb.ToString();
     }
