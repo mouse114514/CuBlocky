@@ -17,12 +17,16 @@ public static class CodeEmitter
         sb.AppendLine("using CUCoreLib.Helpers;");
         sb.AppendLine("using CUCoreLib.Registries;");
         sb.AppendLine("using CUCoreLib.Data;");
+        sb.AppendLine("using HarmonyLib;");
         sb.AppendLine("using UnityEngine;");
         sb.AppendLine();
         sb.AppendLine($"namespace {SafeIdent(bp.Mod.RootNamespace)}");
         sb.AppendLine("{");
         sb.AppendLine("    public static class RegisterContent");
         sb.AppendLine("    {");
+        sb.AppendLine("        // Magazine configs: itemId -> (ammoType, maxRounds, startRounds)");
+        sb.AppendLine("        public static readonly Dictionary<string, (string ammoType, int maxRounds, int startRounds)> _magazineConfigs = new Dictionary<string, (string, int, int)>();");
+        sb.AppendLine();
         sb.AppendLine("        public static void RegisterAll()");
         sb.AppendLine("        {");
 
@@ -68,6 +72,28 @@ public static class CodeEmitter
         if (extraItems != null) allItemsList.AddRange(extraItems);
         if (allItemsList.Any(it => string.IsNullOrEmpty(it.SpriteAssetId)))
             sb.AppendLine(EmitPlaceholderSpriteHelper());
+
+        // Emit magazine Harmony patch
+        sb.AppendLine();
+        sb.AppendLine("        // Harmony patch to apply AmmoScript to magazine items at runtime");
+        sb.AppendLine("        [HarmonyPatch(typeof(Item), \"Start\")]");
+        sb.AppendLine("        [HarmonyPostfix]");
+        sb.AppendLine("        public static void ApplyMagazineComponents(Item __instance)");
+        sb.AppendLine("        {");
+        sb.AppendLine("            if (__instance == null || string.IsNullOrEmpty(__instance.id)) return;");
+        sb.AppendLine("            if (!_magazineConfigs.TryGetValue(__instance.id, out var cfg)) return;");
+        sb.AppendLine("            var ammo = __instance.GetComponent<AmmoScript>();");
+        sb.AppendLine("            if (ammo == null) ammo = __instance.gameObject.AddComponent<AmmoScript>();");
+        sb.AppendLine("            ammo.itemType = AmmoScript.AmmoItemType.Magazine;");
+        sb.AppendLine("            switch (cfg.ammoType) {");
+        sb.AppendLine("                case \"Pistol\": ammo.ammoType = GunScript.AmmoType.Pistol; break;");
+        sb.AppendLine("                case \"Rifle\": ammo.ammoType = GunScript.AmmoType.Rifle; break;");
+        sb.AppendLine("                case \"Shotgun\": ammo.ammoType = GunScript.AmmoType.Shotgun; break;");
+        sb.AppendLine("                default: ammo.ammoType = GunScript.AmmoType.Pistol; break;");
+        sb.AppendLine("            }");
+        sb.AppendLine("            ammo.maxRounds = Mathf.Max(1, cfg.maxRounds);");
+        sb.AppendLine("            ammo.rounds = Mathf.Clamp(cfg.startRounds, 0, ammo.maxRounds);");
+        sb.AppendLine("        }");
 
         sb.AppendLine("    }");
         sb.AppendLine("}");
@@ -233,15 +259,10 @@ public static class CodeEmitter
             sb.AppendLine($"                slotRotation = -90f,");
         }
 
-        // Advanced: Magazine
+        // Advanced: Magazine (stored in static dict, applied via Harmony patch)
         if (it.Magazine != null)
         {
-            sb.AppendLine($"                Magazine = new MagazineProperties");
-            sb.AppendLine("                {");
-            sb.AppendLine($"                    AmmoType = GunScript.AmmoType.{it.Magazine.AmmoType},");
-            sb.AppendLine($"                    MaxRounds = {it.Magazine.MaxRounds},");
-            sb.AppendLine($"                    StartRounds = {it.Magazine.StartRounds},");
-            sb.AppendLine("                },");
+            sb.AppendLine($"                _magazineConfigs[\"{Escape(it.Id)}\"] = (\"{Escape(it.Magazine.AmmoType)}\", {it.Magazine.MaxRounds}, {it.Magazine.StartRounds});");
         }
 
         // useAction from Blockly-generated C# code
