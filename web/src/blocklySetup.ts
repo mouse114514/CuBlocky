@@ -1359,12 +1359,12 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'GAS_TIME', check: 'Number' },
       { type: 'input_value', name: 'SHOTS_PER_FIRE', check: 'Number' },
       { type: 'input_value', name: 'VERTICAL_SPREAD', check: 'Number' },
-      { type: 'input_value', name: 'SPRITE_RACKED', check: 'String' },
-      { type: 'input_value', name: 'SPRITE_NORMAL_NOMAG', check: 'String' },
-      { type: 'input_value', name: 'SPRITE_RACKED_NOMAG', check: 'String' },
-      { type: 'input_value', name: 'SOUND_FIRE', check: 'String' },
-      { type: 'input_value', name: 'SOUND_RACK', check: 'String' },
-      { type: 'input_value', name: 'SOUND_UNRACK', check: 'String' },
+      { type: 'field_sprite_picker', name: 'SPRITE_RACKED' },
+      { type: 'field_sprite_picker', name: 'SPRITE_NORMAL_NOMAG' },
+      { type: 'field_sprite_picker', name: 'SPRITE_RACKED_NOMAG' },
+      { type: 'field_input', name: 'SOUND_FIRE', text: '' },
+      { type: 'field_input', name: 'SOUND_RACK', text: '' },
+      { type: 'field_input', name: 'SOUND_UNRACK', text: '' },
     ],
     colour: C.REGISTER, inputsInline: false,
   },
@@ -2702,12 +2702,12 @@ csharpGenerator.forBlock['cu_item_gun'] = (block, gen) => {
   const gasTime = gen.valueToCode(block, 'GAS_TIME', ORDER_ATOMIC) || '0';
   const shots = gen.valueToCode(block, 'SHOTS_PER_FIRE', ORDER_ATOMIC) || '1';
   const spread = gen.valueToCode(block, 'VERTICAL_SPREAD', ORDER_ATOMIC) || '0';
-  const spriteRacked = gen.valueToCode(block, 'SPRITE_RACKED', ORDER_ATOMIC) || '';
-  const spriteNormalNoMag = gen.valueToCode(block, 'SPRITE_NORMAL_NOMAG', ORDER_ATOMIC) || '';
-  const spriteRackedNoMag = gen.valueToCode(block, 'SPRITE_RACKED_NOMAG', ORDER_ATOMIC) || '';
-  const soundFire = gen.valueToCode(block, 'SOUND_FIRE', ORDER_ATOMIC) || '';
-  const soundRack = gen.valueToCode(block, 'SOUND_RACK', ORDER_ATOMIC) || '';
-  const soundUnrack = gen.valueToCode(block, 'SOUND_UNRACK', ORDER_ATOMIC) || '';
+  const spriteRacked = block.getFieldValue('SPRITE_RACKED') || '';
+  const spriteNormalNoMag = block.getFieldValue('SPRITE_NORMAL_NOMAG') || '';
+  const spriteRackedNoMag = block.getFieldValue('SPRITE_RACKED_NOMAG') || '';
+  const soundFire = block.getFieldValue('SOUND_FIRE') || '';
+  const soundRack = block.getFieldValue('SOUND_RACK') || '';
+  const soundUnrack = block.getFieldValue('SOUND_UNRACK') || '';
   const gun: Record<string, unknown> = {AmmoType: ammoType, FiringMode: firingMode, FeedType: feedType, MagCapacity: magCap, KnockBack: kb, StructureDamage: structDmg, AnimalDamage: animalDmg, Loudness: loudness, DesiredGasTime: gasTime, ShotsPerFire: shots, VerticalSpread: spread, ConditionLossPerShot: condLoss};
   if (spriteRacked) gun.RackedSprite = spriteRacked;
   if (spriteNormalNoMag) gun.NormalSpriteNoMag = spriteNormalNoMag;
