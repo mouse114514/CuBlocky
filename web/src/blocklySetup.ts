@@ -418,7 +418,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'TARGET_ITEM', check: 'Item' },
       { type: 'field_dropdown', name: 'PROP', options: [
         ['耐久(condition)','condition'],['重量(weight)','weight'],
-        ['价值(value)','value'],['标签(tags)','tags'],
+        ['价值(value)','value'],
         ['可使用(usable)','usable'],['可穿戴(wearable)','wearable'],
         ['左手使用(useLimbAction)','useLimbAction'],
         ['零耐久销毁(destroyAtZeroCondition)','destroyAtZeroCondition'],
@@ -427,6 +427,22 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'VALUE', check: ['Number','String','Boolean','Item'], align: 'RIGHT' },
     ],
     extensions: ['prop_type_check'],
+    colour: C.ITEM, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  // Set item tag: dedicated block with tag dropdown
+  {
+    type: 'cu_item_set_tag',
+    message0: '%{BKY_CU_ITEM_SET_TAG}',
+    args0: [
+      { type: 'input_value', name: 'TARGET_ITEM', check: 'Item' },
+      { type: 'field_dropdown', name: 'TAG', options: [
+        ['可放置(placeable)','placeable'],
+        ['可食用(edible)','edible'],
+        ['可饮用(drinkable)','drinkable'],
+        ['可穿戴(wearable)','wearable'],
+        ['可堆叠(stackable)','stackable'],
+      ]},
+    ],
     colour: C.ITEM, previousStatement: null, nextStatement: null, inputsInline: true,
   },
   // Recipe registration: inputs (list), output, amount, resultCondition, isRepair
@@ -1431,6 +1447,7 @@ const MSG_ZH: Record<string, string> = {
   CU_DEFINE_ITEM_USE: '物品 %1 使用时',
   CU_DEFINE_ITEM_LIMB_USE: '物品 %1 肢体使用时',
   CU_ITEM_SET_PROPERTY: '设置物品 %1 属性 %2 为 %3',
+  CU_ITEM_SET_TAG: '设置物品 %1 标签为 %2',
   CU_REGISTER_RECIPE: '配方 %1 → %2 ×%3 耐久%4 材料耐久%5 修理%6 智力%7',
   CU_EAT: '吃 饥饿 %1 体重增益 %2',
   CU_DRINK: '喝水 量 %1',
@@ -1617,6 +1634,7 @@ const MSG_EN: Record<string, string> = {
   CU_DEFINE_ITEM_USE: 'when %1 item used',
   CU_DEFINE_ITEM_LIMB_USE: 'when %1 item limb used',
   CU_ITEM_SET_PROPERTY: 'set item %1 property %2 to %3',
+  CU_ITEM_SET_TAG: 'set item %1 tag to %2',
   CU_REGISTER_RECIPE: 'recipe %1 → %2 ×%3 cond%4 ing cond%5 repair%6 int%7',
   CU_EAT: 'eat hunger %1 weight gain %2',
   CU_DRINK: 'drink amount %1',
@@ -1808,21 +1826,19 @@ export function defineBlocks(lang: string = 'zh') {
     Blockly.Extensions.register('prop_type_check', function(this: Blockly.Block) {
       const PROP_CHECK: Record<string, string[]> = {
         condition: ['Number'], weight: ['Number'], value: ['Number'],
-        tags: ['String'], usable: ['Boolean'], wearable: ['Boolean'],
+        usable: ['Boolean'], wearable: ['Boolean'],
         useLimbAction: ['Boolean'], destroyAtZeroCondition: ['Boolean'],
-        placeable: ['Boolean'],
+        placeable: [],
       };
-      const updateType = () => {
+      const updateCheck = () => {
         const prop = this.getFieldValue('PROP') as string;
-        const check = PROP_CHECK[prop] || ['Number','String','Boolean','Item'];
-        this.getInput('VALUE')?.setCheck(check);
+        const input = this.getInput('VALUE');
+        if (input) input.setCheck(PROP_CHECK[prop] || ['Number','String','Boolean','Item']);
       };
-      updateType();
-      const prevChange = this.onchange;
+      updateCheck();
       this.onchange = function(e: Blockly.Events.Abstract) {
-        if (prevChange) prevChange.call(this, e);
         if (e.type === Blockly.Events.BLOCK_CHANGE && (e as any).name === 'PROP') {
-          updateType();
+          updateCheck();
         }
       };
     });
@@ -1954,20 +1970,23 @@ csharpGenerator.forBlock['cu_define_item_limb_use'] = (block, gen) => {
 };
 csharpGenerator.forBlock['cu_item_set_property'] = (block, gen) => {
   const prop = block.getFieldValue('PROP');
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
   const target = gen.valueToCode(block, 'TARGET_ITEM', ORDER_ATOMIC) || '"myItem"';
   if (prop === 'placeable') {
     return `${target}.tags = "placeable";\n${target}.Stats.usable = true;\n${target}.Stats.usableWithLMB = true;\n`;
   }
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
   const itemProps = ['condition'];
   const numStatsProps = ['weight','slotRotation','rotSpeed','jumpHeightMultChange','wearableVisualOffset','spriteScale','scaleConditionToward'];
   const boolStatsProps = ['usable','wearable','useLimbAction','destroyAtZeroCondition','wearableArmor','wearableIsolation','wearableHitDurabilityLossMultiplier'];
-  const strStatsProps = ['tags'];
   if (itemProps.includes(prop)) return `${target}.${prop} = ${float(v)};\n`;
   if (numStatsProps.includes(prop)) return `${target}.Stats.${prop} = ${float(v)};\n`;
   if (boolStatsProps.includes(prop)) return `${target}.Stats.${prop} = ${bool(v)};\n`;
-  if (strStatsProps.includes(prop)) return `${target}.Stats.${prop} = ${v};\n`;
   return `${target}.${prop} = ${v};\n`;
+};
+csharpGenerator.forBlock['cu_item_set_tag'] = (block, gen) => {
+  const tag = block.getFieldValue('TAG') || 'placeable';
+  const target = gen.valueToCode(block, 'TARGET_ITEM', ORDER_ATOMIC) || '"myItem"';
+  return `${target}.Stats.tags = "${tag}";\n`;
 };
 // Helper: walk a lists_create_with block and extract item ID strings from each slot
 function extractListItemIds(listBlock: Blockly.Block | null): string[] {
@@ -2774,10 +2793,11 @@ let _blocksLang = 'zh';
 
 const PROP_OPTIONS: DdOption[] = [
   ['耐久', 'Durability', 'condition'], ['重量', 'Weight', 'weight'],
-  ['价值', 'Value', 'value'], ['标签', 'Tags', 'tags'],
+  ['价值', 'Value', 'value'],
   ['可使用', 'Usable', 'usable'], ['可穿戴', 'Wearable', 'wearable'],
   ['左手使用', 'UseLimbAction', 'useLimbAction'],
   ['零耐久销毁', 'DestroyAtZero', 'destroyAtZeroCondition'],
+  ['可放置', 'Placeable', 'placeable'],
 ];
 
 const TARGET_OPTIONS: DdOption[] = [
@@ -2912,6 +2932,7 @@ const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_set_item_category: { CATEGORY: CATEGORY_OPTIONS },
   cu_item_gun: { AMMO_TYPE: AMMO_TYPE_OPTIONS, FIRING_MODE: FIRING_MODE_OPTIONS, FEED_TYPE: FEED_TYPE_OPTIONS },
   cu_item_set_property: { PROP: PROP_OPTIONS },
+  cu_item_set_tag: {},
   cu_item_use: { TARGET: TARGET_OPTIONS, ACTION: ACTION_OPTIONS },
   cu_item_consume: { TARGET: TARGET_OPTIONS },
   cu_item_set_condition: { TARGET: TARGET_OPTIONS, OP: COND_OP_OPTIONS },
