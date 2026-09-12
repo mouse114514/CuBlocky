@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>CuBlocky.Server</RootNamespace>
     <AssemblyName>CuBlocky.Server</AssemblyName>
-    <Version>0.1.6</Version>
+    <Version>0.1.7</Version>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <EnableDefaultContentItems>true</EnableDefaultContentItems>
