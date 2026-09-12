@@ -30,6 +30,35 @@ public static class CodeEmitter
         sb.AppendLine("        // Start condition configs: itemId -> initialCondition");
         sb.AppendLine("        public static readonly Dictionary<string, float> _startConditionConfigs = new Dictionary<string, float>();");
         sb.AppendLine();
+        sb.AppendLine("        private static bool _debugSprite = true;");
+        sb.AppendLine("        private static readonly System.Text.StringBuilder _spriteLog = new System.Text.StringBuilder();");
+        sb.AppendLine("        private static Sprite _loadSprite(string name)");
+        sb.AppendLine("        {");
+        sb.AppendLine("            var asm = typeof(RegisterContent).Assembly;");
+        sb.AppendLine("            var names = asm.GetManifestResourceNames();");
+        sb.AppendLine("            bool found = names.Any(n => n.EndsWith(name) || n.Contains(name));");
+        sb.AppendLine("            _spriteLog.AppendLine($\"Sprite '{{name}}' -> embedded={{found}} resources=[{{string.Join(\",\", names)}}]\");");
+        sb.AppendLine("            var sprite = AssetLoader.LoadEmbeddedSprite(name);");
+        sb.AppendLine("            _spriteLog.AppendLine($\"  -> result={{(sprite != null ? \"OK\" : \"NULL\")}}\");");
+        sb.AppendLine("            return sprite;");
+        sb.AppendLine("        }");
+        sb.AppendLine("        private static AudioClip _loadAudio(string name)");
+        sb.AppendLine("        {");
+        sb.AppendLine("            var asm = typeof(RegisterContent).Assembly;");
+        sb.AppendLine("            var names = asm.GetManifestResourceNames();");
+        sb.AppendLine("            bool found = names.Any(n => n.EndsWith(name) || n.Contains(name));");
+        sb.AppendLine("            _spriteLog.AppendLine($\"Audio '{{name}}' -> embedded={{found}} resources=[{{string.Join(\",\", names)}}]\");");
+        sb.AppendLine("            var clip = AssetLoader.LoadEmbeddedAudio(name);");
+        sb.AppendLine("            _spriteLog.AppendLine($\"  -> result={{(clip != null ? \"OK\" : \"NULL\")}}\");");
+        sb.AppendLine("            return clip;");
+        sb.AppendLine("        }");
+        sb.AppendLine("        private static Sprite LoadSprite(string name) => _loadSprite(name);");
+        sb.AppendLine("        private static AudioClip LoadAudio(string name) => _loadAudio(name);");
+        sb.AppendLine("        private static void DumpSpriteLog()");
+        sb.AppendLine("        {");
+        sb.AppendLine("            Plugin.Logger.LogInfo($\"[CuBlocky] Sprite/Audio debug log:\\n{{_spriteLog}}\");");
+        sb.AppendLine("        }");
+        sb.AppendLine();
         sb.AppendLine("        public static void RegisterAll()");
         sb.AppendLine("        {");
 
@@ -68,9 +97,8 @@ public static class CodeEmitter
                 sb.Append(EmitLocale(l));
         }
 
+        sb.AppendLine("        DumpSpriteLog();");
         sb.AppendLine("        }");
-
-        // Emit placeholder sprite helper if any item has no sprite
         var allItemsList = new List<ItemEntry>(bp.Items);
         if (extraItems != null) allItemsList.AddRange(extraItems);
         if (allItemsList.Any(it => string.IsNullOrEmpty(it.SpriteAssetId)))
@@ -257,17 +285,17 @@ public static class CodeEmitter
             sb.AppendLine($"                    VerticalSpread = {it.Gun.VerticalSpread}f,");
             sb.AppendLine($"                    ConditionLossPerShot = {it.Gun.ConditionLossPerShot}f,");
             if (!string.IsNullOrEmpty(it.Gun.RackedSprite))
-                sb.AppendLine($"                    RackedSprite = AssetLoader.LoadEmbeddedSprite(\"{Escape(CleanSpriteName(it.Gun.RackedSprite))}\"),");
+                sb.AppendLine($"                    RackedSprite = LoadSprite(\"{Escape(CleanSpriteName(it.Gun.RackedSprite))}\"),");
             if (!string.IsNullOrEmpty(it.Gun.NormalSpriteNoMag))
-                sb.AppendLine($"                    NormalSpriteNoMag = AssetLoader.LoadEmbeddedSprite(\"{Escape(CleanSpriteName(it.Gun.NormalSpriteNoMag))}\"),");
+                sb.AppendLine($"                    NormalSpriteNoMag = LoadSprite(\"{Escape(CleanSpriteName(it.Gun.NormalSpriteNoMag))}\"),");
             if (!string.IsNullOrEmpty(it.Gun.RackedSpriteNoMag))
-                sb.AppendLine($"                    RackedSpriteNoMag = AssetLoader.LoadEmbeddedSprite(\"{Escape(CleanSpriteName(it.Gun.RackedSpriteNoMag))}\"),");
+                sb.AppendLine($"                    RackedSpriteNoMag = LoadSprite(\"{Escape(CleanSpriteName(it.Gun.RackedSpriteNoMag))}\"),");
             if (!string.IsNullOrEmpty(it.Gun.FireSound))
-                sb.AppendLine($"                    FireSound = AssetLoader.LoadEmbeddedAudio(\"{Escape(CleanSpriteName(it.Gun.FireSound))}\"),");
+                sb.AppendLine($"                    FireSound = LoadAudio(\"{Escape(CleanSpriteName(it.Gun.FireSound))}\"),");
             if (!string.IsNullOrEmpty(it.Gun.CustomRack))
-                sb.AppendLine($"                    CustomRack = AssetLoader.LoadEmbeddedAudio(\"{Escape(CleanSpriteName(it.Gun.CustomRack))}\"),");
+                sb.AppendLine($"                    CustomRack = LoadAudio(\"{Escape(CleanSpriteName(it.Gun.CustomRack))}\"),");
             if (!string.IsNullOrEmpty(it.Gun.CustomUnrack))
-                sb.AppendLine($"                    CustomUnrack = AssetLoader.LoadEmbeddedAudio(\"{Escape(CleanSpriteName(it.Gun.CustomUnrack))}\"),");
+                sb.AppendLine($"                    CustomUnrack = LoadAudio(\"{Escape(CleanSpriteName(it.Gun.CustomUnrack))}\"),");
             sb.AppendLine("                },");
             sb.AppendLine($"                slotRotation = -90f,");
         }
@@ -319,7 +347,7 @@ public static class CodeEmitter
             var spriteName = ResolveSpriteName(it.SpriteAssetId, bp);
             if (string.IsNullOrEmpty(spriteName))
                 spriteName = it.Id + ".png";
-            sb.AppendLine($"            , AssetLoader.LoadEmbeddedSprite(\"{Escape(CleanSpriteName(spriteName))}\")");
+            sb.AppendLine($"            , LoadSprite(\"{Escape(CleanSpriteName(spriteName))}\")");
         }
         else
         {
@@ -514,7 +542,7 @@ public static class CodeEmitter
     {
         var spriteName = ResolveSpriteName(st.SpriteAssetId, bp);
         if (!string.IsNullOrEmpty(spriteName))
-            return $"AssetLoader.LoadEmbeddedSprite(\"{Escape(CleanSpriteName(spriteName))}\")";
+            return $"LoadSprite(\"{Escape(CleanSpriteName(spriteName))}\")";
         // No icon: colored placeholder by type (green buff / red debuff)
         var color = st.Type == "buff" ? "new Color(0.3f, 0.8f, 0.4f)" : "new Color(0.9f, 0.3f, 0.3f)";
         return $"StatusPlaceholderSprite({color})";
