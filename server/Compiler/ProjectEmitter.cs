@@ -361,6 +361,8 @@ public static class ProjectEmitter
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using System.Reflection;
+using System.Linq;
 using {ns};
 
 namespace {ns}
@@ -382,6 +384,13 @@ namespace {ns}
             Logger.LogInfo(""[CuBlocky] Awake started"");
             try
             {{
+                // Debug: list all embedded resources
+                var asm = typeof(Plugin).Assembly;
+                var resources = asm.GetManifestResourceNames();
+                Logger.LogInfo($""[CuBlocky] Embedded resources: {{resources.Length}} items"");
+                foreach (var r in resources)
+                    Logger.LogInfo($""[CuBlocky]   Resource: {{r}}"");
+
                 RegisterContent.RegisterAll();
                 Logger.LogInfo(""[CuBlocky] RegisterAll done"");
 {patchLine}                Logger.LogInfo(""[CuBlocky] Harmony patches applied"");
