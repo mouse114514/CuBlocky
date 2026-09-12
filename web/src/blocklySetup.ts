@@ -4,6 +4,7 @@ import { fieldRegistry } from 'blockly/core';
 // ── Global sprite picker callback (React ↔ Blockly bridge) ──────
 export type SpritePickCallback = (assetName: string) => void;
 let _spritePickCb: SpritePickCallback | null = null;
+let _propTypeCheckRegistered = false;
 export function setSpritePickCallback(cb: SpritePickCallback | null) { _spritePickCb = cb; }
 export function pickSprite(assetName: string) { _spritePickCb?.(assetName); _spritePickCb = null; }
 
@@ -421,9 +422,11 @@ const BLOCK_JSON: any[] = [
         ['可使用(usable)','usable'],['可穿戴(wearable)','wearable'],
         ['左手使用(useLimbAction)','useLimbAction'],
         ['零耐久销毁(destroyAtZeroCondition)','destroyAtZeroCondition'],
+        ['可放置(placeable)','placeable'],
       ]},
       { type: 'input_value', name: 'VALUE', check: ['Number','String','Boolean','Item'], align: 'RIGHT' },
     ],
+    extensions: ['prop_type_check'],
     colour: C.ITEM, previousStatement: null, nextStatement: null, inputsInline: true,
   },
   // Recipe registration: inputs (list), output, amount, resultCondition, isRepair
@@ -1798,6 +1801,32 @@ export function defineBlocks(lang: string = 'zh') {
   if (blocks && blocks.lists_create_with) {
     blocks.lists_create_with.inputsInline = true;
   }
+
+  // Extension: dynamically change VALUE input type based on PROP dropdown
+  if (!_propTypeCheckRegistered) {
+    _propTypeCheckRegistered = true;
+    Blockly.Extensions.register('prop_type_check', function(this: Blockly.Block) {
+      const PROP_CHECK: Record<string, string[]> = {
+        condition: ['Number'], weight: ['Number'], value: ['Number'],
+        tags: ['String'], usable: ['Boolean'], wearable: ['Boolean'],
+        useLimbAction: ['Boolean'], destroyAtZeroCondition: ['Boolean'],
+        placeable: ['Boolean'],
+      };
+      const updateType = () => {
+        const prop = this.getFieldValue('PROP') as string;
+        const check = PROP_CHECK[prop] || ['Number','String','Boolean','Item'];
+        this.getInput('VALUE')?.setCheck(check);
+      };
+      updateType();
+      const prevChange = this.onchange;
+      this.onchange = function(e: Blockly.Events.Abstract) {
+        if (prevChange) prevChange.call(this, e);
+        if (e.type === Blockly.Events.BLOCK_CHANGE && (e as any).name === 'PROP') {
+          updateType();
+        }
+      };
+    });
+  }
 }
 
 // ── Create sprite block in workspace ──────────────────────────────
@@ -1927,10 +1956,17 @@ csharpGenerator.forBlock['cu_item_set_property'] = (block, gen) => {
   const prop = block.getFieldValue('PROP');
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
   const target = gen.valueToCode(block, 'TARGET_ITEM', ORDER_ATOMIC) || '"myItem"';
+  if (prop === 'placeable') {
+    return `${target}.tags = "placeable";\n${target}.Stats.usable = true;\n${target}.Stats.usableWithLMB = true;\n`;
+  }
   const itemProps = ['condition'];
-  const statsProps = ['weight','slotRotation','rotSpeed','usable','wearable','useLimbAction','destroyAtZeroCondition','jumpHeightMultChange','wearableArmor','wearableIsolation','wearableHitDurabilityLossMultiplier','wearableVisualOffset','spriteScale','scaleConditionToward','tags'];
+  const numStatsProps = ['weight','slotRotation','rotSpeed','jumpHeightMultChange','wearableVisualOffset','spriteScale','scaleConditionToward'];
+  const boolStatsProps = ['usable','wearable','useLimbAction','destroyAtZeroCondition','wearableArmor','wearableIsolation','wearableHitDurabilityLossMultiplier'];
+  const strStatsProps = ['tags'];
   if (itemProps.includes(prop)) return `${target}.${prop} = ${float(v)};\n`;
-  if (statsProps.includes(prop)) return `${target}.Stats.${prop} = ${float(v)};\n`;
+  if (numStatsProps.includes(prop)) return `${target}.Stats.${prop} = ${float(v)};\n`;
+  if (boolStatsProps.includes(prop)) return `${target}.Stats.${prop} = ${bool(v)};\n`;
+  if (strStatsProps.includes(prop)) return `${target}.Stats.${prop} = ${v};\n`;
   return `${target}.${prop} = ${v};\n`;
 };
 // Helper: walk a lists_create_with block and extract item ID strings from each slot
@@ -2149,6 +2185,10 @@ csharpGenerator.forBlock['cu_for_loop'] = (block, gen) => {
 function float(v: string): string {
   if (/^-?\d+(\.\d+)?$/.test(v.trim())) return v + 'f';
   return v;
+}
+function bool(v: string): string {
+  if (v === 'true' || v === 'false') return v;
+  return v + ' == true';
 }
 
 // Value
