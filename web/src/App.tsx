@@ -77,6 +77,50 @@ export function App() {
 
   useEffect(() => { if (inEditor) scheduleAutoSave(); }, [bp, scheduleAutoSave, inEditor]);
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!e.ctrlKey || !inEditor) return;
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      const key = e.key.toLowerCase();
+      const ws = wsRef.current;
+      if (!ws) return;
+      const getSelected = () => {
+        const ev = Blockly.Events.getMostRecentEvent(Blockly.Events.BLOCK_SELECT);
+        return ev ? ws.getBlockById((ev as any).blockId) : null;
+      };
+      if (e.altKey && key === 'q') {
+        e.preventDefault();
+        window.close();
+      } else if (key === 'c') {
+        e.preventDefault();
+        const b = getSelected();
+        if (b) Blockly.clipboard.copy(b);
+      } else if (key === 'v') {
+        e.preventDefault();
+        Blockly.clipboard.paste(ws);
+      } else if (key === 'x') {
+        e.preventDefault();
+        const b = getSelected();
+        if (b) { Blockly.clipboard.copy(b); b.dispose(true); }
+      } else if (key === 'z') {
+        e.preventDefault();
+        ws.undo(false);
+      } else if (key === 'r') {
+        e.preventDefault();
+        ws.undo(true);
+      } else if (key === 's') {
+        e.preventDefault();
+        saveLocal();
+      } else if (key === 'b') {
+        e.preventDefault();
+        handleBuild();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [inEditor]);
+
   // Listen for sprite picker events from Blockly fields
   useEffect(() => {
     const handler = () => setShowSpritePicker(true);
