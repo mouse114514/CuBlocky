@@ -30,6 +30,11 @@ Thank you for your interest in contributing!
 - No comments in generated C# code
 - Use `I18n.T(zh, en)` for user-facing strings
 
+## Release Policy
+
+- **Release 版本**（编译包）：上传到 GitHub Releases，附带构建产物 zip
+- **S版（源码版本）**：不上传到 Releases，仅保留在本地 `C:\Users\Administrator\Desktop\IBuild` 目录
+
 ## License
 
 By contributing, you agree that your contributions will be licensed under MIT.
