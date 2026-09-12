@@ -27,6 +27,9 @@ public static class CodeEmitter
         sb.AppendLine("        // Magazine configs: itemId -> (ammoType, maxRounds, startRounds)");
         sb.AppendLine("        public static readonly Dictionary<string, (string ammoType, int maxRounds, int startRounds)> _magazineConfigs = new Dictionary<string, (string, int, int)>();");
         sb.AppendLine();
+        sb.AppendLine("        // Start condition configs: itemId -> initialCondition");
+        sb.AppendLine("        public static readonly Dictionary<string, float> _startConditionConfigs = new Dictionary<string, float>();");
+        sb.AppendLine();
         sb.AppendLine("        public static void RegisterAll()");
         sb.AppendLine("        {");
 
@@ -93,6 +96,16 @@ public static class CodeEmitter
         sb.AppendLine("            }");
         sb.AppendLine("            ammo.maxRounds = Mathf.Max(1, cfg.maxRounds);");
         sb.AppendLine("            ammo.rounds = Mathf.Clamp(cfg.startRounds, 0, ammo.maxRounds);");
+        sb.AppendLine("        }");
+        sb.AppendLine();
+        sb.AppendLine("        // Harmony patch to apply initial condition at runtime");
+        sb.AppendLine("        [HarmonyPatch(typeof(Item), \"Start\")]");
+        sb.AppendLine("        [HarmonyPostfix]");
+        sb.AppendLine("        public static void ApplyStartCondition(Item __instance)");
+        sb.AppendLine("        {");
+        sb.AppendLine("            if (__instance == null || string.IsNullOrEmpty(__instance.id)) return;");
+        sb.AppendLine("            if (!_startConditionConfigs.TryGetValue(__instance.id, out var cond)) return;");
+        sb.AppendLine("            __instance.condition = Mathf.Clamp01(cond);");
         sb.AppendLine("        }");
 
         sb.AppendLine("    }");
@@ -319,6 +332,11 @@ public static class CodeEmitter
         if (it.Magazine != null)
         {
             sb.AppendLine($"            _magazineConfigs[\"{Escape(it.Id)}\"] = (\"{Escape(it.Magazine.AmmoType)}\", {it.Magazine.MaxRounds}, {it.Magazine.StartRounds});");
+        }
+        // Start condition config: stored in static dict, applied via Harmony patch on Item.Start
+        if (it.StartCondition >= 0f)
+        {
+            sb.AppendLine($"            _startConditionConfigs[\"{Escape(it.Id)}\"] = {F(it.StartCondition)}f;");
         }
         sb.AppendLine();
         return sb.ToString();

@@ -373,6 +373,10 @@ const TOOLBOX = `
     <block type="cu_item_set_tag">
       <value name="TARGET_ITEM"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
     </block>
+    <block type="cu_item_set_start_condition">
+      <value name="TARGET_ITEM"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+      <value name="VALUE"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+    </block>
     <sep></sep>
     <block type="cu_item_condition"></block>
     <block type="cu_item_max_condition"></block>

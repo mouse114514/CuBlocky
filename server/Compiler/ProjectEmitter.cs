@@ -177,6 +177,21 @@ public static class ProjectEmitter
                     }
                 } catch { }
             }
+            else if (line.StartsWith("//ITEM_START_CONDITION:"))
+            {
+                var json = line.Substring(23).Trim();
+                try
+                {
+                    var doc = JsonDocument.Parse(json);
+                    if (doc.RootElement.TryGetProperty("Id", out var idEl) && doc.RootElement.TryGetProperty("Condition", out var condEl))
+                    {
+                        var itemId = idEl.GetString();
+                        var cond = (float)condEl.GetDouble();
+                        var item = items.FirstOrDefault(i => i.Id == itemId);
+                        if (item != null) item.StartCondition = cond;
+                    }
+                } catch { }
+            }
             else
             {
                 remainingLines.Add(raw);

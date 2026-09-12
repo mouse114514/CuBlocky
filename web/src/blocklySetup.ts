@@ -445,6 +445,16 @@ const BLOCK_JSON: any[] = [
     ],
     colour: C.ITEM, previousStatement: null, nextStatement: null, inputsInline: true,
   },
+  // Set item start condition: sets initial durability at spawn
+  {
+    type: 'cu_item_set_start_condition',
+    message0: '%{BKY_CU_ITEM_SET_START_CONDITION}',
+    args0: [
+      { type: 'input_value', name: 'TARGET_ITEM', check: 'Item' },
+      { type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.ITEM, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
   // Recipe registration: inputs (list), output, amount, resultCondition, isRepair
   {
     type: 'cu_register_recipe',
@@ -1448,6 +1458,7 @@ const MSG_ZH: Record<string, string> = {
   CU_DEFINE_ITEM_LIMB_USE: '物品 %1 肢体使用时',
   CU_ITEM_SET_PROPERTY: '设置物品 %1 属性 %2 为 %3',
   CU_ITEM_SET_TAG: '设置物品 %1 标签为 %2',
+  CU_ITEM_SET_START_CONDITION: '设置物品 %1 初始耐久为 %2',
   CU_REGISTER_RECIPE: '配方 %1 → %2 ×%3 耐久%4 材料耐久%5 修理%6 智力%7',
   CU_EAT: '吃 饥饿 %1 体重增益 %2',
   CU_DRINK: '喝水 量 %1',
@@ -1635,6 +1646,7 @@ const MSG_EN: Record<string, string> = {
   CU_DEFINE_ITEM_LIMB_USE: 'when %1 item limb used',
   CU_ITEM_SET_PROPERTY: 'set item %1 property %2 to %3',
   CU_ITEM_SET_TAG: 'set item %1 tag to %2',
+  CU_ITEM_SET_START_CONDITION: 'set item %1 start condition to %2',
   CU_REGISTER_RECIPE: 'recipe %1 → %2 ×%3 cond%4 ing cond%5 repair%6 int%7',
   CU_EAT: 'eat hunger %1 weight gain %2',
   CU_DRINK: 'drink amount %1',
@@ -1987,6 +1999,12 @@ csharpGenerator.forBlock['cu_item_set_tag'] = (block, gen) => {
   const tag = block.getFieldValue('TAG') || 'placeable';
   const target = gen.valueToCode(block, 'TARGET_ITEM', ORDER_ATOMIC) || '"myItem"';
   return `${target}.Stats.tags = "${tag}";\n`;
+};
+csharpGenerator.forBlock['cu_item_set_start_condition'] = (block, gen) => {
+  const target = gen.valueToCode(block, 'TARGET_ITEM', ORDER_ATOMIC) || '"myItem"';
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '1';
+  const id = target.replace(/^"|"$/g, '');
+  return `//ITEM_START_CONDITION:{"Id":"${id.replace(/"/g, '\\"')}","Condition":${float(v)}}\n`;
 };
 // Helper: walk a lists_create_with block and extract item ID strings from each slot
 function extractListItemIds(listBlock: Blockly.Block | null): string[] {

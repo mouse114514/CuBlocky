@@ -58,6 +58,7 @@ public class ItemEntry
     public SyringeProps? Syringe { get; set; }
     public GunProps? Gun { get; set; }
     public MagazineProps? Magazine { get; set; }
+    public float StartCondition { get; set; } = -1f; // -1 = don't override (use default 1.0)
 }
 
 public class ContainerProps
