@@ -379,8 +379,22 @@ namespace {ns}
         private void Awake()
         {{
             Logger = base.Logger;
-            RegisterContent.RegisterAll();
-{patchLine}            Logger.LogInfo($""{name} v{ver} loaded."");
+            Logger.LogInfo(""[CuBlocky] Awake started"");
+            try
+            {{
+                RegisterContent.RegisterAll();
+                Logger.LogInfo(""[CuBlocky] RegisterAll done"");
+{patchLine}                Logger.LogInfo(""[CuBlocky] Harmony patches applied"");
+            }}
+            catch (System.Exception ex)
+            {{
+                Logger.LogError($""[CuBlocky] EXCEPTION: {{ex.GetType().Name}}: {{ex.Message}}"");
+                Logger.LogError($""[CuBlocky] StackTrace: {{ex.StackTrace}}"");
+                if (ex.InnerException != null)
+                    Logger.LogError($""[CuBlocky] Inner: {{ex.InnerException.GetType().Name}}: {{ex.InnerException.Message}}"");
+                return;
+            }}
+            Logger.LogInfo($""{name} v{ver} loaded."");
         }}
     }}
 }}

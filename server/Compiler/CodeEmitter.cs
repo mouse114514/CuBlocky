@@ -257,17 +257,17 @@ public static class CodeEmitter
             sb.AppendLine($"                    VerticalSpread = {it.Gun.VerticalSpread}f,");
             sb.AppendLine($"                    ConditionLossPerShot = {it.Gun.ConditionLossPerShot}f,");
             if (!string.IsNullOrEmpty(it.Gun.RackedSprite))
-                sb.AppendLine($"                    RackedSprite = AssetLoader.LoadEmbeddedSprite(\"{Escape(it.Gun.RackedSprite)}\"),");
+                sb.AppendLine($"                    RackedSprite = AssetLoader.LoadEmbeddedSprite(\"{Escape(CleanSpriteName(it.Gun.RackedSprite))}\"),");
             if (!string.IsNullOrEmpty(it.Gun.NormalSpriteNoMag))
-                sb.AppendLine($"                    NormalSpriteNoMag = AssetLoader.LoadEmbeddedSprite(\"{Escape(it.Gun.NormalSpriteNoMag)}\"),");
+                sb.AppendLine($"                    NormalSpriteNoMag = AssetLoader.LoadEmbeddedSprite(\"{Escape(CleanSpriteName(it.Gun.NormalSpriteNoMag))}\"),");
             if (!string.IsNullOrEmpty(it.Gun.RackedSpriteNoMag))
-                sb.AppendLine($"                    RackedSpriteNoMag = AssetLoader.LoadEmbeddedSprite(\"{Escape(it.Gun.RackedSpriteNoMag)}\"),");
+                sb.AppendLine($"                    RackedSpriteNoMag = AssetLoader.LoadEmbeddedSprite(\"{Escape(CleanSpriteName(it.Gun.RackedSpriteNoMag))}\"),");
             if (!string.IsNullOrEmpty(it.Gun.FireSound))
-                sb.AppendLine($"                    FireSound = AssetLoader.LoadEmbeddedAudio(\"{Escape(it.Gun.FireSound)}\"),");
+                sb.AppendLine($"                    FireSound = AssetLoader.LoadEmbeddedAudio(\"{Escape(CleanSpriteName(it.Gun.FireSound))}\"),");
             if (!string.IsNullOrEmpty(it.Gun.CustomRack))
-                sb.AppendLine($"                    CustomRack = AssetLoader.LoadEmbeddedAudio(\"{Escape(it.Gun.CustomRack)}\"),");
+                sb.AppendLine($"                    CustomRack = AssetLoader.LoadEmbeddedAudio(\"{Escape(CleanSpriteName(it.Gun.CustomRack))}\"),");
             if (!string.IsNullOrEmpty(it.Gun.CustomUnrack))
-                sb.AppendLine($"                    CustomUnrack = AssetLoader.LoadEmbeddedAudio(\"{Escape(it.Gun.CustomUnrack)}\"),");
+                sb.AppendLine($"                    CustomUnrack = AssetLoader.LoadEmbeddedAudio(\"{Escape(CleanSpriteName(it.Gun.CustomUnrack))}\"),");
             sb.AppendLine("                },");
             sb.AppendLine($"                slotRotation = -90f,");
         }
@@ -319,7 +319,7 @@ public static class CodeEmitter
             var spriteName = ResolveSpriteName(it.SpriteAssetId, bp);
             if (string.IsNullOrEmpty(spriteName))
                 spriteName = it.Id + ".png";
-            sb.AppendLine($"            , AssetLoader.LoadEmbeddedSprite(\"{Escape(spriteName)}\")");
+            sb.AppendLine($"            , AssetLoader.LoadEmbeddedSprite(\"{Escape(CleanSpriteName(spriteName))}\")");
         }
         else
         {
@@ -514,7 +514,7 @@ public static class CodeEmitter
     {
         var spriteName = ResolveSpriteName(st.SpriteAssetId, bp);
         if (!string.IsNullOrEmpty(spriteName))
-            return $"AssetLoader.LoadEmbeddedSprite(\"{Escape(spriteName)}\")";
+            return $"AssetLoader.LoadEmbeddedSprite(\"{Escape(CleanSpriteName(spriteName))}\")";
         // No icon: colored placeholder by type (green buff / red debuff)
         var color = st.Type == "buff" ? "new Color(0.3f, 0.8f, 0.4f)" : "new Color(0.9f, 0.3f, 0.3f)";
         return $"StatusPlaceholderSprite({color})";
@@ -538,6 +538,12 @@ public static class CodeEmitter
     private static string B(bool v) => v ? "true" : "false";
     private static string Cap(string s) => string.IsNullOrEmpty(s) ? "Tools" : char.ToUpperInvariant(s[0]) + s.Substring(1).ToLowerInvariant();
     private static string Escape(string s) => s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", " ").Replace("\n", " ");
+    private static string CleanSpriteName(string s)
+    {
+        if (string.IsNullOrEmpty(s)) return s;
+        s = s.Trim().Trim('"', '\'');
+        return s;
+    }
     private static string SafeIdent(string s)
     {
         var sb = new StringBuilder();
