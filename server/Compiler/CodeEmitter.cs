@@ -34,6 +34,9 @@ public static class CodeEmitter
         sb.AppendLine("        // Track which custom magazine is loaded in each gun (for correct ejection)");
         sb.AppendLine("        private static readonly Dictionary<int, string> _loadedMagazines = new Dictionary<int, string>();");
         sb.AppendLine();
+        sb.AppendLine("        // Pending round count for freshly spawned magazines (overrides Start)");
+        sb.AppendLine("        private static readonly Dictionary<int, int> _pendingMagRounds = new Dictionary<int, int>();");
+        sb.AppendLine();
         sb.AppendLine("        private static bool _debugSprite = true;");
         sb.AppendLine("        private static readonly System.Text.StringBuilder _spriteLog = new System.Text.StringBuilder();");
         sb.AppendLine("        private static Sprite _loadSprite(string name)");
@@ -127,7 +130,16 @@ public static class CodeEmitter
         sb.AppendLine("                default: ammo.ammoType = GunScript.AmmoType.Pistol; break;");
         sb.AppendLine("            }");
         sb.AppendLine("            ammo.maxRounds = Mathf.Max(1, cfg.maxRounds);");
-        sb.AppendLine("            ammo.rounds = Mathf.Clamp(cfg.startRounds, 0, ammo.maxRounds);");
+        sb.AppendLine("            int objId = __instance.gameObject.GetInstanceID();");
+        sb.AppendLine("            if (_pendingMagRounds.TryGetValue(objId, out int pendingRounds))");
+        sb.AppendLine("            {");
+        sb.AppendLine("                ammo.rounds = Mathf.Clamp(pendingRounds, 0, ammo.maxRounds);");
+        sb.AppendLine("                _pendingMagRounds.Remove(objId);");
+        sb.AppendLine("            }");
+        sb.AppendLine("            else");
+        sb.AppendLine("            {");
+        sb.AppendLine("                ammo.rounds = Mathf.Clamp(cfg.startRounds, 0, ammo.maxRounds);");
+        sb.AppendLine("            }");
         sb.AppendLine("        }");
         sb.AppendLine();
         sb.AppendLine("        // Harmony patch to apply initial condition at runtime");
@@ -167,6 +179,8 @@ public static class CodeEmitter
         sb.AppendLine("            var go = CustomInstantiate.InstantiateReturn(magId, pos, Quaternion.identity);");
         sb.AppendLine("            if (go != null)");
         sb.AppendLine("            {");
+        sb.AppendLine("                // Store pending rounds so ApplyMagazineComponents uses them instead of startRounds");
+        sb.AppendLine("                _pendingMagRounds[go.GetInstanceID()] = __instance.roundsInMag;");
         sb.AppendLine("                var ammo = go.GetComponent<AmmoScript>();");
         sb.AppendLine("                if (ammo != null) ammo.rounds = __instance.roundsInMag;");
         sb.AppendLine("                var item = go.GetComponent<Item>();");
