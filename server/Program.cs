@@ -165,21 +165,24 @@ app.MapPost("/api/build", async (HttpRequest req) =>
             await File.WriteAllTextAsync(fp, kv.Value);
         }
 
-        // Copy project assets into build and embed as resources
+        // Copy ALL project assets into build and embed as resources
         var spriteFiles = new List<string>();
         var projectAssetsDir = Path.Combine(projectsDir, projectName, "assets");
 
-        // Copy assets referenced by Blueprint.Assets
-        foreach (var asset in bp.Assets)
+        // Copy all files from project assets directory
+        if (Directory.Exists(projectAssetsDir))
         {
-            var src = Path.Combine(projectAssetsDir, asset.Name);
-            if (File.Exists(src))
+            foreach (var file in Directory.GetFiles(projectAssetsDir))
             {
-                var destDir = Path.Combine(buildDir, "Sprites");
+                var fileName = Path.GetFileName(file);
+                var ext = Path.GetExtension(fileName).ToLowerInvariant();
+                var destDir = ext == ".png" || ext == ".jpg" || ext == ".jpeg"
+                    ? Path.Combine(buildDir, "Sprites")
+                    : Path.Combine(buildDir, "Audio");
                 Directory.CreateDirectory(destDir);
-                var dest = Path.Combine(destDir, asset.Name);
-                File.Copy(src, dest, true);
-                spriteFiles.Add(asset.Name);
+                var dest = Path.Combine(destDir, fileName);
+                File.Copy(file, dest, true);
+                spriteFiles.Add(fileName);
             }
         }
 
