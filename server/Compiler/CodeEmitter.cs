@@ -170,7 +170,7 @@ public static class CodeEmitter
         sb.AppendLine("                var ammo = go.GetComponent<AmmoScript>();");
         sb.AppendLine("                if (ammo != null) ammo.rounds = __instance.roundsInMag;");
         sb.AppendLine("                var item = go.GetComponent<Item>();");
-        sb.AppendLine("                if (item != null && __instance.body != null) __instance.body.AutoPickUpItem(item);");
+        sb.AppendLine("                if (item != null) { var b = PlayerCamera.main.body; if (b != null) b.AutoPickUpItem(item); }");
         sb.AppendLine("            }");
         sb.AppendLine("            __instance.hasMag = false;");
         sb.AppendLine("            __instance.roundsInMag = 0;");
