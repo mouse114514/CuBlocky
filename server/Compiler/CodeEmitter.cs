@@ -181,14 +181,10 @@ public static class CodeEmitter
         sb.AppendLine("            {");
         sb.AppendLine("                // Force-set sprite from registered info (template base may be wrong)");
         sb.AppendLine("                var spriteItem = go.GetComponent<Item>();");
-        sb.AppendLine("                if (spriteItem != null && ItemRegistry.TryGetCustomInfo(spriteItem, out var magInfo))");
+        sb.AppendLine("                if (spriteItem != null && ItemRegistry.TryGetIcon(spriteItem.id, out var magIcon) && magIcon != null)");
         sb.AppendLine("                {");
-        sb.AppendLine("                    var magIcon = ItemRegistry.GetIcon(magInfo);");
-        sb.AppendLine("                    if (magIcon != null)");
-        sb.AppendLine("                    {");
-        sb.AppendLine("                        var sr = go.GetComponent<SpriteRenderer>();");
-        sb.AppendLine("                        if (sr != null) sr.sprite = magIcon;");
-        sb.AppendLine("                    }");
+        sb.AppendLine("                    var sr = go.GetComponent<SpriteRenderer>();");
+        sb.AppendLine("                    if (sr != null) sr.sprite = magIcon;");
         sb.AppendLine("                }");
         sb.AppendLine("                // Store pending rounds so ApplyMagazineComponents uses them instead of startRounds");
         sb.AppendLine("                _pendingMagRounds[go.GetInstanceID()] = __instance.roundsInMag;");
