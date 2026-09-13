@@ -183,36 +183,49 @@ app.MapPost("/api/build", async (HttpRequest req) =>
             }
         }
 
-        // Also scan RegisterContent.cs and Statuses.cs for AssetLoader.LoadEmbeddedSprite calls
+        // Also scan RegisterContent.cs and Statuses.cs for sprite/audio load calls
+        // Handles both direct AssetLoader.LoadEmbeddedSprite("...") and helper LoadSprite("...")/LoadAudio("...")
         var scanFiles = new[] { "RegisterContent.cs", "Statuses.cs" };
-        var marker = "AssetLoader.LoadEmbeddedSprite(\"";
+        var markers = new[]
+        {
+            "AssetLoader.LoadEmbeddedSprite(\"",
+            "LoadSprite(\"",
+            "LoadAudio(\"",
+            "AssetLoader.LoadEmbeddedAudio(\""
+        };
         foreach (var scanFile in scanFiles)
         {
             var rcPath = Path.Combine(buildDir, scanFile);
             if (!File.Exists(rcPath)) continue;
             var rcContent = await File.ReadAllTextAsync(rcPath);
-            var idx = 0;
-            while ((idx = rcContent.IndexOf(marker, idx)) >= 0)
+            foreach (var marker in markers)
             {
-                var start = idx + marker.Length;
-                var end = rcContent.IndexOf('"', start);
-                if (end > start)
+                var idx = 0;
+                while ((idx = rcContent.IndexOf(marker, idx)) >= 0)
                 {
-                    var spriteName = rcContent[start..end];
-                    if (!spriteFiles.Contains(spriteName))
+                    var start = idx + marker.Length;
+                    var end = rcContent.IndexOf('"', start);
+                    if (end > start)
                     {
-                        var src = Path.Combine(projectAssetsDir, spriteName);
-                        if (File.Exists(src))
+                        var assetName = rcContent[start..end];
+                        if (!spriteFiles.Contains(assetName))
                         {
-                            var destDir = Path.Combine(buildDir, "Sprites");
-                            Directory.CreateDirectory(destDir);
-                            var dest = Path.Combine(destDir, spriteName);
-                            File.Copy(src, dest, true);
-                            spriteFiles.Add(spriteName);
+                            var src = Path.Combine(projectAssetsDir, assetName);
+                            if (File.Exists(src))
+                            {
+                                var ext = Path.GetExtension(assetName).ToLowerInvariant();
+                                var destDir = ext == ".png" || ext == ".jpg" || ext == ".jpeg"
+                                    ? Path.Combine(buildDir, "Sprites")
+                                    : Path.Combine(buildDir, "Audio");
+                                Directory.CreateDirectory(destDir);
+                                var dest = Path.Combine(destDir, assetName);
+                                File.Copy(src, dest, true);
+                                spriteFiles.Add(assetName);
+                            }
                         }
                     }
+                    idx = end;
                 }
-                idx = end;
             }
         }
 
@@ -224,7 +237,11 @@ app.MapPost("/api/build", async (HttpRequest req) =>
             {
                 var csprojContent = await File.ReadAllTextAsync(csprojPath);
                 var resourceItems = string.Join("\n", spriteFiles.Select(s =>
-                    $"    <EmbeddedResource Include=\"Sprites\\{s}\" />"));
+                {
+                    var ext = Path.GetExtension(s).ToLowerInvariant();
+                    var dir = ext == ".png" || ext == ".jpg" || ext == ".jpeg" ? "Sprites" : "Audio";
+                    return $"    <EmbeddedResource Include=\"{dir}\\{s}\" />";
+                }));
                 csprojContent = csprojContent.Replace(
                     "</Project>",
                     $"  <ItemGroup>\n{resourceItems}\n  </ItemGroup>\n</Project>");
