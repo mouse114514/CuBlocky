@@ -162,7 +162,7 @@ export function App() {
       if (wsRef.current) {
         eventHandlers = csharpGenerator.workspaceToCode(wsRef.current);
       }
-      const r = await buildProject({ ...bp, eventHandlers });
+      const r = await buildProject({ ...bp, eventHandlers }, currentProjectName ?? '');
       setBuildResult(r);
     } catch (e: any) {
       setBuildResult({ success: false, message: e.message });

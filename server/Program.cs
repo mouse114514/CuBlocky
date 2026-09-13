@@ -151,8 +151,9 @@ app.MapPost("/api/build", async (HttpRequest req) =>
     var asmName = Path.GetFileNameWithoutExtension(files.Keys.First(k => k.EndsWith(".csproj")));
     var buildDir = Path.Combine(Directory.GetCurrentDirectory(), "builds", asmName);
 
-    // Determine project name from mod name for asset lookup
-    var projectName = bp.Mod?.Name?.Replace(' ', '_') ?? "";
+    // Determine project name: use provided projectName, fall back to mod name
+    var reqProjectName = bp.ProjectName ?? "";
+    var projectName = !string.IsNullOrWhiteSpace(reqProjectName) ? reqProjectName : (bp.Mod?.Name?.Replace(' ', '_') ?? "");
 
     try
     {
@@ -168,11 +169,17 @@ app.MapPost("/api/build", async (HttpRequest req) =>
         // Copy ALL project assets into build and embed as resources
         var spriteFiles = new List<string>();
         var projectAssetsDir = Path.Combine(projectsDir, projectName, "assets");
-
+        
+        Console.WriteLine($"[Build] projectName={projectName}");
+        Console.WriteLine($"[Build] projectAssetsDir={projectAssetsDir}");
+        Console.WriteLine($"[Build] projectAssetsDir exists={Directory.Exists(projectAssetsDir)}");
+        
         // Copy all files from project assets directory
         if (Directory.Exists(projectAssetsDir))
         {
-            foreach (var file in Directory.GetFiles(projectAssetsDir))
+            var allFiles = Directory.GetFiles(projectAssetsDir);
+            Console.WriteLine($"[Build] Found {allFiles.Length} files in projectAssetsDir");
+            foreach (var file in allFiles)
             {
                 var fileName = Path.GetFileName(file);
                 var ext = Path.GetExtension(fileName).ToLowerInvariant();
@@ -183,7 +190,12 @@ app.MapPost("/api/build", async (HttpRequest req) =>
                 var dest = Path.Combine(destDir, fileName);
                 File.Copy(file, dest, true);
                 spriteFiles.Add(fileName);
+                Console.WriteLine($"[Build] Copied: {fileName} -> {destDir}");
             }
+        }
+        else
+        {
+            Console.WriteLine($"[Build] WARNING: projectAssetsDir does not exist! Assets won't be embedded.");
         }
 
         // Also scan RegisterContent.cs and Statuses.cs for sprite/audio load calls
@@ -233,6 +245,7 @@ app.MapPost("/api/build", async (HttpRequest req) =>
         }
 
         // Patch .csproj to embed sprite resources
+        Console.WriteLine($"[Build] spriteFiles count={spriteFiles.Count}");
         if (spriteFiles.Count > 0)
         {
             var csprojPath = Path.Combine(buildDir, asmName + ".csproj");
@@ -249,7 +262,16 @@ app.MapPost("/api/build", async (HttpRequest req) =>
                     "</Project>",
                     $"  <ItemGroup>\n{resourceItems}\n  </ItemGroup>\n</Project>");
                 await File.WriteAllTextAsync(csprojPath, csprojContent);
+                Console.WriteLine($"[Build] Patched csproj with {spriteFiles.Count} embedded resources");
             }
+            else
+            {
+                Console.WriteLine($"[Build] WARNING: csproj not found at {csprojPath}");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"[Build] WARNING: No sprite files to embed! Check if assets were uploaded.");
         }
 
         var psi = new ProcessStartInfo("dotnet", $"build \"{buildDir}\" -c Release --nologo -v q")

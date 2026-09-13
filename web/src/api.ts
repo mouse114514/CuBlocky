@@ -29,11 +29,11 @@ export interface BuildResult {
   buildDir?: string;
 }
 
-export async function buildProject(bp: Blueprint): Promise<BuildResult> {
+export async function buildProject(bp: Blueprint, projectName: string): Promise<BuildResult> {
   const res = await fetch('/api/build', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(bp),
+    body: JSON.stringify({ ...bp, projectName }),
   });
   if (!res.ok) throw new Error('build failed: ' + res.status);
   return await res.json() as BuildResult;
