@@ -691,7 +691,7 @@ const BLOCK_JSON: any[] = [
   // ═══ Value reporters (lime green) ════════════════════════════
   { type: 'cu_number', message0: '%1', args0: [{ type: 'field_number', name: 'NUM', value: 0, precision: 0.1 }], output: 'Number', colour: C.VALUE },
   { type: 'cu_text', message0: '%1', args0: [{ type: 'field_input', name: 'TEXT', text: '' }], output: 'String', colour: C.VALUE },
-  { type: 'cu_var_get', message0: '%1', args0: [{ type: 'field_input', name: 'NAME', text: 'myVar' }], output: 'Number', colour: C.VALUE },
+  { type: 'cu_var_get', message0: '%1', args0: [{ type: 'field_input', name: 'NAME', text: 'myVar' }], output: null, colour: C.VALUE },
   {
     type: 'cu_item_custom',
     message0: '%{BKY_CU_ITEM_CUSTOM} %1',
@@ -827,7 +827,7 @@ const BLOCK_JSON: any[] = [
     message0: '%{BKY_CU_VAR_SET} %1 %{BKY_CU_VAR_TO} %2',
     args0: [
       { type: 'field_input', name: 'NAME', text: 'myVar' },
-      { type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'VALUE', align: 'RIGHT' },
     ],
     colour: C.VAR, previousStatement: null, nextStatement: null, inputsInline: true,
   },
