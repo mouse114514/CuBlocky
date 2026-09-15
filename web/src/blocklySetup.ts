@@ -1428,11 +1428,89 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'ID', check: 'Item' },
       { type: 'input_value', name: 'WEIGHT', check: 'Number' },
       { type: 'input_value', name: 'VALUE', check: 'Number' },
-      { type: 'input_value', name: 'DECAY', check: 'Number' },
+      { type: 'field_dropdown', name: 'DECAY_ENABLED', options: [['真','TRUE'],['假','FALSE']] },
+      { type: 'input_value', name: 'DECAY_MINUTES', check: 'Number' },
       { type: 'input_value', name: 'RECOGNITION', check: 'Number' },
       { type: 'input_value', name: 'SPAWN_FREQ', check: 'Number' },
     ],
     colour: C.REGISTER, inputsInline: false,
+  },
+
+  // ═══ Function (indigo) ════════════════════════════════════════
+  {
+    type: 'cu_define_function',
+    message0: '定义函数 %1 返回 %2',
+    args0: [
+      { type: 'field_input', name: 'NAME', text: 'myFunc' },
+      { type: 'field_dropdown', name: 'RETURN_TYPE', options: [['无','void'],['整数','int'],['浮点数','float'],['字符串','string'],['布尔','bool']] },
+    ],
+    colour: '#5c6bc0', inputsInline: true,
+    mutator: 'cu_define_function_mutator',
+  },
+  {
+    type: 'cu_define_function_container',
+    message0: '参数',
+    args0: [],
+    message1: '%1',
+    args1: [
+      { type: 'input_statement', name: 'STACK' },
+    ],
+    colour: '#5c6bc0',
+  },
+  {
+    type: 'cu_define_function_item',
+    message0: '参数',
+    args0: [],
+    previousStatement: null,
+    nextStatement: null,
+    colour: '#5c6bc0',
+  },
+  {
+    type: 'cu_return',
+    message0: '返回 %1',
+    args0: [
+      { type: 'input_value', name: 'VALUE' },
+    ],
+    previousStatement: null,
+    colour: '#5c6bc0',
+  },
+  {
+    type: 'cu_call_function',
+    message0: '调用 %1',
+    args0: [
+      { type: 'field_input', name: 'NAME', text: 'myFunc' },
+    ],
+    previousStatement: null, nextStatement: null,
+    colour: '#5c6bc0', inputsInline: true,
+    mutator: 'cu_call_function_mutator',
+  },
+  {
+    type: 'cu_call_function_value',
+    message0: '调用 %1',
+    args0: [
+      { type: 'field_input', name: 'NAME', text: 'myFunc' },
+    ],
+    output: null,
+    colour: '#5c6bc0', inputsInline: true,
+    mutator: 'cu_call_function_mutator',
+  },
+  {
+    type: 'cu_call_function_container',
+    message0: '参数',
+    args0: [],
+    message1: '%1',
+    args1: [
+      { type: 'input_statement', name: 'STACK' },
+    ],
+    colour: '#5c6bc0',
+  },
+  {
+    type: 'cu_call_function_item',
+    message0: '参数',
+    args0: [],
+    previousStatement: null,
+    nextStatement: null,
+    colour: '#5c6bc0',
   },
 ];
 
@@ -1608,7 +1686,7 @@ const MSG_ZH: Record<string, string> = {
   CU_WORLD_DEPTH: '玩家深度(米)',
   // Item properties
   CU_SET_ITEM_CATEGORY: '设置物品分类 id %1 分类 %2',
-  CU_SET_ITEM_BASE_STATS: '设置物品基础属性 id %1 重量 %2 价值 %3 腐烂时间 %4 识别 %5 生成频率 %6',
+  CU_SET_ITEM_BASE_STATS: '设置物品基础属性 id %1 重量 %2 价值 %3 腐烂 %4 分钟 %5 识别 %6 生成频率 %7',
   CU_ITEM_CONTAINER: '设置容器属性\nid %1\n容量 %2\n单物品最大重量 %3\n减重 %4\n物品可见 %5\n标签限制 %6',
   CU_ITEM_TOOL: '设置武器/工具属性\nid %1\n伤害 %2\n结构伤害 %3\n距离 %4\n击退 %5\n冷却 %6\n体力消耗 %7\n穿透 %8',
   CU_ITEM_WEARABLE: '设置可穿戴属性\nid %1\n部位 %2\n插槽 %3\n护甲 %4\n隔离 %5\n耐久损失倍率 %6',
@@ -1623,6 +1701,16 @@ const MSG_ZH: Record<string, string> = {
   CU_ITEM_SYRINGE: '设置注射器属性\nid %1\n容量 %2\n每次注射 %3\n自动填充 %4\n液体ID %5\n液体量 %6',
   CU_ITEM_GUN: '设置枪械属性\nid %1\n弹药类型 %2\n射击模式 %3\n供弹方式 %4\n弹匣容量 %5\n动物伤害 %6\n结构伤害 %7\n击退 %8\n耐久消耗 %9\n响度 %10\n气体循环 %11\n每次射弹数 %12\n垂直散布 %13\n上膛精灵 %14\n无弹匣正常 %15\n无弹匣上膛 %16\n开火音效 %17\n上膛音效 %18\n退膛音效 %19',
   CU_ITEM_MAGAZINE: '设置弹匣属性\nid %1\n弹药类型 %2\n最大容量 %3\n初始弹药 %4',
+  // Function
+  CU_PARAM: '参数 %1 类型 %2',
+  CU_DEFINE_FUNCTION: '定义函数 %1 返回 %2',
+  CU_DEFINE_FUNCTION_CONTAINER: '参数',
+  CU_DEFINE_FUNCTION_ITEM: '参数',
+  CU_RETURN: '返回 %1',
+  CU_CALL_FUNCTION: '调用 %1',
+  CU_CALL_FUNCTION_VALUE: '调用 %1',
+  CU_CALL_FUNCTION_CONTAINER: '参数',
+  CU_CALL_FUNCTION_ITEM: '参数',
 };
 
 const MSG_EN: Record<string, string> = {
@@ -1796,7 +1884,7 @@ const MSG_EN: Record<string, string> = {
   CU_WORLD_DEPTH: 'player depth (meters)',
   // Item properties
   CU_SET_ITEM_CATEGORY: 'set item category id %1 category %2',
-  CU_SET_ITEM_BASE_STATS: 'set item base stats id %1 weight %2 value %3 decay %4 recognition %5 spawn freq %6',
+  CU_SET_ITEM_BASE_STATS: 'set item base stats id %1 weight %2 value %3 decay %4 minutes %5 recognition %6 spawn freq %7',
   CU_ITEM_CONTAINER: 'set container properties\nid %1\ncapacity %2\nmax weight %3\nencumbrance %4\nvisible %5\ntag restriction %6',
   CU_ITEM_TOOL: 'set weapon/tool properties\nid %1\ndamage %2\nstructural %3\ndistance %4\nknockback %5\ncooldown %6\nstamina %7\npiercing %8',
   CU_ITEM_WEARABLE: 'set wearable properties\nid %1\nlimb %2\nslot %3\narmor %4\nisolation %5\ndurability loss %6',
@@ -1811,6 +1899,16 @@ const MSG_EN: Record<string, string> = {
   CU_ITEM_SYRINGE: 'set syringe properties\nid %1\ncapacity %2\nper use %3\nauto fill %4\nliquid id %5\namount %6',
   CU_ITEM_GUN: 'set gun properties\nid %1\nammo type %2\nfiring mode %3\nfeed type %4\nmag capacity %5\nanimal dmg %6\nstruct dmg %7\nknockback %8\ncondition loss %9\nloudness %10\ngas time %11\nshots per fire %12\nvertical spread %13\nracked sprite %14\nnormal no-mag %15\nracked no-mag %16\nfire sound %17\nrack sound %18\nunrack sound %19',
   CU_ITEM_MAGAZINE: 'set magazine properties\nid %1\nammo type %2\nmax rounds %3\nstart rounds %4',
+  // Function
+  CU_PARAM: 'param %1 type %2',
+  CU_DEFINE_FUNCTION: 'define function %1 return %2',
+  CU_DEFINE_FUNCTION_CONTAINER: 'params',
+  CU_DEFINE_FUNCTION_ITEM: 'param',
+  CU_RETURN: 'return %1',
+  CU_CALL_FUNCTION: 'call %1',
+  CU_CALL_FUNCTION_VALUE: 'call %1',
+  CU_CALL_FUNCTION_CONTAINER: 'args',
+  CU_CALL_FUNCTION_ITEM: 'arg',
 };
 
 export function setMessages(lang: string) {
@@ -1821,6 +1919,7 @@ export function setMessages(lang: string) {
 }
 
 // ── Define blocks ──
+let _cuFuncMutatorRegistered = false;
 export function defineBlocks(lang: string = 'zh') {
   _blocksLang = lang;
   const defs = applyLang(lang);
@@ -1830,6 +1929,10 @@ export function defineBlocks(lang: string = 'zh') {
   const blocks = (Blockly as any).Blocks;
   if (blocks && blocks.lists_create_with) {
     blocks.lists_create_with.inputsInline = true;
+  }
+  // Force function blocks to horizontal
+  for (const t of ['cu_define_function', 'cu_call_function', 'cu_call_function_value']) {
+    if (blocks && blocks[t]) blocks[t].inputsInline = true;
   }
 
   // Extension: dynamically change VALUE input type based on PROP dropdown
@@ -1854,6 +1957,192 @@ export function defineBlocks(lang: string = 'zh') {
         }
       };
     });
+  }
+
+  // ═══ Function mutators ════════════════════════════════════════
+  if (!_cuFuncMutatorRegistered) {
+    _cuFuncMutatorRegistered = true;
+
+    // --- cu_define_function mutator ---
+    Blockly.Extensions.registerMutator('cu_define_function_mutator',
+      {
+        paramCount_: 0,
+        saveExtraState(this: any) {
+          return { paramCount: this.paramCount_ };
+        },
+        loadExtraState(this: any, state: any) {
+          this.paramCount_ = state['paramCount'] || 0;
+          this.updateShape_();
+        },
+        decompose(this: any, workspace: Blockly.WorkspaceSvg) {
+          const topBlock = workspace.newBlock('cu_define_function_container');
+          topBlock.initSvg();
+          let conn = topBlock.getInput('STACK')!.connection;
+          for (let i = 0; i < this.paramCount_; i++) {
+            const item = workspace.newBlock('cu_define_function_item');
+            item.initSvg();
+            conn!.connect(item.previousConnection!);
+            conn = item.nextConnection;
+          }
+          return topBlock;
+        },
+        compose(this: any, topBlock: Blockly.Block) {
+          // Save current field values
+          const fieldValues: { name: string; type: string }[] = [];
+          for (let i = 0; i < this.paramCount_; i++) {
+            fieldValues.push({
+              name: this.getFieldValue('PARAM_NAME_' + i) || ('p' + i),
+              type: this.getFieldValue('PARAM_TYPE_' + i) || 'int',
+            });
+          }
+          let itemBlock = topBlock.getInputTargetBlock('STACK');
+          const connections: (Blockly.Connection | null)[] = [];
+          while (itemBlock && !itemBlock.isInsertionMarker()) {
+            connections.push((itemBlock as any).valueConnection_);
+            itemBlock = itemBlock.getNextBlock();
+          }
+          // Save BODY connection
+          const bodyConn = this.getInput('BODY')?.connection?.targetConnection || null;
+          this.paramCount_ = connections.length;
+          this.updateShape_();
+          // Reconnect params and restore field values
+          const defaultNames = ['x', 'y', 'z', 'a', 'b', 'c', 'd', 'e'];
+          for (let i = 0; i < this.paramCount_; i++) {
+            if (connections[i]) connections[i]!.reconnect(this, 'PARAM' + i);
+            if (fieldValues[i]) {
+              this.setFieldValue(fieldValues[i].name, 'PARAM_NAME_' + i);
+              this.setFieldValue(fieldValues[i].type, 'PARAM_TYPE_' + i);
+            } else {
+              this.setFieldValue(defaultNames[i] || ('p' + i), 'PARAM_NAME_' + i);
+            }
+          }
+          // Reconnect BODY
+          if (bodyConn) bodyConn.reconnect(this, 'BODY');
+        },
+        saveConnections(this: any, topBlock: Blockly.Block) {
+          let itemBlock = topBlock.getInputTargetBlock('STACK');
+          let i = 0;
+          while (itemBlock && !itemBlock.isInsertionMarker()) {
+            const input = this.getInput('PARAM' + i);
+            (itemBlock as any).valueConnection_ = input && input.connection?.targetConnection || null;
+            i++;
+            itemBlock = itemBlock.getNextBlock();
+          }
+        },
+        updateShape_(this: any) {
+          // Remove all dynamic inputs first
+          const toRemove: string[] = [];
+          for (const inp of this.inputList) {
+            if (inp.name.startsWith('PARAM') || inp.name === 'BODY') {
+              toRemove.push(inp.name);
+            }
+          }
+          for (const name of toRemove) {
+            this.removeInput(name);
+          }
+          const PARAM_TYPE_OPTIONS: [string, string][] = [
+            ['整数','int'],['浮点数','float'],['字符串','string'],
+            ['布尔','bool'],['物品','Item'],['状态效果','StatusEffect'],
+          ];
+          const TYPE_CHECK: Record<string, string[]> = {
+            int: ['Number'], float: ['Number'], string: ['String'],
+            bool: ['Boolean'], Item: ['Item'], StatusEffect: ['StatusEffect'],
+          };
+          // Re-add PARAM inputs then BODY
+          for (let i = 0; i < this.paramCount_; i++) {
+            const inp = this.appendValueInput('PARAM' + i);
+            if (i === 0) inp.appendField('参数');
+            inp.appendField(new Blockly.FieldTextInput('x'), 'PARAM_NAME_' + i);
+            const dd = new Blockly.FieldDropdown(PARAM_TYPE_OPTIONS, (val: string) => {
+              inp.setCheck(TYPE_CHECK[val] || null);
+              this.workspace?.resizeContents();
+              return val;
+            });
+            inp.appendField(dd, 'PARAM_TYPE_' + i);
+            // Set initial type check
+            const initType = dd.getValue() || 'int';
+            inp.setCheck(TYPE_CHECK[initType] || null);
+          }
+          this.appendStatementInput('BODY');
+          this.setInputsInline(true);
+        },
+      },
+      undefined,
+      ['cu_define_function_item']
+    );
+
+    // --- cu_call_function / cu_call_function_value mutator ---
+    Blockly.Extensions.registerMutator('cu_call_function_mutator',
+      {
+        argCount_: 0,
+        saveExtraState(this: any) {
+          return { argCount: this.argCount_ };
+        },
+        loadExtraState(this: any, state: any) {
+          this.argCount_ = state['argCount'] || 0;
+          this.updateShape_();
+        },
+        decompose(this: any, workspace: Blockly.WorkspaceSvg) {
+          const topBlock = workspace.newBlock('cu_call_function_container');
+          topBlock.initSvg();
+          let conn = topBlock.getInput('STACK')!.connection;
+          for (let i = 0; i < this.argCount_; i++) {
+            const item = workspace.newBlock('cu_call_function_item');
+            item.initSvg();
+            conn!.connect(item.previousConnection!);
+            conn = item.nextConnection;
+          }
+          return topBlock;
+        },
+        compose(this: any, topBlock: Blockly.Block) {
+          let itemBlock = topBlock.getInputTargetBlock('STACK');
+          const connections: (Blockly.Connection | null)[] = [];
+          while (itemBlock && !itemBlock.isInsertionMarker()) {
+            connections.push((itemBlock as any).valueConnection_);
+            itemBlock = itemBlock.getNextBlock();
+          }
+          for (let i = 0; i < this.argCount_; i++) {
+            const conn = this.getInput('ARG' + i)?.connection?.targetConnection;
+            if (conn && connections.indexOf(conn) === -1) {
+              conn.disconnect();
+            }
+          }
+          this.argCount_ = connections.length;
+          this.updateShape_();
+          for (let i = 0; i < this.argCount_; i++) {
+            if (connections[i]) {
+              connections[i]!.reconnect(this, 'ARG' + i);
+            }
+          }
+        },
+        saveConnections(this: any, topBlock: Blockly.Block) {
+          let itemBlock = topBlock.getInputTargetBlock('STACK');
+          let i = 0;
+          while (itemBlock && !itemBlock.isInsertionMarker()) {
+            const input = this.getInput('ARG' + i);
+            (itemBlock as any).valueConnection_ = input && input.connection?.targetConnection || null;
+            i++;
+            itemBlock = itemBlock.getNextBlock();
+          }
+        },
+        updateShape_(this: any) {
+          const toRemove: string[] = [];
+          for (const inp of this.inputList) {
+            if (inp.name.startsWith('ARG')) toRemove.push(inp.name);
+          }
+          for (const name of toRemove) {
+            this.removeInput(name);
+          }
+          for (let i = 0; i < this.argCount_; i++) {
+            const inp = this.appendValueInput('ARG' + i);
+            if (i === 0) inp.appendField('参数');
+          }
+          this.setInputsInline(true);
+        },
+      },
+      undefined,
+      ['cu_call_function_item']
+    );
   }
 }
 
@@ -2639,7 +2928,9 @@ csharpGenerator.forBlock['cu_set_item_base_stats'] = (block, gen) => {
   const itemId = id.replace(/^"|"$/g, '');
   const weight = gen.valueToCode(block, 'WEIGHT', ORDER_ATOMIC) || '0.4';
   const value = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '1';
-  const decay = gen.valueToCode(block, 'DECAY', ORDER_ATOMIC) || '180';
+  const decayEnabled = block.getFieldValue('DECAY_ENABLED');
+  const decayMinutes = gen.valueToCode(block, 'DECAY_MINUTES', ORDER_ATOMIC) || '180';
+  const decay = decayEnabled === 'TRUE' ? decayMinutes : '0';
   const rec = gen.valueToCode(block, 'RECOGNITION', ORDER_ATOMIC) || '2';
   const spawn = gen.valueToCode(block, 'SPAWN_FREQ', ORDER_ATOMIC) || '1';
   const json = JSON.stringify({Id: itemId, Weight: weight, Value: value, DecayMinutes: decay, Recognition: rec, SpawnFrequency: spawn});
@@ -2804,6 +3095,55 @@ csharpGenerator.forBlock['cu_item_magazine'] = (block, gen) => {
   const startRounds = gen.valueToCode(block, 'START_ROUNDS', ORDER_ATOMIC) || '0';
   const json = JSON.stringify({Id: itemId, Magazine: {AmmoType: ammoType, MaxRounds: maxRounds, StartRounds: startRounds}});
   return `//ITEM_PROP:${json}\n`;
+};
+
+// ═══ Function generators ════════════════════════════════════════
+csharpGenerator.forBlock['cu_define_function'] = (block, gen) => {
+  const name = block.getFieldValue('NAME') || 'myFunc';
+  const returnType = block.getFieldValue('RETURN_TYPE') || 'void';
+  // Collect params from fields
+  const params: { type: string; name: string }[] = [];
+  let i = 0;
+  while (block.getInput('PARAM' + i)) {
+    const pName = block.getFieldValue('PARAM_NAME_' + i) || ('p' + i);
+    const pType = block.getFieldValue('PARAM_TYPE_' + i) || 'var';
+    params.push({ type: pType, name: pName });
+    i++;
+  }
+  let body = '';
+  let child = block.getInputTargetBlock('BODY');
+  while (child) {
+    body += gen.blockToCode(child);
+    child = child.getNextBlock();
+  }
+  const json = JSON.stringify({ name, returnType, params });
+  return `//DEFINE_FUNCTION:${json}\n${body}//END_FUNCTION\n`;
+};
+csharpGenerator.forBlock['cu_return'] = (block, gen) => {
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  return `return ${v};\n`;
+};
+csharpGenerator.forBlock['cu_call_function'] = (block, gen) => {
+  const name = block.getFieldValue('NAME') || 'myFunc';
+  const args: string[] = [];
+  let i = 0;
+  while (block.getInput('ARG' + i)) {
+    const code = gen.valueToCode(block, 'ARG' + i, ORDER_ATOMIC);
+    if (code) args.push(code);
+    i++;
+  }
+  return `${name}(${args.join(', ')});\n`;
+};
+csharpGenerator.forBlock['cu_call_function_value'] = (block, gen) => {
+  const name = block.getFieldValue('NAME') || 'myFunc';
+  const args: string[] = [];
+  let i = 0;
+  while (block.getInput('ARG' + i)) {
+    const code = gen.valueToCode(block, 'ARG' + i, ORDER_ATOMIC);
+    if (code) args.push(code);
+    i++;
+  }
+  return [`${name}(${args.join(', ')})`, ORDER_ATOMIC];
 };
 
 // ═══ Dropdown i18n ═══════════════════════════════════════════

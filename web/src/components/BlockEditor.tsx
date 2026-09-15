@@ -102,7 +102,8 @@ const TOOLBOX = `
       <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
       <value name="WEIGHT"><shadow type="cu_number"><field name="NUM">0.4</field></shadow></value>
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
-      <value name="DECAY"><shadow type="cu_number"><field name="NUM">180</field></shadow></value>
+      <value name="DECAY"><shadow type="logic_boolean"><field name="BOOL">FALSE</field></shadow></value>
+      <value name="DECAY_MINUTES"><shadow type="cu_number"><field name="NUM">180</field></shadow></value>
       <value name="RECOGNITION"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
       <value name="SPAWN_FREQ"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
     </block>
@@ -577,6 +578,12 @@ const TOOLBOX = `
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
     </block>
   </category>
+  <category name="%{BKY_CAT_FUNC}" colour="#5c6bc0" icon="fn">
+    <block type="cu_define_function"></block>
+    <block type="cu_return"></block>
+    <block type="cu_call_function"></block>
+    <block type="cu_call_function_value"></block>
+  </category>
   <category name="%{BKY_CAT_BUILDING}" colour="#00897b" icon="🏗">
     <block type="cu_building_set_property">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">250</field></shadow></value>
@@ -593,13 +600,13 @@ const TOOLBOX = `
 const CAT_MSG_ZH: Record<string, string> = {
   CAT_EVENT: '事件', CAT_REGISTER: '注册', CAT_BODY: '身体', CAT_ITEM: '物品',
   CAT_SOUND: '音效', CAT_WORLD: '世界', CAT_FLOW: '流程', CAT_VALUE: '取值',
-  CAT_BOOLEAN: '布尔', CAT_VAR: '变量',
+  CAT_BOOLEAN: '布尔', CAT_VAR: '变量', CAT_FUNC: '函数',
   CAT_BUILDING: '建筑', CAT_TILE: '地块', CAT_LOCALE: '本地化',
 };
 const CAT_MSG_EN: Record<string, string> = {
   CAT_EVENT: 'Events', CAT_REGISTER: 'Register', CAT_BODY: 'Body', CAT_ITEM: 'Item',
   CAT_SOUND: 'Sound', CAT_WORLD: 'World', CAT_FLOW: 'Flow', CAT_VALUE: 'Value',
-  CAT_BOOLEAN: 'Boolean', CAT_VAR: 'Variable',
+  CAT_BOOLEAN: 'Boolean', CAT_VAR: 'Variable', CAT_FUNC: 'Function',
   CAT_BUILDING: 'Building', CAT_TILE: 'Tile', CAT_LOCALE: 'Locale',
 };
 
@@ -777,7 +784,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
 
       const forceHorizontal = () => {
         ws.getAllBlocks().forEach((b: any) => {
-          if (b.type === 'lists_create_with' && !b.inputsInline) {
+          if ((b.type === 'lists_create_with' || b.type === 'cu_define_function' || b.type === 'cu_call_function' || b.type === 'cu_call_function_value') && !b.inputsInline) {
             b.inputsInline = true;
             b.render();
           }
