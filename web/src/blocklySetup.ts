@@ -1448,6 +1448,15 @@ const BLOCK_JSON: any[] = [
     mutator: 'cu_define_function_mutator',
   },
   {
+    type: 'cu_get_param',
+    message0: '参数 %1',
+    args0: [
+      { type: 'field_input', name: 'NAME', text: 'x' },
+    ],
+    output: null,
+    colour: '#5c6bc0',
+  },
+  {
     type: 'cu_define_function_container',
     message0: '参数',
     args0: [],
@@ -1707,6 +1716,7 @@ const MSG_ZH: Record<string, string> = {
   CU_DEFINE_FUNCTION_CONTAINER: '参数',
   CU_DEFINE_FUNCTION_ITEM: '参数',
   CU_RETURN: '返回 %1',
+  CU_GET_PARAM: '参数 %1',
   CU_CALL_FUNCTION: '调用 %1',
   CU_CALL_FUNCTION_VALUE: '调用 %1',
   CU_CALL_FUNCTION_CONTAINER: '参数',
@@ -1905,6 +1915,7 @@ const MSG_EN: Record<string, string> = {
   CU_DEFINE_FUNCTION_CONTAINER: 'params',
   CU_DEFINE_FUNCTION_ITEM: 'param',
   CU_RETURN: 'return %1',
+  CU_GET_PARAM: 'param %1',
   CU_CALL_FUNCTION: 'call %1',
   CU_CALL_FUNCTION_VALUE: 'call %1',
   CU_CALL_FUNCTION_CONTAINER: 'args',
@@ -3123,6 +3134,7 @@ csharpGenerator.forBlock['cu_return'] = (block, gen) => {
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
   return `return ${v};\n`;
 };
+csharpGenerator.forBlock['cu_get_param'] = (block) => [`_${block.getFieldValue('NAME')}`, ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_call_function'] = (block, gen) => {
   const name = block.getFieldValue('NAME') || 'myFunc';
   const args: string[] = [];

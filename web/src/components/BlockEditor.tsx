@@ -580,6 +580,7 @@ const TOOLBOX = `
   </category>
   <category name="%{BKY_CAT_FUNC}" colour="#5c6bc0" icon="fn">
     <block type="cu_define_function"></block>
+    <block type="cu_get_param"></block>
     <block type="cu_return"></block>
     <block type="cu_call_function"></block>
     <block type="cu_call_function_value"></block>
