@@ -67,7 +67,14 @@ export function ItemForm({ item, onChange, onDelete }: Props) {
             <label>{t('item.value')}<input type="number" value={item.value} onChange={e => set('value', parseInt(e.target.value) || 0)} /></label>
           </div>
           <div className="form-row">
-            <label>{t('item.decay')}<input type="number" value={item.decayMinutes} onChange={e => set('decayMinutes', parseFloat(e.target.value) || 0)} /></label>
+            <label className="decay-row">{t('item.decay')}
+              <input type="checkbox" checked={item.decayMinutes > 0}
+                onChange={e => set('decayMinutes', e.target.checked ? (item.decayMinutes || 180) : 0)} />
+              {item.decayMinutes > 0 && (
+                <input type="number" value={item.decayMinutes}
+                  onChange={e => set('decayMinutes', parseFloat(e.target.value) || 0)} />
+              )}
+            </label>
             <label>{t('item.recognition')}<input type="number" value={item.recognition} onChange={e => set('recognition', parseInt(e.target.value) || 0)} /></label>
             <label>{t('item.spawnFreq')}<input type="number" value={item.spawnFrequency} onChange={e => set('spawnFrequency', parseInt(e.target.value) || 0)} /></label>
           </div>

@@ -3144,7 +3144,7 @@ csharpGenerator.forBlock['cu_call_function'] = (block, gen) => {
     if (code) args.push(code);
     i++;
   }
-  return `${name}(${args.join(', ')});\n`;
+  return `EventHandlers.${name}(${args.join(', ')});\n`;
 };
 csharpGenerator.forBlock['cu_call_function_value'] = (block, gen) => {
   const name = block.getFieldValue('NAME') || 'myFunc';
@@ -3155,7 +3155,7 @@ csharpGenerator.forBlock['cu_call_function_value'] = (block, gen) => {
     if (code) args.push(code);
     i++;
   }
-  return [`${name}(${args.join(', ')})`, ORDER_ATOMIC];
+  return [`EventHandlers.${name}(${args.join(', ')})`, ORDER_ATOMIC];
 };
 
 // ═══ Dropdown i18n ═══════════════════════════════════════════

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using CuBlocky.Server.Models;
@@ -21,7 +22,7 @@ public static class ProjectEmitter
         var hasEvents = !string.IsNullOrWhiteSpace(bp.EventHandlers);
 
         // Extract register markers from event code
-        var (eventCode, registerItems, registerRecipes, registerBuildings, registerTiles, registerLocales, registerLiquids, statuses) = ExtractRegisterMarkers(bp.EventHandlers!);
+        var (eventCode, registerItems, registerRecipes, registerBuildings, registerTiles, registerLocales, registerLiquids, statuses, functions) = ExtractRegisterMarkers(bp.EventHandlers!);
         var hasStatuses = statuses.Count > 0;
 
         var gPath = gamePath ?? DefaultGamePath;
@@ -35,7 +36,7 @@ public static class ProjectEmitter
         };
 
         if (hasEvents)
-            files["EventHandlers.cs"] = EmitEventHandlers(ns, eventCode);
+            files["EventHandlers.cs"] = EmitEventHandlers(ns, eventCode, functions);
 
         if (hasStatuses)
             files["Statuses.cs"] = CodeEmitter.EmitStatuses(bp, statuses);
@@ -43,7 +44,7 @@ public static class ProjectEmitter
         return files;
     }
 
-    private static (string eventCode, List<ItemEntry> items, List<RecipeEntry> recipes, List<BuildingEntry> buildings, List<TileEntry> tiles, List<LocaleEntry> locales, List<LiquidEntry> liquids, List<StatusEntry> statuses) ExtractRegisterMarkers(string eventCode)
+    private static (string eventCode, List<ItemEntry> items, List<RecipeEntry> recipes, List<BuildingEntry> buildings, List<TileEntry> tiles, List<LocaleEntry> locales, List<LiquidEntry> liquids, List<StatusEntry> statuses, List<FunctionDef> functions) ExtractRegisterMarkers(string eventCode)
     {
         var items = new List<ItemEntry>();
         var recipes = new List<RecipeEntry>();
@@ -52,6 +53,7 @@ public static class ProjectEmitter
         var locales = new List<LocaleEntry>();
         var liquids = new List<LiquidEntry>();
         var statuses = new List<StatusEntry>();
+        var functions = new List<FunctionDef>();
         var itemProps = new List<(string id, JsonElement json)>();
         var liquidFlags = new Dictionary<string, JsonElement>();
         var itemUseActions = new Dictionary<string, string>();
@@ -61,6 +63,8 @@ public static class ProjectEmitter
         var lines = eventCode.Split('\n');
         string capturingItemUse = null;
         var itemUseBody = new System.Text.StringBuilder();
+        FunctionDef capturingFunction = null;
+        var functionBody = new System.Text.StringBuilder();
 
         foreach (var raw in lines)
         {
@@ -191,6 +195,43 @@ public static class ProjectEmitter
                         if (item != null) item.StartCondition = cond;
                     }
                 } catch { }
+            }
+            else if (line.StartsWith("//DEFINE_FUNCTION:"))
+            {
+                var json = line.Substring(18).Trim();
+                FunctionDef fn = null;
+                try
+                {
+                    var doc = JsonDocument.Parse(json);
+                    fn = new FunctionDef();
+                    if (doc.RootElement.TryGetProperty("name", out var n)) fn.Name = n.GetString() ?? "unknown";
+                    if (doc.RootElement.TryGetProperty("returnType", out var rt)) fn.ReturnType = rt.GetString() ?? "void";
+                    if (doc.RootElement.TryGetProperty("params", out var pArr))
+                    {
+                        foreach (var p in pArr.EnumerateArray())
+                        {
+                            var pd = new ParamDef();
+                            if (p.TryGetProperty("name", out var pn)) pd.Name = pn.GetString() ?? "p";
+                            if (p.TryGetProperty("type", out var pt)) pd.Type = pt.GetString() ?? "var";
+                            fn.Params.Add(pd);
+                        }
+                    }
+                    functions.Add(fn);
+                } catch { }
+                capturingFunction = fn;
+                functionBody.Clear();
+            }
+            else if (line == "//END_FUNCTION")
+            {
+                if (capturingFunction != null)
+                {
+                    capturingFunction.Body = functionBody.ToString().Trim();
+                    capturingFunction = null;
+                }
+            }
+            else if (capturingFunction != null)
+            {
+                functionBody.AppendLine(line);
             }
             else
             {
@@ -340,7 +381,7 @@ public static class ProjectEmitter
             if (json.TryGetProperty("SpawnFrequency", out var sEl)) { item.SpawnFrequency = int.TryParse(Raw(sEl), out var sVal) ? sVal : 1; item.IsAdvanced = true; }
         }
 
-        return (string.Join('\n', remainingLines), items, recipes, buildings, tiles, locales, liquids, statuses);
+        return (string.Join('\n', remainingLines), items, recipes, buildings, tiles, locales, liquids, statuses, functions);
     }
 
     // Strip quotes from JSON string values; pass through numbers/booleans as-is.
@@ -480,7 +521,7 @@ Copy the built DLL from `bin/Release/` into
 ";
     }
 
-    private static string EmitEventHandlers(string ns, string eventCode)
+    private static string EmitEventHandlers(string ns, string eventCode, List<FunctionDef> functions)
     {
         var sb = new StringBuilder();
         sb.AppendLine("// AUTO-GENERATED by CuBlocky. Event handlers.");
@@ -538,6 +579,28 @@ Copy the built DLL from `bin/Release/` into
         sb.AppendLine();
         sb.AppendLine("        private static Body GetPlayer() => PlayerCamera.main.body;");
         sb.AppendLine();
+
+        // Emit user-defined functions
+        foreach (var fn in functions)
+        {
+            if (string.IsNullOrEmpty(fn.Name)) continue;
+            var csharpReturn = MapParamType(fn.ReturnType);
+            var paramList = string.Join(", ", fn.Params.Select(p => $"{MapParamType(p.Type)} _{SanitizeIdent(p.Name)}"));
+            sb.AppendLine($"        public static {csharpReturn} {SanitizeIdent(fn.Name)}({paramList})");
+            sb.AppendLine("        {");
+            if (!string.IsNullOrEmpty(fn.Body))
+            {
+                var bodyCode = fn.Body.Replace("body.", "GetPlayer().");
+                foreach (var bline in bodyCode.Split('\n'))
+                {
+                    var btrim = bline.TrimEnd('\r');
+                    if (!string.IsNullOrWhiteSpace(btrim))
+                        sb.AppendLine("            " + btrim);
+                }
+            }
+            sb.AppendLine("        }");
+            sb.AppendLine();
+        }
 
         // Second pass: emit patch and event handler methods
         foreach (var raw in lines)
@@ -682,5 +745,27 @@ Copy the built DLL from `bin/Release/` into
             if (char.IsLetterOrDigit(c)) sb.Append(c); else sb.Append('_');
         if (sb.Length == 0 || char.IsDigit(sb[0])) sb.Insert(0, "M");
         return sb.ToString();
+    }
+
+    private static string SanitizeIdent(string s)
+    {
+        var sb = new StringBuilder();
+        foreach (var c in s)
+            if (char.IsLetterOrDigit(c)) sb.Append(c); else sb.Append('_');
+        if (sb.Length == 0 || char.IsDigit(sb[0])) sb.Insert(0, "_");
+        return sb.ToString();
+    }
+
+    private static string MapParamType(string type)
+    {
+        return type?.ToLowerInvariant() switch
+        {
+            "number" or "float" or "int" => "float",
+            "string" or "text" => "string",
+            "bool" or "boolean" => "bool",
+            "void" => "void",
+            "var" or "any" or null => "var",
+            _ => type
+        };
     }
 }

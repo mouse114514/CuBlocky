@@ -259,3 +259,18 @@ public class LocaleEntry
     public string Zh { get; set; } = "中文名";
     public string En { get; set; } = "English Name";
 }
+
+// ── Functions (define/call/return from Blockly) ────────────────────
+public class FunctionDef
+{
+    public string Name { get; set; } = "myFunc";
+    public string ReturnType { get; set; } = "void";
+    public List<ParamDef> Params { get; set; } = new();
+    public string Body { get; set; } = "";
+}
+
+public class ParamDef
+{
+    public string Name { get; set; } = "p";
+    public string Type { get; set; } = "var";
+}

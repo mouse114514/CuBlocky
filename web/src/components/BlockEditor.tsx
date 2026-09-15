@@ -30,25 +30,27 @@ interface Props {
   searchTerm?: string;
 }
 
+const _t = Date.now();
 const CAT_ICONS: Record<string, string> = {
-  CAT_EVENT: '/media/cat-icons/event.png',
-  CAT_REGISTER: '/media/cat-icons/register.png',
-  CAT_BODY: '/media/cat-icons/body.png',
-  CAT_ITEM: '/media/cat-icons/item.png',
-  CAT_SOUND: '/media/cat-icons/sound.png',
-  CAT_WORLD: '/media/cat-icons/world.png',
-  CAT_FLOW: '/media/cat-icons/flow.png',
-  CAT_VALUE: '/media/cat-icons/value.png',
-  CAT_BOOLEAN: '/media/cat-icons/boolean.png',
-  CAT_VAR: '/media/cat-icons/var.png',
-  CAT_BUILDING: '/media/cat-icons/building.png',
-  CAT_TILE: '/media/cat-icons/tile.png',
+  CAT_EVENT: `/media/cat-icons/event.png?v=${_t}`,
+  CAT_REGISTER: `/media/cat-icons/register.png?v=${_t}`,
+  CAT_BODY: `/media/cat-icons/body.png?v=${_t}`,
+  CAT_ITEM: `/media/cat-icons/item.png?v=${_t}`,
+  CAT_SOUND: `/media/cat-icons/sound.png?v=${_t}`,
+  CAT_WORLD: `/media/cat-icons/world.png?v=${_t}`,
+  CAT_FLOW: `/media/cat-icons/flow.png?v=${_t}`,
+  CAT_VALUE: `/media/cat-icons/value.png?v=${_t}`,
+  CAT_BOOLEAN: `/media/cat-icons/boolean.png?v=${_t}`,
+  CAT_VAR: `/media/cat-icons/var.png?v=${_t}`,
+  CAT_FUNC: `/media/cat-icons/function.png?v=${_t}`,
+  CAT_BUILDING: `/media/cat-icons/building.png?v=${_t}`,
+  CAT_TILE: `/media/cat-icons/tile.png?v=${_t}`,
   CAT_LOCALE: '',
 };
 
 const TOOLBOX = `
 <xml id="toolbox" style="display: none">
-  <category name="%{BKY_CAT_EVENT}" colour="#ff8c1a" icon="⚡">
+  <category name="%{BKY_CAT_EVENT}" colour="#ff8c1a">
     <block type="cu_when_awake"></block>
     <block type="cu_when_update"></block>
     <block type="cu_when_hurt"></block>
@@ -68,7 +70,7 @@ const TOOLBOX = `
       <value name="ITEM"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
     </block>
   </category>
-  <category name="%{BKY_CAT_REGISTER}" colour="#e91e63" icon="📦">
+  <category name="%{BKY_CAT_REGISTER}" colour="#e91e63">
     <block type="cu_register_item">
       <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
     </block>
@@ -179,7 +181,7 @@ const TOOLBOX = `
       <value name="START_ROUNDS"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
   </category>
-  <category name="%{BKY_CAT_BODY}" colour="#4caf50" icon="🧍">
+  <category name="%{BKY_CAT_BODY}" colour="#4caf50">
     <block type="cu_eat">
       <value name="HUNGER"><shadow type="cu_number"><field name="NUM">12</field></shadow></value>
       <value name="WEIGHT_GAIN"><shadow type="cu_number"><field name="NUM">0.5</field></shadow></value>
@@ -348,7 +350,7 @@ const TOOLBOX = `
       <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
     </block>
   </category>
-  <category name="%{BKY_CAT_ITEM}" colour="#2196f3" icon="🎒">
+  <category name="%{BKY_CAT_ITEM}" colour="#2196f3">
     <block type="cu_item_use"></block>
     <block type="cu_item_consume">
       <value name="AMOUNT"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
@@ -387,7 +389,7 @@ const TOOLBOX = `
     <block type="cu_item_id"></block>
     <block type="cu_item_category"></block>
   </category>
-  <category name="%{BKY_CAT_SOUND}" colour="#9c27b0" icon="🔊">
+  <category name="%{BKY_CAT_SOUND}" colour="#9c27b0">
     <block type="cu_play_sound"></block>
     <block type="cu_play_sound_at">
       <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
