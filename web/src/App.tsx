@@ -7,7 +7,7 @@ import WelcomePage from './components/WelcomePage';
 import AssetManager from './components/AssetManager';
 import { download, buildProject, saveProject, getConfig, updateConfig, deployDll, type BuildResult, type ServerConfig } from './api';
 import * as Blockly from 'blockly/core';
-import { csharpGenerator, pickSprite, setSpritePickCallback, createSpriteBlock } from './blocklySetup';
+import { csharpGenerator, pickSprite, setSpritePickCallback, createSpriteBlock, extractFunctions } from './blocklySetup';
 
 function CopyIcon() {
   return (
@@ -62,6 +62,7 @@ export function App() {
   const wsRef = useRef<Blockly.WorkspaceSvg | null>(null);
   const bpRef = useRef(bp);
   bpRef.current = bp;
+  const restoringWsRef = useRef(false);
 
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleAutoSave = useCallback(() => {
@@ -145,11 +146,19 @@ export function App() {
     const ws = wsRef.current;
     if (!ws || !xml) return;
     try {
+      restoringWsRef.current = true;
       ws.clear();
       const dom = Blockly.utils.xml.textToDom(xml);
       Blockly.Xml.domToWorkspace(dom, ws);
     } catch (e) {
       console.warn('Failed to restore workspace:', e);
+    } finally {
+      restoringWsRef.current = false;
+      const ws2 = wsRef.current;
+      if (ws2) {
+        const functions = extractFunctions(ws2);
+        setBp(prev => ({ ...prev, functions }));
+      }
     }
   }, []);
 
@@ -159,10 +168,12 @@ export function App() {
     setDeployResult(null);
     try {
       let eventHandlers = bp.eventHandlers || '';
+      let functions = bp.functions || [];
       if (wsRef.current) {
         eventHandlers = csharpGenerator.workspaceToCode(wsRef.current);
+        functions = extractFunctions(wsRef.current);
       }
-      const r = await buildProject({ ...bp, eventHandlers }, currentProjectName ?? '');
+      const r = await buildProject({ ...bp, eventHandlers, functions }, currentProjectName ?? '');
       setBuildResult(r);
     } catch (e: any) {
       setBuildResult({ success: false, message: e.message });
@@ -225,7 +236,16 @@ export function App() {
         </header>
 
         <BlockEditor
-          onCodeChange={(c) => { setCode(c); setBp(prev => ({ ...prev, eventHandlers: c })); }}
+          onCodeChange={(c) => {
+            setCode(c);
+            if (!restoringWsRef.current) {
+              const ws = wsRef.current;
+              const functions = ws ? extractFunctions(ws) : [];
+              setBp(prev => ({ ...prev, eventHandlers: c, functions }));
+            } else {
+              setBp(prev => ({ ...prev, eventHandlers: c }));
+            }
+          }}
           onBlocksChange={(xml) => { setBp(prev => ({ ...prev, eventHandlersXml: xml })); }}
           onWorkspaceReady={(ws) => { wsRef.current = ws; restoreWorkspace(bp.eventHandlersXml); }}
           searchTerm={blockSearch}

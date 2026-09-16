@@ -13,6 +13,7 @@ public class Blueprint
     public List<AssetRef> Assets { get; set; } = new();
     public string EventHandlers { get; set; } = "";
     public string EventHandlersXml { get; set; } = "";
+    public List<FunctionDef> Functions { get; set; } = new();
     public string? ProjectName { get; set; }
 }
 

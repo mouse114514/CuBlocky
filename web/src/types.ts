@@ -63,12 +63,26 @@ export interface Block {
   children?: Block[];  // for control-flow blocks (branch, forLoop, sequence)
 }
 
+// ── Function definitions ──
+export interface ParamDef {
+  name: string;
+  type: string;
+}
+
+export interface FunctionDef {
+  name: string;
+  returnType: string;
+  params: ParamDef[];
+  body: string;
+}
+
 // ── Blueprint root ──
 export interface Blueprint {
   mod: ModMeta;
   items: ItemEntry[];
   recipes: RecipeEntry[];
   assets: AssetRef[];
+  functions?: FunctionDef[];
   eventHandlers?: string;
   eventHandlersXml?: string;
 }
@@ -87,6 +101,7 @@ export function defaultBlueprint(): Blueprint {
     items: [],
     recipes: [],
     assets: [],
+    functions: [],
   };
 }
 

@@ -1,5 +1,6 @@
 import * as Blockly from 'blockly/core';
 import { fieldRegistry } from 'blockly/core';
+import type { FunctionDef, ParamDef } from './types';
 
 // ── Global sprite picker callback (React ↔ Blockly bridge) ──────
 export type SpritePickCallback = (assetName: string) => void;
@@ -1978,6 +1979,15 @@ export function defineBlocks(lang: string = 'zh') {
     Blockly.Extensions.registerMutator('cu_define_function_mutator',
       {
         paramCount_: 0,
+        mutationToDom(this: any) {
+          const mutation = Blockly.utils.xml.createElement('mutation');
+          mutation.setAttribute('paramCount', String(this.paramCount_));
+          return mutation;
+        },
+        domToMutation(this: any, xmlElement: Element) {
+          this.paramCount_ = parseInt(xmlElement.getAttribute('paramCount') || '0', 10);
+          this.updateShape_();
+        },
         saveExtraState(this: any) {
           return { paramCount: this.paramCount_ };
         },
@@ -2041,16 +2051,6 @@ export function defineBlocks(lang: string = 'zh') {
           }
         },
         updateShape_(this: any) {
-          // Remove all dynamic inputs first
-          const toRemove: string[] = [];
-          for (const inp of this.inputList) {
-            if (inp.name.startsWith('PARAM') || inp.name === 'BODY') {
-              toRemove.push(inp.name);
-            }
-          }
-          for (const name of toRemove) {
-            this.removeInput(name);
-          }
           const PARAM_TYPE_OPTIONS: [string, string][] = [
             ['整数','int'],['浮点数','float'],['字符串','string'],
             ['布尔','bool'],['物品','Item'],['状态效果','StatusEffect'],
@@ -2059,8 +2059,18 @@ export function defineBlocks(lang: string = 'zh') {
             int: ['Number'], float: ['Number'], string: ['String'],
             bool: ['Boolean'], Item: ['Item'], StatusEffect: ['StatusEffect'],
           };
-          // Re-add PARAM inputs then BODY
+          // Remove excess PARAM inputs (keep only what we need)
+          const existingParams: string[] = [];
+          for (const inp of this.inputList) {
+            if (inp.name.startsWith('PARAM')) existingParams.push(inp.name);
+          }
+          for (const name of existingParams) {
+            const idx = parseInt(name.substring(5), 10);
+            if (idx >= this.paramCount_) this.removeInput(name);
+          }
+          // Add missing PARAM inputs
           for (let i = 0; i < this.paramCount_; i++) {
+            if (this.getInput('PARAM' + i)) continue;
             const inp = this.appendValueInput('PARAM' + i);
             if (i === 0) inp.appendField('参数');
             inp.appendField(new Blockly.FieldTextInput('x'), 'PARAM_NAME_' + i);
@@ -2070,11 +2080,13 @@ export function defineBlocks(lang: string = 'zh') {
               return val;
             });
             inp.appendField(dd, 'PARAM_TYPE_' + i);
-            // Set initial type check
             const initType = dd.getValue() || 'int';
             inp.setCheck(TYPE_CHECK[initType] || null);
           }
-          this.appendStatementInput('BODY');
+          // Add BODY only if it doesn't exist yet
+          if (!this.getInput('BODY')) {
+            this.appendStatementInput('BODY');
+          }
           this.setInputsInline(true);
         },
       },
@@ -2086,6 +2098,15 @@ export function defineBlocks(lang: string = 'zh') {
     Blockly.Extensions.registerMutator('cu_call_function_mutator',
       {
         argCount_: 0,
+        mutationToDom(this: any) {
+          const mutation = Blockly.utils.xml.createElement('mutation');
+          mutation.setAttribute('argCount', String(this.argCount_));
+          return mutation;
+        },
+        domToMutation(this: any, xmlElement: Element) {
+          this.argCount_ = parseInt(xmlElement.getAttribute('argCount') || '0', 10);
+          this.updateShape_();
+        },
         saveExtraState(this: any) {
           return { argCount: this.argCount_ };
         },
@@ -3157,6 +3178,33 @@ csharpGenerator.forBlock['cu_call_function_value'] = (block, gen) => {
   }
   return [`EventHandlers.${name}(${args.join(', ')})`, ORDER_ATOMIC];
 };
+
+// ═══ Extract structured function data from workspace ═════════════
+export function extractFunctions(ws: Blockly.Workspace): FunctionDef[] {
+  const result: FunctionDef[] = [];
+  for (const block of ws.getAllBlocks(false)) {
+    if (block.type !== 'cu_define_function') continue;
+    const name = (block.getFieldValue('NAME') as string) || 'myFunc';
+    const returnType = (block.getFieldValue('RETURN_TYPE') as string) || 'void';
+    const params: ParamDef[] = [];
+    let i = 0;
+    while (block.getInput('PARAM' + i)) {
+      params.push({
+        name: (block.getFieldValue('PARAM_NAME_' + i) as string) || ('p' + i),
+        type: (block.getFieldValue('PARAM_TYPE_' + i) as string) || 'var',
+      });
+      i++;
+    }
+    let body = '';
+    let child = block.getInputTargetBlock('BODY');
+    while (child) {
+      body += csharpGenerator.blockToCode(child);
+      child = child.getNextBlock();
+    }
+    result.push({ name, returnType, params, body: body.trim() });
+  }
+  return result;
+}
 
 // ═══ Dropdown i18n ═══════════════════════════════════════════
 let _blocksLang = 'zh';
