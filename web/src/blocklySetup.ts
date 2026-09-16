@@ -2212,6 +2212,13 @@ csharpGenerator.blockToCode = (block: Blockly.Block, opt_thisOnly?: boolean) => 
 };
 const ORDER_ATOMIC = 0;
 
+function floatSuffix(code: string): string {
+  const trimmed = code.trim();
+  if (/^-?\d+(\.\d+)?$/.test(trimmed)) return `${trimmed}f`;
+  if (trimmed.endsWith('f')) return trimmed;
+  return `(float)(${trimmed})`;
+}
+
 csharpGenerator.scrub_ = function (block, code, thisOnly) {
   if (thisOnly) return code;
   const next = block.getNextBlock();
@@ -2367,7 +2374,7 @@ csharpGenerator.forBlock['cu_register_recipe'] = (block, gen) => {
 
   // Build List<RecipeItem> code from extracted IDs
   const recipeItems = itemIds.map(id =>
-    `new RecipeItem(${ingCond}f) { specificId = "${id}" }`
+    `new RecipeItem(${floatSuffix(ingCond)}) { specificId = "${id}" }`
   ).join(', ');
   const inputsCode = `new List<RecipeItem> { ${recipeItems} }`;
 
@@ -2402,11 +2409,11 @@ csharpGenerator.forBlock['cu_register_recipe'] = (block, gen) => {
 csharpGenerator.forBlock['cu_eat'] = (block, gen) => {
   const h = gen.valueToCode(block, 'HUNGER', ORDER_ATOMIC) || '12';
   const w = gen.valueToCode(block, 'WEIGHT_GAIN', ORDER_ATOMIC) || '0.5';
-  return `body.Eat(${h}f, ${w}f);\n`;
+  return `body.Eat(${floatSuffix(h)}, ${floatSuffix(w)});\n`;
 };
 csharpGenerator.forBlock['cu_drink'] = (block, gen) => {
   const a = gen.valueToCode(block, 'AMOUNT', ORDER_ATOMIC) || '4';
-  return `body.Drink(${a}f);\n`;
+  return `body.Drink(${floatSuffix(a)});\n`;
 };
 csharpGenerator.forBlock['cu_set_happiness'] = (block, gen) => {
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '1';
@@ -2460,7 +2467,7 @@ csharpGenerator.forBlock['cu_item_consume'] = (block, gen) => {
   const target = block.getFieldValue('TARGET');
   const amt = gen.valueToCode(block, 'AMOUNT', ORDER_ATOMIC) || '1';
   const targetExpr = target === 'this' ? 'item' : target === 'left' ? 'body.limbs[0].handItem' : 'body.limbs[1].handItem';
-  return `${targetExpr}.condition -= ${amt}f;\n`;
+  return `${targetExpr}.condition -= ${floatSuffix(amt)};\n`;
 };
 csharpGenerator.forBlock['cu_item_set_condition'] = (block, gen) => {
   const target = block.getFieldValue('TARGET');
@@ -2506,7 +2513,7 @@ csharpGenerator.forBlock['cu_play_sound_at'] = (block, gen) => {
   const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
   const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
   const vol = gen.valueToCode(block, 'VOLUME', ORDER_ATOMIC) || '1';
-  return `Sound.Play("${s}", new Vector3(${x}f, ${y}f, 0f), twoDimensional: false, pitchShift: false, null, ${float(vol)}f);\n`;
+  return `Sound.Play("${s}", new Vector3(${floatSuffix(x)}, ${floatSuffix(y)}, 0f), twoDimensional: false, pitchShift: false, null, ${floatSuffix(float(vol))});\n`;
 };
 
 // Flow
