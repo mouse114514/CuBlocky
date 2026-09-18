@@ -20,7 +20,8 @@ const dict = {
   'app.placeholder.name': { zh: '请在此处输入项目名称', en: 'Enter project name here', ru: 'Введите название проекта' },
   'app.placeholder.guid': { zh: '例如 com.author.modname', en: 'e.g. com.author.modname', ru: 'например com.author.modname' },
   'app.placeholder.desc': { zh: '可选，简要说明插件功能', en: 'Optional, brief description', ru: 'Необязательно, краткое описание' },
-  'app.lang':          { zh: 'Русский', en: '中文', ru: 'English' },
+  'app.lang':          { zh: 'Language', en: 'Language', ru: 'Language' },
+  'app.langTitle':     { zh: '选择语言', en: 'Select Language', ru: 'Выбрать язык' },
   'app.newProject':    { zh: '新建项目', en: 'New Project', ru: 'Новый проект' },
   'app.openProject':   { zh: '打开项目', en: 'Open Project', ru: 'Открыть проект' },
   'app.subtitle':      { zh: 'Casualties Unknown 模组编辑器', en: 'Casualties Unknown Mod Editor', ru: 'Редактор модов Casualties Unknown' },
@@ -148,12 +149,10 @@ type DictKey = keyof typeof dict;
 interface I18nCtx {
   lang: Lang;
   t: (key: string, params?: Record<string, string>) => string;
-  toggle: () => void;
+  setLang: (lang: Lang) => void;
 }
 
 const Ctx = createContext<I18nCtx>(null!);
-
-const LANG_CYCLE: Lang[] = ['zh', 'en', 'ru'];
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Lang>(() => {
@@ -161,11 +160,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     if (saved === 'zh' || saved === 'en' || saved === 'ru') return saved;
     return 'zh';
   });
-  const toggle = () => {
-    const idx = LANG_CYCLE.indexOf(lang);
-    const next = LANG_CYCLE[(idx + 1) % LANG_CYCLE.length];
-    setLang(next);
-    localStorage.setItem('cublocky-lang', next);
+  const setLangFn = (l: Lang) => {
+    setLang(l);
+    localStorage.setItem('cublocky-lang', l);
   };
   const t = (key: string, params?: Record<string, string>) => {
     const entry = dict[key as DictKey];
@@ -175,7 +172,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
     return s;
   };
-  return <Ctx.Provider value={{ lang, t, toggle }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ lang, t, setLang: setLangFn }}>{children}</Ctx.Provider>;
 }
 
 export function useI18n() { return useContext(Ctx); }

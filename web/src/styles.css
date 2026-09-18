@@ -56,6 +56,20 @@ code{background:#0d1b2a;padding:1px 4px;border-radius:3px;font-size:12px}
   background:#222;color:#fff;border:none;border-radius:16px;padding:6px 14px;cursor:pointer;font-size:13px;
 }
 .toolbar button:hover{background:#333}
+.toolbar .lang-dropdown{position:relative;display:inline-block}
+.toolbar .lang-trigger{
+  background:#222;color:#fff;border:none;border-radius:16px;padding:6px 24px 6px 12px;cursor:pointer;font-size:13px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23fff'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;
+}
+.toolbar .lang-trigger:hover{background:#333}
+.lang-grid{display:flex;gap:8px;margin:14px 0}
+.lang-card{
+  flex:1;padding:8px 0;text-align:center;border-radius:8px;cursor:pointer;font-size:13px;
+  background:#e8e8e8;color:#333;border:2px solid transparent;transition:all .15s;
+}
+.lang-card:hover{background:#ddd;color:#111}
+.lang-card.active{border-color:#1a8a1a;color:#1a8a1a;background:#d4f5d4}
 .toolbar button.build-btn{background:#1a8a1a}
 .toolbar button.build-btn:hover{background:#22a522}
 .toolbar button.build-btn:disabled{background:#555;cursor:wait}

@@ -45,7 +45,7 @@ function CopyBlock({ children }: { children: ReactNode }) {
 }
 
 export function App() {
-  const { lang, t, toggle: toggleLang } = useI18n();
+  const { lang, t } = useI18n();
   const [inEditor, setInEditor] = useState(false);
   const [bp, setBp] = useState<Blueprint>(() => defaultBlueprint());
   const [currentProjectName, setCurrentProjectName] = useState<string | null>(null);

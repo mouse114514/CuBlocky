@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Blueprint } from '../types';
 import { defaultBlueprint } from '../types';
 import { useI18n } from '../i18n';
+import type { Lang } from '../i18n';
 import GradientBg from './GradientBg';
 import { getConfig, updateConfig, type ServerConfig } from '../api';
 
@@ -17,7 +18,14 @@ interface Props {
 const API = '';
 
 export default function WelcomePage({ onOpenProject }: Props) {
-  const { t, toggle: toggleLang } = useI18n();
+  const { t, lang, setLang } = useI18n();
+  const [showLang, setShowLang] = useState(false);
+  const LANGS: { key: Lang; label: string }[] = [
+    { key: 'zh', label: '中文' },
+    { key: 'en', label: 'English' },
+    { key: 'ru', label: 'Русский' },
+  ];
+  const currentLabel = LANGS.find(l => l.key === lang)?.label ?? 'English';
   const [showNew, setShowNew] = useState(false);
   const [showOpen, setShowOpen] = useState(false);
   const [projects, setProjects] = useState<ProjectInfo[]>([]);
@@ -86,8 +94,24 @@ export default function WelcomePage({ onOpenProject }: Props) {
         <span className="logo">CuBlocky</span>
         <span className="spacer" />
         <button onClick={openSettings}>{t('app.settings')}</button>
-        <button onClick={toggleLang}>{t('app.lang')}</button>
+        <button onClick={() => setShowLang(true)}>{t('app.lang')}</button>
       </header>
+
+      {showLang && (
+        <div className="modal-overlay" onClick={() => setShowLang(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3>{t('app.langTitle')}</h3>
+            <div className="lang-grid">
+              {LANGS.map(l => (
+                <div key={l.key} className={`lang-card${l.key === lang ? ' active' : ''}`} onClick={() => { setLang(l.key); setShowLang(false); }}>{l.label}</div>
+              ))}
+            </div>
+            <div className="modal-actions">
+              <button onClick={() => setShowLang(false)}>{t('app.close')}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="wp-body">
         <GradientBg />

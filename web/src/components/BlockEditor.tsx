@@ -612,6 +612,12 @@ const CAT_MSG_EN: Record<string, string> = {
   CAT_BOOLEAN: 'Boolean', CAT_VAR: 'Variable', CAT_FUNC: 'Function',
   CAT_BUILDING: 'Building', CAT_TILE: 'Tile', CAT_LOCALE: 'Locale',
 };
+const CAT_MSG_RU: Record<string, string> = {
+  CAT_EVENT: 'События', CAT_REGISTER: 'Регистрация', CAT_BODY: 'Тело', CAT_ITEM: 'Предмет',
+  CAT_SOUND: 'Звук', CAT_WORLD: 'Мир', CAT_FLOW: 'Поток', CAT_VALUE: 'Значение',
+  CAT_BOOLEAN: 'Логическое', CAT_VAR: 'Переменная', CAT_FUNC: 'Функция',
+  CAT_BUILDING: 'Здание', CAT_TILE: 'Плитка', CAT_LOCALE: 'Локализация',
+};
 
 export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, searchTerm }: Props) {
   const { lang } = useI18n();
@@ -682,7 +688,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
     const doInit = () => {
       if (disposed) return;
       setMessages(lang);
-      const catMsgs = lang === 'zh' ? CAT_MSG_ZH : CAT_MSG_EN;
+      const catMsgs = lang === 'zh' ? CAT_MSG_ZH : lang === 'ru' ? CAT_MSG_RU : CAT_MSG_EN;
       for (const [key, val] of Object.entries(catMsgs)) {
         (Blockly.Msg as Record<string, string>)[key] = val;
       }
@@ -745,13 +751,9 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
           const label = catEl.querySelector('.blocklyToolboxCategoryLabel');
           const name = label?.textContent?.trim() ?? '';
           let iconSrc = '';
-          for (const [k, v] of Object.entries(CAT_MSG_ZH)) {
+          const allCatMsgs = { ...CAT_MSG_ZH, ...CAT_MSG_EN, ...CAT_MSG_RU };
+          for (const [k, v] of Object.entries(allCatMsgs)) {
             if (v === name) { iconSrc = CAT_ICONS[k] ?? ''; break; }
-          }
-          if (!iconSrc) {
-            for (const [k, v] of Object.entries(CAT_MSG_EN)) {
-              if (v === name) { iconSrc = CAT_ICONS[k] ?? ''; break; }
-            }
           }
           if (!iconSrc) return;
           (label as HTMLElement).style.opacity = '0';
@@ -823,7 +825,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
     if (!wsRef.current) return;
     setMessages(lang);
     defineBlocks(lang);
-    const catMsgs = lang === 'zh' ? CAT_MSG_ZH : CAT_MSG_EN;
+    const catMsgs = lang === 'zh' ? CAT_MSG_ZH : lang === 'ru' ? CAT_MSG_RU : CAT_MSG_EN;
     for (const [key, val] of Object.entries(catMsgs)) {
       (Blockly.Msg as Record<string, string>)[key] = val;
     }
