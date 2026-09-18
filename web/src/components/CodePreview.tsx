@@ -39,11 +39,17 @@ export function CodePreview({ blueprint }: Props) {
   const exportCs = () => download('RegisterContent.cs', code);
 
   const exportAll = async () => {
-    // Download each project file individually (M5 will zip them)
     for (const [name, content] of Object.entries(projectFiles)) {
       download(name, content);
     }
   };
+
+  const textFiles = Object.fromEntries(
+    Object.entries(projectFiles).filter(([_, c]) => !c.startsWith('base64:'))
+  );
+  const binaryFiles = Object.fromEntries(
+    Object.entries(projectFiles).filter(([_, c]) => c.startsWith('base64:'))
+  );
 
   return (
     <div className="code-preview">
@@ -65,8 +71,8 @@ export function CodePreview({ blueprint }: Props) {
       )}
       {tab === 'project' && (
         <div className="project-files">
-          {Object.keys(projectFiles).length === 0 && <p className="empty">No files generated.</p>}
-          {Object.entries(projectFiles).map(([name, content]) => (
+          {Object.keys(textFiles).length === 0 && Object.keys(binaryFiles).length === 0 && <p className="empty">No files generated.</p>}
+          {Object.entries(textFiles).map(([name, content]) => (
             <div key={name} className="file-card">
               <div className="file-header">
                 <span className="file-name">{name}</span>
@@ -75,6 +81,15 @@ export function CodePreview({ blueprint }: Props) {
               <pre className="code-block small"><code>{content}</code></pre>
             </div>
           ))}
+          {Object.keys(binaryFiles).length > 0 && (
+            <div className="file-card">
+              <div className="file-header">
+                <span className="file-name">references/ (DLLs)</span>
+                <button className="small" onClick={() => { for (const [n, c] of Object.entries(binaryFiles)) download(n, c); }}>Download All DLLs</button>
+              </div>
+              <pre className="code-block small"><code>{Object.keys(binaryFiles).map(n => n.split('/').pop()).join('\n')}</code></pre>
+            </div>
+          )}
         </div>
       )}
     </div>

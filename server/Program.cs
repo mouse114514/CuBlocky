@@ -146,6 +146,45 @@ app.MapPost("/api/compile/project", async (HttpRequest req) =>
     var bp = await JsonSerializer.DeserializeAsync<Blueprint>(req.Body, jsonOpts);
     if (bp == null) return Results.BadRequest("invalid blueprint");
     var files = ProjectEmitter.EmitProject(bp, config.GamePath);
+
+    // Also emit reference DLLs as base64 so frontend can bundle them
+    var gPath = config.GamePath!;
+    var refDlls = new Dictionary<string, string>
+    {
+        ["BepInEx"] = Path.Combine(gPath, "BepInEx", "core", "BepInEx.dll"),
+        ["0Harmony"] = Path.Combine(gPath, "BepInEx", "core", "0Harmony.dll"),
+        ["CUCoreLib"] = Path.Combine(gPath, "BepInEx", "plugins", "CUCoreLib.dll"),
+        ["Assembly-CSharp"] = Path.Combine(gPath, "CasualtiesUnknown_Data", "Managed", "Assembly-CSharp.dll"),
+        ["UnityEngine"] = Path.Combine(gPath, "CasualtiesUnknown_Data", "Managed", "UnityEngine.dll"),
+        ["UnityEngine.CoreModule"] = Path.Combine(gPath, "CasualtiesUnknown_Data", "Managed", "UnityEngine.CoreModule.dll"),
+        ["UnityEngine.AudioModule"] = Path.Combine(gPath, "CasualtiesUnknown_Data", "Managed", "UnityEngine.AudioModule.dll"),
+    };
+
+    // Patch .csproj to use relative references\ paths
+    var csprojKey = files.Keys.FirstOrDefault(k => k.EndsWith(".csproj"));
+    if (csprojKey != null)
+    {
+        var content = files[csprojKey];
+        foreach (var kv in refDlls)
+        {
+            var dllName = kv.Key + ".dll";
+            var pattern = $"<HintPath>[^<]*{System.Text.RegularExpressions.Regex.Escape(dllName)}</HintPath>";
+            var replacement = $"<HintPath>references\\{dllName}</HintPath>";
+            content = System.Text.RegularExpressions.Regex.Replace(content, pattern, replacement);
+        }
+        files[csprojKey] = content;
+    }
+
+    // Add reference DLLs as base64-encoded entries
+    foreach (var kv in refDlls)
+    {
+        if (File.Exists(kv.Value))
+        {
+            var bytes = await File.ReadAllBytesAsync(kv.Value);
+            files["references/" + kv.Key + ".dll"] = "base64:" + Convert.ToBase64String(bytes);
+        }
+    }
+
     return Results.Json(new { files }, jsonOpts);
 });
 
@@ -158,6 +197,7 @@ app.MapPost("/api/build", async (HttpRequest req) =>
     var files = ProjectEmitter.EmitProject(bp, config.GamePath);
     var asmName = Path.GetFileNameWithoutExtension(files.Keys.First(k => k.EndsWith(".csproj")));
     var buildDir = Path.Combine(Directory.GetCurrentDirectory(), "builds", asmName);
+    var gPath = config.GamePath!;
 
     // Determine project name: use provided projectName, fall back to mod name
     var reqProjectName = bp.ProjectName ?? "";
@@ -252,14 +292,51 @@ app.MapPost("/api/build", async (HttpRequest req) =>
             }
         }
 
+        // Copy reference DLLs into references/ subfolder and patch .csproj to use relative paths
+        var refDir = Path.Combine(buildDir, "references");
+        Directory.CreateDirectory(refDir);
+        var refDlls = new Dictionary<string, string>
+        {
+            ["BepInEx"] = Path.Combine(gPath, "BepInEx", "core", "BepInEx.dll"),
+            ["0Harmony"] = Path.Combine(gPath, "BepInEx", "core", "0Harmony.dll"),
+            ["CUCoreLib"] = Path.Combine(gPath, "BepInEx", "plugins", "CUCoreLib.dll"),
+            ["Assembly-CSharp"] = Path.Combine(gPath, "CasualtiesUnknown_Data", "Managed", "Assembly-CSharp.dll"),
+            ["UnityEngine"] = Path.Combine(gPath, "CasualtiesUnknown_Data", "Managed", "UnityEngine.dll"),
+            ["UnityEngine.CoreModule"] = Path.Combine(gPath, "CasualtiesUnknown_Data", "Managed", "UnityEngine.CoreModule.dll"),
+            ["UnityEngine.AudioModule"] = Path.Combine(gPath, "CasualtiesUnknown_Data", "Managed", "UnityEngine.AudioModule.dll"),
+        };
+        foreach (var kv in refDlls)
+        {
+            if (File.Exists(kv.Value))
+                File.Copy(kv.Value, Path.Combine(refDir, kv.Key + ".dll"), true);
+        }
+
+        // Patch .csproj to use relative references\*.dll paths
+        var csprojPath = Path.Combine(buildDir, asmName + ".csproj");
+        if (File.Exists(csprojPath))
+        {
+            var csprojContent = await File.ReadAllTextAsync(csprojPath);
+            // Replace all HintPath entries pointing to game dir with relative references/ paths
+            foreach (var kv in refDlls)
+            {
+                var dllName = kv.Key + ".dll";
+                // Match any HintPath containing this dll name (handles various escape patterns)
+                var pattern = $"<HintPath>[^<]*{System.Text.RegularExpressions.Regex.Escape(dllName)}</HintPath>";
+                var replacement = $"<HintPath>references\\{dllName}</HintPath>";
+                csprojContent = System.Text.RegularExpressions.Regex.Replace(csprojContent, pattern, replacement);
+            }
+            await File.WriteAllTextAsync(csprojPath, csprojContent);
+            Console.WriteLine($"[Build] Patched csproj with relative references/ paths");
+        }
+
         // Patch .csproj to embed sprite resources
         Console.WriteLine($"[Build] spriteFiles count={spriteFiles.Count}");
         if (spriteFiles.Count > 0)
         {
-            var csprojPath = Path.Combine(buildDir, asmName + ".csproj");
-            if (File.Exists(csprojPath))
+            var csprojForRes = Path.Combine(buildDir, asmName + ".csproj");
+            if (File.Exists(csprojForRes))
             {
-                var csprojContent = await File.ReadAllTextAsync(csprojPath);
+                var csprojContent = await File.ReadAllTextAsync(csprojForRes);
                 var resourceItems = string.Join("\n", spriteFiles.Select(s =>
                 {
                     var ext = Path.GetExtension(s).ToLowerInvariant();
@@ -269,12 +346,12 @@ app.MapPost("/api/build", async (HttpRequest req) =>
                 csprojContent = csprojContent.Replace(
                     "</Project>",
                     $"  <ItemGroup>\n{resourceItems}\n  </ItemGroup>\n</Project>");
-                await File.WriteAllTextAsync(csprojPath, csprojContent);
+                await File.WriteAllTextAsync(csprojForRes, csprojContent);
                 Console.WriteLine($"[Build] Patched csproj with {spriteFiles.Count} embedded resources");
             }
             else
             {
-                Console.WriteLine($"[Build] WARNING: csproj not found at {csprojPath}");
+                Console.WriteLine($"[Build] WARNING: csproj not found at {csprojForRes}");
             }
         }
         else
