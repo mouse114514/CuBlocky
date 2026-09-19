@@ -75,7 +75,6 @@ const TOOLBOX = `
     <block type="cu_register_item">
       <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
     </block>
-    <block type="cu_sprite_ref"></block>
     <sep></sep>
     <block type="cu_register_status">
       <value name="ID"><shadow type="cu_status_ref"><field name="ID">myStatus</field></shadow></value>
@@ -599,11 +598,14 @@ const TOOLBOX = `
     </block>
   </category>
   <category name="%{BKY_CAT_UI}" colour="#00acc1">
+    <block type="cu_sprite_ref"></block>
     <block type="cu_show_control"></block>
     <block type="cu_hide_control"></block>
     <block type="cu_set_control_property">
       <value name="VALUE"><shadow type="cu_text"><field name="TEXT">Hello</field></shadow></value>
     </block>
+    <block type="cu_get_textfield_content"></block>
+    <block type="cu_is_button_pressed"></block>
   </category>
 </xml>
 `;

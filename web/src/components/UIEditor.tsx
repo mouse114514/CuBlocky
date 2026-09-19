@@ -143,6 +143,7 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
         key={ctrl.id}
         style={style}
         onMouseDown={(e) => handleControlMouseDown(e, ctrl)}
+        onClick={(e) => e.stopPropagation()}
       >
         {ctrl.type === 'toggle' && (
           <span style={{ marginRight: 4, fontSize: '0.8em' }}>○</span>
@@ -273,6 +274,18 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
                 <input type="checkbox" checked={selected.visible} onChange={(e) => updateControl(selected.id, { visible: e.target.checked })} />
                 <span>{t('ui.visible')}</span>
               </label>
+              <div className="ui-prop-row">
+                <span className="ui-align-label">{t('ui.alignH')}</span>
+                <button className="ui-align-btn" title={t('ui.alignLeft')} onClick={() => updateControl(selected.id, { x: 0 })}>⇤</button>
+                <button className="ui-align-btn" title={t('ui.alignCenterH')} onClick={() => updateControl(selected.id, { x: (1 - selected.width) / 2 })}>⇔</button>
+                <button className="ui-align-btn" title={t('ui.alignRight')} onClick={() => updateControl(selected.id, { x: 1 - selected.width })}>⇥</button>
+              </div>
+              <div className="ui-prop-row">
+                <span className="ui-align-label">{t('ui.alignV')}</span>
+                <button className="ui-align-btn" title={t('ui.alignTop')} onClick={() => updateControl(selected.id, { y: 0 })}>⇤</button>
+                <button className="ui-align-btn" title={t('ui.alignCenterV')} onClick={() => updateControl(selected.id, { y: (1 - selected.height) / 2 })}>⇕</button>
+                <button className="ui-align-btn" title={t('ui.alignBottom')} onClick={() => updateControl(selected.id, { y: 1 - selected.height })}>⇥</button>
+              </div>
               <div className="ui-prop-actions">
                 <button onClick={() => duplicateControl(selected.id)}>{t('ui.duplicate')}</button>
                 <button className="danger" onClick={() => deleteControl(selected.id)}>{t('ui.delete')}</button>

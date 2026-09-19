@@ -337,7 +337,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'ASSET', text: 'sprite.png' },
     ],
     output: 'Sprite',
-    colour: C.REGISTER,
+    colour: C.UI,
   },
 
   // Status reference value block
@@ -1562,6 +1562,24 @@ const BLOCK_JSON: any[] = [
     colour: C.UI,
     inputsInline: true,
   },
+  {
+    type: 'cu_get_textfield_content',
+    message0: '%{BKY_CU_GET_TEXTFIELD_CONTENT}',
+    args0: [
+      { type: 'field_input', name: 'CONTROL_ID', text: 'myTextField' },
+    ],
+    output: 'String',
+    colour: C.UI,
+  },
+  {
+    type: 'cu_is_button_pressed',
+    message0: '%{BKY_CU_IS_BUTTON_PRESSED}',
+    args0: [
+      { type: 'field_input', name: 'CONTROL_ID', text: 'myButton' },
+    ],
+    output: 'Boolean',
+    colour: C.UI,
+  },
 ];
 
 // ── Messages ──
@@ -1766,6 +1784,8 @@ const MSG_ZH: Record<string, string> = {
   CU_SHOW_CONTROL: '显示控件 %1',
   CU_HIDE_CONTROL: '隐藏控件 %1',
   CU_SET_CONTROL_PROPERTY: '设置控件 %1 属性 %2 为 %3',
+  CU_GET_TEXTFIELD_CONTENT: '文本框 %1 的内容',
+  CU_IS_BUTTON_PRESSED: '按钮 %1 是否被按下',
 };
 
 const MSG_EN: Record<string, string> = {
@@ -1969,6 +1989,8 @@ const MSG_EN: Record<string, string> = {
   CU_SHOW_CONTROL: 'show control %1',
   CU_HIDE_CONTROL: 'hide control %1',
   CU_SET_CONTROL_PROPERTY: 'set control %1 property %2 to %3',
+  CU_GET_TEXTFIELD_CONTENT: 'content of textfield %1',
+  CU_IS_BUTTON_PRESSED: 'is button %1 pressed',
 };
 
 const MSG_RU: Record<string, string> = {
@@ -2163,6 +2185,8 @@ const MSG_RU: Record<string, string> = {
   CU_SHOW_CONTROL: 'показать элемент %1',
   CU_HIDE_CONTROL: 'скрыть элемент %1',
   CU_SET_CONTROL_PROPERTY: 'установить элемент %1 свойство %2 значение %3',
+  CU_GET_TEXTFIELD_CONTENT: 'содержимое текстового поля %1',
+  CU_IS_BUTTON_PRESSED: 'кнопка %1 нажата',
 };
 
 export function setMessages(lang: string) {
@@ -3442,6 +3466,14 @@ csharpGenerator.forBlock['cu_set_control_property'] = (block, gen) => {
   const prop = block.getFieldValue('PROP');
   const val = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
   return `CuUI.SetProperty("${id}", "${prop}", ${val});\n`;
+};
+csharpGenerator.forBlock['cu_get_textfield_content'] = (block) => {
+  const id = block.getFieldValue('CONTROL_ID') || 'myTextField';
+  return [`CuUI.GetText("${id}")`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_is_button_pressed'] = (block) => {
+  const id = block.getFieldValue('CONTROL_ID') || 'myButton';
+  return [`CuUI.IsPressed("${id}")`, ORDER_ATOMIC];
 };
 
 // ═══ Extract structured function data from workspace ═════════════
