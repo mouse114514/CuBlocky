@@ -45,7 +45,7 @@ function CopyBlock({ children }: { children: ReactNode }) {
 }
 
 export function App() {
-  const { lang, t, toggle: toggleLang } = useI18n();
+  const { lang, t } = useI18n();
   const [inEditor, setInEditor] = useState(false);
   const [bp, setBp] = useState<Blueprint>(() => defaultBlueprint());
   const [currentProjectName, setCurrentProjectName] = useState<string | null>(null);
@@ -54,6 +54,7 @@ export function App() {
   const [building, setBuilding] = useState(false);
   const [buildResult, setBuildResult] = useState<BuildResult | null>(null);
   const [deployResult, setDeployResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [errCopied, setErrCopied] = useState(false);
   const [showSpritePicker, setShowSpritePicker] = useState(false);
   const [showAssetManager, setShowAssetManager] = useState(false);
   const [blockSearch, setBlockSearch] = useState('');
@@ -270,7 +271,15 @@ export function App() {
                 <CopyBlock>{buildResult.buildDir || ''}</CopyBlock>
               </>
             ) : (
-              <pre className="modal-err">{buildResult.message}</pre>
+              <div className="modal-path-wrap">
+                <button className={`copy-btn${errCopied ? ' copied' : ''}`} onClick={async () => {
+                  try { await navigator.clipboard.writeText(buildResult.message || ''); } catch { return; }
+                  setErrCopied(true); setTimeout(() => setErrCopied(false), 1200);
+                }} title="Copy">
+                  {errCopied ? <CheckIcon /> : <CopyIcon />}
+                </button>
+                <pre className="modal-err">{buildResult.message}</pre>
+              </div>
             )}
             {deployResult && (
               <p className={`deploy-result ${deployResult.success ? 'ok' : 'err'}`}>

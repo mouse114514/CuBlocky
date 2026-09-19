@@ -712,6 +712,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
           position: relative;
           height: 44px !important;
           line-height: 44px !important;
+          min-width: 60px !important;
         }
         .cu-cat-icon {
           position: absolute;
@@ -725,16 +726,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
           image-rendering: pixelated;
         }
         .blocklyToolboxSelected .cu-cat-icon {
-          opacity: 0;
-        }
-        .blocklyToolboxCategory .blocklyToolboxCategoryLabel {
-          font-size: 18px !important;
-          font-weight: 700;
-          line-height: 44px !important;
-          transition: opacity .15s;
-        }
-        .blocklyToolboxSelected .blocklyToolboxCategoryLabel {
-          opacity: 1 !important;
+          opacity: 1;
         }
       `;
       document.head.appendChild(style);
@@ -754,7 +746,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
             }
           }
           if (!iconSrc) return;
-          (label as HTMLElement).style.opacity = '0';
+          (label as HTMLElement).style.display = 'none';
           const img = document.createElement('img');
           img.className = 'cu-cat-icon';
           img.src = iconSrc;

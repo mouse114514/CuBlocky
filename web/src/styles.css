@@ -1,9 +1,9 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--bg4:#1c1c3a;
-  --fg:#e0e0e0;--fg2:#a0a0b0;--fg3:#707080;
+  --bg:#f5f5f5;--bg2:#ebebeb;--bg3:#e0e0e0;--bg4:#e8e8e8;
+  --fg:#1a1a1a;--fg2:#555;--fg3:#888;
   --accent:#5a6a7a;--accent2:#533483;--green:#2ecc71;--red:#e74c3c;
-  --border:#2a2a4a;--input-bg:#0d1b2a;--hover:#22224a;
+  --border:#d0d0d0;--input-bg:#fff;--hover:#e0e0e0;
 }
 html,body,#root{height:100%;font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;color:var(--fg);background:var(--bg)}
 input,textarea,select{
@@ -53,7 +53,7 @@ code{background:#0d1b2a;padding:1px 4px;border-radius:3px;font-size:12px}
   background:radial-gradient(circle,rgba(255,215,0,0.06),transparent 70%);border-radius:50%;pointer-events:none;
 }
 .toolbar button{
-  background:#222;color:#fff;border:none;border-radius:16px;padding:6px 14px;cursor:pointer;font-size:13px;
+  background:#333;color:#fff;border:none;border-radius:16px;padding:6px 14px;cursor:pointer;font-size:13px;
 }
 .toolbar button:hover{background:#333}
 .toolbar button.build-btn{background:#1a8a1a}
@@ -107,9 +107,16 @@ code{background:#0d1b2a;padding:1px 4px;border-radius:3px;font-size:12px}
 }
 .modal-actions{margin-top:16px;display:flex;justify-content:flex-end}
 .modal-actions button{
-  background:#222;color:#fff;border:none;border-radius:8px;padding:6px 16px;cursor:pointer;font-size:13px;
+  background:#333;color:#fff;border:none;border-radius:8px;padding:6px 16px;cursor:pointer;font-size:13px;
 }
 .modal-actions button:hover{background:#444}
+.lang-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.lang-option{
+  background:#f0f0f0;color:#333;border:1px solid #d0d0d0;border-radius:8px;
+  padding:10px 16px;cursor:pointer;font-size:14px;text-align:left;
+}
+.lang-option:hover{background:#e4e4e4;border-color:#bbb}
+.lang-option.active{background:#0d6efd;border-color:#0d6efd;color:#fff}
 .code-toggle{font-size:12px;padding:4px 10px}
 .code-toggle.active{background:#555;color:#fff}
 
@@ -230,7 +237,7 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 .wp-sub{font-size:14px;color:#888;margin-top:-8px;position:relative;z-index:1;animation:wp-fade-up .8s .15s cubic-bezier(.22,1,.36,1) both}
 .wp-actions{display:flex;gap:10px;position:relative;z-index:1;animation:wp-fade-up .8s .3s cubic-bezier(.22,1,.36,1) both}
 .wp-actions button{
-  background:#222;color:#fff;border:none;border-radius:16px;padding:10px 28px;font-size:13px;
+  background:#333;color:#fff;border:none;border-radius:16px;padding:10px 28px;font-size:13px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:100px;text-align:center;
   transition:transform .2s,box-shadow .2s;
 }
@@ -295,7 +302,7 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 }
 .asset-action-name{font-size:12px;color:#333;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
 .asset-action-btn{
-  background:#222;color:#fff;border:none;border-radius:12px;padding:4px 14px;font-size:12px;
+  background:#333;color:#fff;border:none;border-radius:12px;padding:4px 14px;font-size:12px;
   cursor:pointer;white-space:nowrap;transition:background .15s;
 }
 .asset-action-btn:hover{background:#444}
