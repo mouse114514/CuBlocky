@@ -1450,7 +1450,7 @@ const BLOCK_JSON: any[] = [
   // ═══ Function (indigo) ════════════════════════════════════════
   {
     type: 'cu_define_function',
-    message0: '定义函数 %1 返回 %2',
+    message0: '%{BKY_CU_DEFINE_FUNCTION}',
     args0: [
       { type: 'field_input', name: 'NAME', text: 'myFunc' },
       { type: 'field_dropdown', name: 'RETURN_TYPE', options: [['无','void'],['整数','int'],['浮点数','float'],['字符串','string'],['布尔','bool']] },
@@ -1460,7 +1460,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_get_param',
-    message0: '参数 %1',
+    message0: '%{BKY_CU_GET_PARAM}',
     args0: [
       { type: 'field_input', name: 'NAME', text: 'x' },
     ],
@@ -1469,7 +1469,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_define_function_container',
-    message0: '参数',
+    message0: '%{BKY_CU_PARAMS}',
     args0: [],
     message1: '%1',
     args1: [
@@ -1479,7 +1479,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_define_function_item',
-    message0: '参数',
+    message0: '%{BKY_CU_PARAMS}',
     args0: [],
     previousStatement: null,
     nextStatement: null,
@@ -1487,7 +1487,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_return',
-    message0: '返回 %1',
+    message0: '%{BKY_CU_RETURN}',
     args0: [
       { type: 'input_value', name: 'VALUE' },
     ],
@@ -1496,7 +1496,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_call_function',
-    message0: '调用 %1',
+    message0: '%{BKY_CU_CALL_FUNCTION}',
     args0: [
       { type: 'field_input', name: 'NAME', text: 'myFunc' },
     ],
@@ -1506,7 +1506,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_call_function_value',
-    message0: '调用 %1',
+    message0: '%{BKY_CU_CALL_FUNCTION_VALUE}',
     args0: [
       { type: 'field_input', name: 'NAME', text: 'myFunc' },
     ],
@@ -1516,7 +1516,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_call_function_container',
-    message0: '参数',
+    message0: '%{BKY_CU_PARAMS}',
     args0: [],
     message1: '%1',
     args1: [
@@ -1526,7 +1526,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_call_function_item',
-    message0: '参数',
+    message0: '%{BKY_CU_PARAMS}',
     args0: [],
     previousStatement: null,
     nextStatement: null,

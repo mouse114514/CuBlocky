@@ -217,20 +217,21 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
 
   const renderControl = (ctrl: UIControl) => {
     const isSel = ctrl.id === selectedId;
+    const isButton = ctrl.type === 'button';
     const style: React.CSSProperties = {
       position: 'absolute',
       left: `${ctrl.x * 100}%`,
       top: `${ctrl.y * 100}%`,
       width: `${ctrl.width * 100}%`,
       height: `${ctrl.height * 100}%`,
-      background: ctrl.backgroundColor,
-      border: `${ctrl.strokeWidth}px solid ${ctrl.strokeColor}`,
-      borderRadius: `${ctrl.cornerRadius}px`,
+      background: isButton ? '#000000' : ctrl.backgroundColor,
+      border: isButton ? 'none' : `${ctrl.strokeWidth}px solid ${ctrl.strokeColor}`,
+      borderRadius: isButton ? '20px' : `${ctrl.cornerRadius}px`,
       opacity: ctrl.visible ? ctrl.opacity : ctrl.opacity * 0.35,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      color: ctrl.textColor,
+      color: isButton ? '#ffffff' : ctrl.textColor,
       fontSize: `${ctrl.fontSize}px`,
       cursor: 'move',
       userSelect: 'none',
