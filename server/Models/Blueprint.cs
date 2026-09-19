@@ -294,5 +294,5 @@ public class UIControlEntry
     public float StrokeWidth { get; set; } = 1;
     public float CornerRadius { get; set; } = 4;
     public float Opacity { get; set; } = 1;
-    public bool Visible { get; set; } = false;
+    public bool Visible { get; set; } = true;
 }

@@ -23,7 +23,7 @@ function defaultProps(type: UIControl['type'], x: number, y: number, idx: number
     strokeWidth: 1,
     cornerRadius: 4,
     opacity: 1,
-    visible: false,
+    visible: true,
   };
   if (type === 'button') return { ...base, type, width: 120, height: 32, text: `Button${idx}` };
   if (type === 'textfield') return { ...base, type, width: 160, height: 26, text: '' };

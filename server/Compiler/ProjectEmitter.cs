@@ -500,6 +500,10 @@ namespace {ns}
       <HintPath>{g}\CasualtiesUnknown_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include=""UnityEngine.IMGUIModule"">
+      <HintPath>{g}\CasualtiesUnknown_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
   </ItemGroup>
 </Project>
 ";
