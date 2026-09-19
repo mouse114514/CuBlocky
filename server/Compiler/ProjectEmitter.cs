@@ -504,6 +504,10 @@ namespace {ns}
       <HintPath>{g}\CasualtiesUnknown_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include=""UnityEngine.TextRenderingModule"">
+      <HintPath>{g}\CasualtiesUnknown_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
   </ItemGroup>
 </Project>
 ";
