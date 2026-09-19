@@ -314,6 +314,16 @@ const BLOCK_JSON: any[] = [
   { type: 'cu_when_heal', message0: '%{BKY_CU_WHEN_HEAL}', colour: C.EVENT, hat: 'cap', nextStatement: null },
   { type: 'cu_when_laststand', message0: '%{BKY_CU_WHEN_LASTSTAND}', colour: C.EVENT, hat: 'cap', nextStatement: null },
   { type: 'cu_when_enter_world', message0: '%{BKY_CU_WHEN_ENTER_WORLD}', colour: C.EVENT, hat: 'cap', nextStatement: null },
+  {
+    type: 'cu_when_button_pressed',
+    message0: '%{BKY_CU_WHEN_BUTTON_PRESSED}',
+    args0: [
+      { type: 'field_input', name: 'CONTROL_ID', text: 'myButton' },
+    ],
+    colour: C.EVENT,
+    hat: 'cap',
+    nextStatement: null,
+  },
 
   // ═══ Registration (pink) ═════════════════════════════════════
   // Item registration: id (item value block), fullName, description, category
@@ -1571,15 +1581,6 @@ const BLOCK_JSON: any[] = [
     output: 'String',
     colour: C.UI,
   },
-  {
-    type: 'cu_is_button_pressed',
-    message0: '%{BKY_CU_IS_BUTTON_PRESSED}',
-    args0: [
-      { type: 'field_input', name: 'CONTROL_ID', text: 'myButton' },
-    ],
-    output: 'Boolean',
-    colour: C.UI,
-  },
 ];
 
 // ── Messages ──
@@ -1594,6 +1595,7 @@ const MSG_ZH: Record<string, string> = {
   CU_WHEN_HEAL: '当被治疗',
   CU_WHEN_LASTSTAND: '当濒死战起',
   CU_WHEN_ENTER_WORLD: '当进入世界',
+  CU_WHEN_BUTTON_PRESSED: '当按钮 %1 被按下',
   CU_REGISTER_ITEM: '注册物品 id %1 名称 %2 描述 %3 精灵图 %4',
   CU_SPRITE_REF: '精灵图 %1',
   CU_REGISTER_STATUS: '注册状态效果 id %1 名称 %2 类型 %3 描述 %4 精灵图 %5',
@@ -1785,7 +1787,6 @@ const MSG_ZH: Record<string, string> = {
   CU_HIDE_CONTROL: '隐藏控件 %1',
   CU_SET_CONTROL_PROPERTY: '设置控件 %1 属性 %2 为 %3',
   CU_GET_TEXTFIELD_CONTENT: '文本框 %1 的内容',
-  CU_IS_BUTTON_PRESSED: '按钮 %1 是否被按下',
 };
 
 const MSG_EN: Record<string, string> = {
@@ -1799,6 +1800,7 @@ const MSG_EN: Record<string, string> = {
   CU_WHEN_HEAL: 'when healed',
   CU_WHEN_LASTSTAND: 'when last stand',
   CU_WHEN_ENTER_WORLD: 'when enter world',
+  CU_WHEN_BUTTON_PRESSED: 'when button %1 pressed',
   CU_REGISTER_ITEM: 'register item id %1 name %2 desc %3 sprite %4',
   CU_SPRITE_REF: 'sprite %1',
   CU_REGISTER_STATUS: 'register status effect id %1 name %2 type %3 desc %4 sprite %5',
@@ -1990,7 +1992,6 @@ const MSG_EN: Record<string, string> = {
   CU_HIDE_CONTROL: 'hide control %1',
   CU_SET_CONTROL_PROPERTY: 'set control %1 property %2 to %3',
   CU_GET_TEXTFIELD_CONTENT: 'content of textfield %1',
-  CU_IS_BUTTON_PRESSED: 'is button %1 pressed',
 };
 
 const MSG_RU: Record<string, string> = {
@@ -2004,6 +2005,7 @@ const MSG_RU: Record<string, string> = {
   CU_WHEN_HEAL: 'при лечении',
   CU_WHEN_LASTSTAND: 'при последнем шансе',
   CU_WHEN_ENTER_WORLD: 'при входе в мир',
+  CU_WHEN_BUTTON_PRESSED: 'при нажатии кнопки %1',
   CU_REGISTER_ITEM: 'зарегистрировать предмет id %1 название %2 описание %3 спрайт %4',
   CU_SPRITE_REF: 'спрайт %1',
   CU_REGISTER_STATUS: 'зарегистрировать эффект id %1 название %2 тип %3 описание %4 спрайт %5',
@@ -2186,7 +2188,6 @@ const MSG_RU: Record<string, string> = {
   CU_HIDE_CONTROL: 'скрыть элемент %1',
   CU_SET_CONTROL_PROPERTY: 'установить элемент %1 свойство %2 значение %3',
   CU_GET_TEXTFIELD_CONTENT: 'содержимое текстового поля %1',
-  CU_IS_BUTTON_PRESSED: 'кнопка %1 нажата',
 };
 
 export function setMessages(lang: string) {
@@ -2461,7 +2462,7 @@ export function createSpriteBlock(assetName: string, ws: Blockly.WorkspaceSvg) {
 // ── C# Code Generator ──
 export const csharpGenerator = new Blockly.Generator('CSharp');
 
-const EVENT_TYPES = new Set(['cu_when_awake', 'cu_when_update', 'cu_when_hurt', 'cu_when_die', 'cu_when_pickup', 'cu_when_drop', 'cu_when_wear', 'cu_when_heal', 'cu_when_laststand', 'cu_when_enter_world']);
+const EVENT_TYPES = new Set(['cu_when_awake', 'cu_when_update', 'cu_when_hurt', 'cu_when_die', 'cu_when_pickup', 'cu_when_drop', 'cu_when_wear', 'cu_when_heal', 'cu_when_laststand', 'cu_when_enter_world', 'cu_when_button_pressed']);
 const origBlockToCode = csharpGenerator.blockToCode.bind(csharpGenerator);
 csharpGenerator.blockToCode = (block: Blockly.Block, opt_thisOnly?: boolean) => {
   if (block && EVENT_TYPES.has(block.type) && !opt_thisOnly) {
@@ -2503,6 +2504,10 @@ csharpGenerator.forBlock['cu_when_wear'] = () => '//PATCH:WearWearable\n';
 csharpGenerator.forBlock['cu_when_heal'] = () => '//EVENT:OnHeal\n';
 csharpGenerator.forBlock['cu_when_laststand'] = () => '//EVENT:OnLastStand\n';
 csharpGenerator.forBlock['cu_when_enter_world'] = () => '//PATCH:Start\n';
+csharpGenerator.forBlock['cu_when_button_pressed'] = (block) => {
+  const id = block.getFieldValue('CONTROL_ID') || 'myButton';
+  return `//EVENT:OnButtonPressed:${id}\n`;
+};
 
 // Registration
 csharpGenerator.forBlock['cu_register_item'] = (block, gen) => {
@@ -3470,10 +3475,6 @@ csharpGenerator.forBlock['cu_set_control_property'] = (block, gen) => {
 csharpGenerator.forBlock['cu_get_textfield_content'] = (block) => {
   const id = block.getFieldValue('CONTROL_ID') || 'myTextField';
   return [`CuUI.GetText("${id}")`, ORDER_ATOMIC];
-};
-csharpGenerator.forBlock['cu_is_button_pressed'] = (block) => {
-  const id = block.getFieldValue('CONTROL_ID') || 'myButton';
-  return [`CuUI.IsPressed("${id}")`, ORDER_ATOMIC];
 };
 
 // ═══ Extract structured function data from workspace ═════════════

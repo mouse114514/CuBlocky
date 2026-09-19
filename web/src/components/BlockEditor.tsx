@@ -64,6 +64,7 @@ const TOOLBOX = `
     <block type="cu_when_heal"></block>
     <block type="cu_when_laststand"></block>
     <block type="cu_when_enter_world"></block>
+    <block type="cu_when_button_pressed"></block>
     <block type="cu_define_item_use">
       <value name="ITEM"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
     </block>
@@ -605,7 +606,6 @@ const TOOLBOX = `
       <value name="VALUE"><shadow type="cu_text"><field name="TEXT">Hello</field></shadow></value>
     </block>
     <block type="cu_get_textfield_content"></block>
-    <block type="cu_is_button_pressed"></block>
   </category>
 </xml>
 `;

@@ -582,7 +582,16 @@ Copy the built DLL from `bin/Release/` into
                 if (line.StartsWith("//EVENT:"))
                 {
                     var eventName = line.Substring(8).Split(':')[0].Trim();
-                    sb.AppendLine($"            CUCoreUtils.{eventName} += Handle{eventName};");
+                    if (eventName == "OnButtonPressed")
+                    {
+                        var btnId = line.Substring(8).Split(':').Skip(1).FirstOrDefault() ?? "myButton";
+                        var safeId = btnId.Replace("\\", "\\\\").Replace("\"", "\\\"");
+                        sb.AppendLine($"            CuUI.OnButtonPressed(\"{safeId}\", HandleButtonPressed_{safeId});");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"            CUCoreUtils.{eventName} += Handle{eventName};");
+                    }
                 }
             }
         }
@@ -628,7 +637,15 @@ Copy the built DLL from `bin/Release/` into
             else if (line.StartsWith("//EVENT:"))
             {
                 var eventName = line.Substring(8).Split(':')[0].Trim();
-                currentMethod = $"CCL_{eventName}";
+                if (eventName == "OnButtonPressed")
+                {
+                    var btnId = line.Substring(8).Split(':').Skip(1).FirstOrDefault() ?? "myButton";
+                    currentMethod = $"BUTTON_{btnId}";
+                }
+                else
+                {
+                    currentMethod = $"CCL_{eventName}";
+                }
                 currentBody.Clear();
             }
             else if (line == "//ENDPATCH")
@@ -642,6 +659,23 @@ Copy the built DLL from `bin/Release/` into
                         // CCL event handler
                         var eventName = currentMethod.Substring(4);
                         var handlerName = $"Handle{eventName}";
+                        sb.AppendLine($"        private static void {handlerName}()");
+                        sb.AppendLine("        {");
+                        sb.AppendLine($"            Log.LogInfo($\"[CuBlocky] {handlerName} fired\");");
+                        foreach (var bline in bodyCode.Split('\n'))
+                        {
+                            var btrim = bline.TrimEnd('\r');
+                            if (!string.IsNullOrWhiteSpace(btrim))
+                                sb.AppendLine("            " + btrim);
+                        }
+                        sb.AppendLine("        }");
+                        sb.AppendLine();
+                    }
+                    else if (currentMethod.StartsWith("BUTTON_"))
+                    {
+                        var btnId = currentMethod.Substring(7);
+                        var safeId = btnId.Replace("\\", "\\\\").Replace("\"", "\\\"");
+                        var handlerName = $"HandleButtonPressed_{safeId}";
                         sb.AppendLine($"        private static void {handlerName}()");
                         sb.AppendLine("        {");
                         sb.AppendLine($"            Log.LogInfo($\"[CuBlocky] {handlerName} fired\");");
@@ -836,7 +870,7 @@ Copy the built DLL from `bin/Release/` into
         sb.AppendLine("        }");
         sb.AppendLine();
         sb.AppendLine("        private static Dictionary<string, Ctrl> _controls = new();");
-        sb.AppendLine("        private static Dictionary<string, bool> _pressed = new();");
+        sb.AppendLine("        private static Dictionary<string, System.Action> _buttonCallbacks = new();");
         sb.AppendLine("        private static bool _dataInit = false;");
         sb.AppendLine("        private static Dictionary<Color, Texture2D> _texCache = new();");
         sb.AppendLine("        private static Dictionary<int, Texture2D> _nineSliceCache = new();");
@@ -901,10 +935,10 @@ Copy the built DLL from `bin/Release/` into
         sb.AppendLine("            return _controls.TryGetValue(id, out var c) ? c.TextFieldText : \"\";");
         sb.AppendLine("        }");
         sb.AppendLine();
-        sb.AppendLine("        public static bool IsPressed(string id)");
+        sb.AppendLine("        public static void OnButtonPressed(string id, System.Action callback)");
         sb.AppendLine("        {");
         sb.AppendLine("            InitData();");
-        sb.AppendLine("            return _pressed.TryGetValue(id, out var p) && p;");
+        sb.AppendLine("            _buttonCallbacks[id] = callback;");
         sb.AppendLine("        }");
         sb.AppendLine();
         sb.AppendLine("        public static void Render()");
@@ -970,7 +1004,9 @@ Copy the built DLL from `bin/Release/` into
         sb.AppendLine("                _labelStyle.normal.textColor = c.TextColor;");
         sb.AppendLine();
         sb.AppendLine("                if (c.Type == \"button\")");
-        sb.AppendLine("                    _pressed[c.Id] = GUI.Button(rect, c.Text, _labelStyle);");
+        sb.AppendLine("                {");
+        sb.AppendLine("                    if (GUI.Button(rect, c.Text, _labelStyle) && _buttonCallbacks.TryGetValue(c.Id, out var cb)) cb();");
+        sb.AppendLine("                }");
         sb.AppendLine("                else if (c.Type == \"textfield\")");
         sb.AppendLine("                    c.TextFieldText = GUI.TextField(rect, c.TextFieldText, _labelStyle);");
         sb.AppendLine("                else if (c.Type == \"toggle\")");
