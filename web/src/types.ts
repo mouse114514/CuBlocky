@@ -76,6 +76,25 @@ export interface FunctionDef {
   body: string;
 }
 
+// ── UI Control ──
+export interface UIControl {
+  id: string;
+  type: 'button' | 'textfield' | 'toggle';
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  text: string;
+  fontSize: number;
+  textColor: string;
+  backgroundColor: string;
+  strokeColor: string;
+  strokeWidth: number;
+  cornerRadius: number;
+  opacity: number;
+  visible: boolean;
+}
+
 // ── Blueprint root ──
 export interface Blueprint {
   mod: ModMeta;
@@ -85,6 +104,7 @@ export interface Blueprint {
   functions?: FunctionDef[];
   eventHandlers?: string;
   eventHandlersXml?: string;
+  uiControls?: UIControl[];
 }
 
 // ── Defaults ──
@@ -102,6 +122,7 @@ export function defaultBlueprint(): Blueprint {
     recipes: [],
     assets: [],
     functions: [],
+    uiControls: [],
   };
 }
 

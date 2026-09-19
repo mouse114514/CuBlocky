@@ -146,6 +146,36 @@ const dict = {
 
   // ── Language modal ──
   'lang.title':        { zh: '选择语言', en: 'Select Language', ru: 'Выбрать язык' },
+
+  // ── UI Editor ──
+  'app.uiEditor':      { zh: '界面编辑器', en: 'UI Editor', ru: 'Редактор UI' },
+  'app.backToBlocks': { zh: '返回积木', en: 'Back to Blocks', ru: 'К блокам' },
+  'ui.palette':        { zh: '控件库', en: 'Controls', ru: 'Элементы' },
+  'ui.canvas':         { zh: '画布', en: 'Canvas', ru: 'Холст' },
+  'ui.properties':     { zh: '属性', en: 'Properties', ru: 'Свойства' },
+  'ui.button':         { zh: '按钮', en: 'Button', ru: 'Кнопка' },
+  'ui.textfield':      { zh: '文本框', en: 'Text Field', ru: 'Текстовое поле' },
+  'ui.toggle':         { zh: '开关', en: 'Toggle', ru: 'Переключатель' },
+  'ui.id':             { zh: 'ID', en: 'ID', ru: 'ID' },
+  'ui.text':           { zh: '文本', en: 'Text', ru: 'Текст' },
+  'ui.position':       { zh: '位置', en: 'Position', ru: 'Позиция' },
+  'ui.size':           { zh: '尺寸', en: 'Size', ru: 'Размер' },
+  'ui.x':              { zh: 'X', en: 'X', ru: 'X' },
+  'ui.y':              { zh: 'Y', en: 'Y', ru: 'Y' },
+  'ui.width':          { zh: '宽度', en: 'Width', ru: 'Ширина' },
+  'ui.height':         { zh: '高度', en: 'Height', ru: 'Высота' },
+  'ui.fontSize':       { zh: '字号', en: 'Font Size', ru: 'Размер шрифта' },
+  'ui.textColor':      { zh: '文字颜色', en: 'Text Color', ru: 'Цвет текста' },
+  'ui.bgColor':        { zh: '背景色', en: 'Background', ru: 'Фон' },
+  'ui.strokeColor':    { zh: '描边色', en: 'Stroke Color', ru: 'Цвет обводки' },
+  'ui.strokeWidth':    { zh: '描边宽度', en: 'Stroke Width', ru: 'Толщина обводки' },
+  'ui.cornerRadius':  { zh: '圆角', en: 'Corner Radius', ru: 'Радиус угла' },
+  'ui.opacity':        { zh: '透明度', en: 'Opacity', ru: 'Прозрачность' },
+  'ui.visible':        { zh: '可见', en: 'Visible', ru: 'Видимый' },
+  'ui.delete':         { zh: '删除控件', en: 'Delete Control', ru: 'Удалить элемент' },
+  'ui.duplicate':      { zh: '复制控件', en: 'Duplicate', ru: 'Дублировать' },
+  'ui.empty':          { zh: '从左侧拖放控件到画布', en: 'Drag controls from the left to the canvas', ru: 'Перетащите элементы слева на холст' },
+  'ui.noSelection':    { zh: '点击控件查看属性', en: 'Click a control to edit its properties', ru: 'Нажмите на элемент для редактирования' },
 } as const;
 
 type DictKey = keyof typeof dict;

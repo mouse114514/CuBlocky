@@ -3,6 +3,7 @@ import type { Blueprint } from './types';
 import { defaultBlueprint } from './types';
 import { useI18n } from './i18n';
 import { BlockEditor } from './components/BlockEditor';
+import { UIEditor } from './components/UIEditor';
 import WelcomePage from './components/WelcomePage';
 import AssetManager from './components/AssetManager';
 import { download, buildProject, saveProject, getConfig, updateConfig, deployDll, type BuildResult, type ServerConfig } from './api';
@@ -60,6 +61,7 @@ export function App() {
   const [blockSearch, setBlockSearch] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const [gamePath, setGamePath] = useState('');
+  const [view, setView] = useState<'blocks' | 'ui'>('blocks');
   const wsRef = useRef<Blockly.WorkspaceSvg | null>(null);
   const bpRef = useRef(bp);
   bpRef.current = bp;
@@ -230,27 +232,35 @@ export function App() {
             onMouseDown={(e) => e.stopPropagation()}
           />
           <button onClick={() => setShowAssetManager(true)} disabled={!currentProjectName}>{t('asset.manageTitle')}</button>
-          <button onClick={() => setShowSettings(true)}>{t('app.settings')}</button>
+          <button onClick={() => setView('ui')}>{t('app.uiEditor')}</button>
           <button className={`code-toggle ${showCode ? 'active' : ''}`} onClick={() => setShowCode(!showCode)}>
             {t('code.toggle')}
           </button>
         </header>
 
-        <BlockEditor
-          onCodeChange={(c) => {
-            setCode(c);
-            if (!restoringWsRef.current) {
-              const ws = wsRef.current;
-              const functions = ws ? extractFunctions(ws) : [];
-              setBp(prev => ({ ...prev, eventHandlers: c, functions }));
-            } else {
-              setBp(prev => ({ ...prev, eventHandlers: c }));
-            }
-          }}
-          onBlocksChange={(xml) => { setBp(prev => ({ ...prev, eventHandlersXml: xml })); }}
-          onWorkspaceReady={(ws) => { wsRef.current = ws; restoreWorkspace(bp.eventHandlersXml); }}
-          searchTerm={blockSearch}
-        />
+        {view === 'blocks' ? (
+          <BlockEditor
+            onCodeChange={(c) => {
+              setCode(c);
+              if (!restoringWsRef.current) {
+                const ws = wsRef.current;
+                const functions = ws ? extractFunctions(ws) : [];
+                setBp(prev => ({ ...prev, eventHandlers: c, functions }));
+              } else {
+                setBp(prev => ({ ...prev, eventHandlers: c }));
+              }
+            }}
+            onBlocksChange={(xml) => { setBp(prev => ({ ...prev, eventHandlersXml: xml })); }}
+            onWorkspaceReady={(ws) => { wsRef.current = ws; restoreWorkspace(bp.eventHandlersXml); }}
+            searchTerm={blockSearch}
+          />
+        ) : (
+          <UIEditor
+            controls={bp.uiControls || []}
+            onChange={(controls) => { setBp(prev => ({ ...prev, uiControls: controls })); }}
+            onBack={() => setView('blocks')}
+          />
+        )}
       </div>
 
       {showCode && (

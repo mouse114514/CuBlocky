@@ -324,3 +324,71 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 }
 .asset-card:hover .asset-del{opacity:1}
 .asset-del:hover{background:rgba(200,0,0,.8)}
+
+/* ── UI Editor ───────────────────────────────────────────────── */
+.ui-editor{display:flex;flex-direction:column;height:100vh}
+.ui-toolbar{
+  position:absolute;top:0;left:0;right:0;height:var(--toolbar-h);z-index:100;
+  background:rgba(255,255,255,0.72);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border-bottom:1px solid rgba(255,255,255,0.5);
+}
+.ui-body{
+  flex:1;display:flex;overflow:hidden;margin-top:var(--toolbar-h);
+}
+.ui-hint{font-size:11px;color:#888}
+
+/* Palette */
+.ui-palette{
+  width:140px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
+  padding:8px;display:flex;flex-direction:column;gap:4px;
+}
+.ui-palette-header{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--fg3);font-weight:600;margin-bottom:4px}
+.ui-palette-item{
+  display:flex;align-items:center;gap:8px;padding:10px 12px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:6px;
+  cursor:grab;font-size:13px;transition:border-color .15s,background .15s;user-select:none;
+}
+.ui-palette-item:hover{border-color:#00acc1;background:#e0f7fa}
+.ui-palette-item:active{cursor:grabbing;opacity:.7}
+.ui-palette-icon{font-size:16px;color:#00acc1;width:18px;text-align:center}
+
+/* Canvas */
+.ui-canvas-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.ui-canvas-header{
+  padding:6px 12px;font-size:11px;color:var(--fg3);background:var(--bg2);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.ui-canvas-scroll{
+  flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);padding:16px;
+}
+.ui-canvas{
+  width:100%;max-width:680px;min-height:300px;
+  background:#1a1a2e;border:1px solid var(--border);
+  position:relative;border-radius:4px;container-type:inline-size;
+  box-shadow:0 4px 24px rgba(0,0,0,.15);
+}
+.ui-canvas-empty{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  color:#555;font-size:13px;font-style:italic;text-align:center;
+}
+
+/* Properties panel */
+.ui-props{
+  width:220px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);
+  overflow-y:auto;display:flex;flex-direction:column;
+}
+.ui-props-header{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--fg3);font-weight:600;padding:8px 12px;border-bottom:1px solid var(--border)}
+.ui-props-empty{padding:16px;font-size:12px;color:var(--fg3);font-style:italic;text-align:center}
+.ui-props-body{padding:8px 12px;display:flex;flex-direction:column;gap:6px}
+.ui-prop{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--fg2)}
+.ui-prop>span{font-size:10px;text-transform:uppercase;letter-spacing:.03em}
+.ui-prop input{font-size:12px;padding:3px 6px}
+.ui-prop input[type=color]{height:24px;padding:2px;cursor:pointer}
+.ui-prop-row{display:flex;gap:6px}
+.ui-prop-row>.ui-prop{flex:1}
+.ui-prop-check{flex-direction:row;align-items:center;gap:6px}
+.ui-prop-check input{width:auto}
+.ui-prop-check>span{text-transform:none;letter-spacing:normal;font-size:12px}
+.ui-prop-actions{display:flex;gap:6px;margin-top:4px}
+.ui-prop-actions button{flex:1;font-size:11px;padding:4px 8px;border-radius:4px}
