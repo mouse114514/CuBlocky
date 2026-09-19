@@ -1525,7 +1525,7 @@ const BLOCK_JSON: any[] = [
   // ── UI blocks ──
   {
     type: 'cu_show_control',
-    message0: '%{BKY_CU_SHOW_CONTROL} %1',
+    message0: '%{BKY_CU_SHOW_CONTROL}',
     args0: [
       { type: 'field_input', name: 'CONTROL_ID', text: 'myButton' },
     ],
@@ -1535,7 +1535,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_hide_control',
-    message0: '%{BKY_CU_HIDE_CONTROL} %1',
+    message0: '%{BKY_CU_HIDE_CONTROL}',
     args0: [
       { type: 'field_input', name: 'CONTROL_ID', text: 'myButton' },
     ],
@@ -1545,7 +1545,7 @@ const BLOCK_JSON: any[] = [
   },
   {
     type: 'cu_set_control_property',
-    message0: '%{BKY_CU_SET_CONTROL_PROPERTY} %1 %2 %3',
+    message0: '%{BKY_CU_SET_CONTROL_PROPERTY}',
     args0: [
       { type: 'field_input', name: 'CONTROL_ID', text: 'myButton' },
       { type: 'field_dropdown', name: 'PROP', options: [
