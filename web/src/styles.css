@@ -363,7 +363,7 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
   background:var(--bg);padding:16px;
 }
 .ui-canvas{
-  width:100%;max-width:680px;min-height:300px;
+  width:100%;aspect-ratio:1920/1080;min-height:300px;
   background:#1a1a2e;border:1px solid var(--border);
   position:relative;border-radius:4px;container-type:inline-size;
   box-shadow:0 4px 24px rgba(0,0,0,.15);
