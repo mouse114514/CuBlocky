@@ -654,7 +654,7 @@ Copy the built DLL from `bin/Release/` into
                             // Body.Start fires before PlayerCamera.main is ready.
                             // Use Body.Update with a one-shot HashSet so we run once
                             // as soon as the player body is available.
-                            sb.AppendLine("        private static readonly System.Collections.Generic.HashSet<int> _patchedBodies = new();");
+                            sb.AppendLine("        private static readonly System.Collections.Generic.HashSet<int> _patchedBodies = new System.Collections.Generic.HashSet<int>();");
                             sb.AppendLine();
                             sb.AppendLine($"        [HarmonyPatch(typeof(Body), \"Update\")]");
                             sb.AppendLine("        [HarmonyPostfix]");
@@ -689,7 +689,11 @@ Copy the built DLL from `bin/Release/` into
                                     }
                                     else
                                     {
-                                        sb.AppendLine(indent + "var _go = " + trimmed.TrimEnd(';') + ";");
+                                        var code = trimmed.TrimEnd(';');
+                                        if (code.StartsWith("var _go = ") || code.StartsWith("var _go="))
+                                            sb.AppendLine(indent + code + ";");
+                                        else
+                                            sb.AppendLine(indent + "var _go = " + code + ";");
                                     }
                                     sb.AppendLine($"                Log.LogInfo($\"[CuBlocky] {patchName} InstantiateReturn => {{(_go != null ? _go.name + \" at \" + _go.transform.position.ToString() : \"NULL\")}}\");");
                                     sb.AppendLine($"                if (_go != null) {{ var _sr = _go.GetComponent<UnityEngine.SpriteRenderer>(); var _sr2 = _go.GetComponentInChildren<UnityEngine.SpriteRenderer>(); Log.LogInfo($\"[CuBlocky] {patchName} go.layer={{_go.layer}} active={{_go.activeSelf}} sr.enabled={{(_sr != null ? _sr.enabled.ToString() : \"no\")}} sr.sortLayer={{(_sr != null ? _sr.sortingLayerName : \"\")}} sr.sortOrder={{(_sr != null ? _sr.sortingOrder.ToString() : \"\")}} sr.sprite={{(_sr != null && _sr.sprite != null ? _sr.sprite.name + \" \" + _sr.sprite.rect.width + \"x\" + _sr.sprite.rect.height : \"null\")}} localScale={{_go.transform.localScale}} pos={{_go.transform.position}}\"); }}");
