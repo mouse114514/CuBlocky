@@ -938,8 +938,14 @@ Copy the built DLL from `bin/Release/` into
         sb.AppendLine("                    if (c.StrokeWidth > 0)");
         sb.AppendLine("                    {");
         sb.AppendLine("                        float t = c.StrokeWidth * sc;");
+        sb.AppendLine("                        int outerR = r + Mathf.RoundToInt(t);");
+        sb.AppendLine("                        var outerTex = GetNineSliceTex(c.CornerRadius * sc + t);");
+        sb.AppendLine("                        _bgStyle.border = new RectOffset(outerR, outerR, outerR, outerR);");
+        sb.AppendLine("                        _bgStyle.normal.background = outerTex;");
         sb.AppendLine("                        GUI.backgroundColor = c.StrokeColor;");
         sb.AppendLine("                        GUI.Box(new Rect(rect.x - t, rect.y - t, rect.width + t * 2, rect.height + t * 2), \"\", _bgStyle);");
+        sb.AppendLine("                        _bgStyle.border = new RectOffset(r, r, r, r);");
+        sb.AppendLine("                        _bgStyle.normal.background = nineTex;");
         sb.AppendLine("                    }");
         sb.AppendLine("                    GUI.backgroundColor = c.BgColor;");
         sb.AppendLine("                    GUI.Box(rect, \"\", _bgStyle);");
