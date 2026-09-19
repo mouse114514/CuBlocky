@@ -1763,8 +1763,8 @@ const MSG_ZH: Record<string, string> = {
   CU_CALL_FUNCTION_CONTAINER: '参数',
   CU_CALL_FUNCTION_ITEM: '参数',
   // UI
-  CU_SHOW_CONTROL: '显示控件',
-  CU_HIDE_CONTROL: '隐藏控件',
+  CU_SHOW_CONTROL: '显示控件 %1',
+  CU_HIDE_CONTROL: '隐藏控件 %1',
   CU_SET_CONTROL_PROPERTY: '设置控件 %1 属性 %2 为 %3',
 };
 
@@ -1966,8 +1966,8 @@ const MSG_EN: Record<string, string> = {
   CU_CALL_FUNCTION_CONTAINER: 'args',
   CU_CALL_FUNCTION_ITEM: 'arg',
   // UI
-  CU_SHOW_CONTROL: 'show control',
-  CU_HIDE_CONTROL: 'hide control',
+  CU_SHOW_CONTROL: 'show control %1',
+  CU_HIDE_CONTROL: 'hide control %1',
   CU_SET_CONTROL_PROPERTY: 'set control %1 property %2 to %3',
 };
 
@@ -2160,8 +2160,8 @@ const MSG_RU: Record<string, string> = {
   CU_CALL_FUNCTION_CONTAINER: 'аргументы',
   CU_CALL_FUNCTION_ITEM: 'аргум.',
   // UI
-  CU_SHOW_CONTROL: 'показать элемент',
-  CU_HIDE_CONTROL: 'скрыть элемент',
+  CU_SHOW_CONTROL: 'показать элемент %1',
+  CU_HIDE_CONTROL: 'скрыть элемент %1',
   CU_SET_CONTROL_PROPERTY: 'установить элемент %1 свойство %2 значение %3',
 };
 
