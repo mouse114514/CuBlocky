@@ -934,6 +934,7 @@ Copy the built DLL from `bin/Release/` into
         sb.AppendLine("                    int r = Mathf.RoundToInt(c.CornerRadius * sc);");
         sb.AppendLine("                    var nineTex = GetNineSliceTex(c.CornerRadius * sc);");
         sb.AppendLine("                    _bgStyle.border = new RectOffset(r, r, r, r);");
+        sb.AppendLine("                    _bgStyle.normal.background = nineTex;");
         sb.AppendLine("                    GUI.backgroundColor = c.BgColor;");
         sb.AppendLine("                    GUI.Box(rect, \"\", _bgStyle);");
         sb.AppendLine("                }");
