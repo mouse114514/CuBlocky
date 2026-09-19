@@ -26,7 +26,7 @@ function defaultProps(type: UIControl['type'], xPct: number, yPct: number, idx: 
     opacity: 1,
     visible: true,
   };
-  if (type === 'button') return { ...base, type, width: 0.063, height: 0.030, text: `Button${idx}` };
+  if (type === 'button') return { ...base, type, width: 0.063, height: 0.030, text: `Button${idx}`, backgroundColor: '#000000', textColor: '#ffffff', cornerRadius: 20 };
   if (type === 'textfield') return { ...base, type, width: 0.083, height: 0.024, text: '' };
   return { ...base, type, width: 0.073, height: 0.024, text: `Toggle${idx}` };
 }
@@ -217,21 +217,20 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
 
   const renderControl = (ctrl: UIControl) => {
     const isSel = ctrl.id === selectedId;
-    const isButton = ctrl.type === 'button';
     const style: React.CSSProperties = {
       position: 'absolute',
       left: `${ctrl.x * 100}%`,
       top: `${ctrl.y * 100}%`,
       width: `${ctrl.width * 100}%`,
       height: `${ctrl.height * 100}%`,
-      background: isButton ? '#000000' : ctrl.backgroundColor,
-      border: isButton ? 'none' : `${ctrl.strokeWidth}px solid ${ctrl.strokeColor}`,
-      borderRadius: isButton ? '20px' : `${ctrl.cornerRadius}px`,
+      background: ctrl.backgroundColor,
+      border: `${ctrl.strokeWidth}px solid ${ctrl.strokeColor}`,
+      borderRadius: `${ctrl.cornerRadius}px`,
       opacity: ctrl.visible ? ctrl.opacity : ctrl.opacity * 0.35,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      color: isButton ? '#ffffff' : ctrl.textColor,
+      color: ctrl.textColor,
       fontSize: `${ctrl.fontSize}px`,
       cursor: 'move',
       userSelect: 'none',
