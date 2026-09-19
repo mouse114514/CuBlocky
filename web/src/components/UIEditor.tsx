@@ -2,8 +2,8 @@ import { useState, useRef, useCallback, type DragEvent, type MouseEvent } from '
 import type { UIControl } from '../types';
 import { useI18n } from '../i18n';
 
-const CANVAS_W = 960;
-const CANVAS_H = 540;
+const REF_W = 1920;
+const REF_H = 1080;
 
 const PALETTE: { type: UIControl['type']; icon: string; key: string }[] = [
   { type: 'button', icon: '▣', key: 'ui.button' },
@@ -11,11 +11,11 @@ const PALETTE: { type: UIControl['type']; icon: string; key: string }[] = [
   { type: 'toggle', icon: '◐', key: 'ui.toggle' },
 ];
 
-function defaultProps(type: UIControl['type'], x: number, y: number, idx: number): UIControl {
+function defaultProps(type: UIControl['type'], xPct: number, yPct: number, idx: number): UIControl {
   const base = {
     id: `${type}${idx}`,
-    x: Math.max(0, Math.round(x) - 50),
-    y: Math.max(0, Math.round(y) - 15),
+    x: Math.max(0, xPct - 0.03),
+    y: Math.max(0, yPct - 0.015),
     fontSize: 14,
     textColor: '#FFFFFF',
     backgroundColor: '#2a2a3e',
@@ -25,9 +25,9 @@ function defaultProps(type: UIControl['type'], x: number, y: number, idx: number
     opacity: 1,
     visible: true,
   };
-  if (type === 'button') return { ...base, type, width: 120, height: 32, text: `Button${idx}` };
-  if (type === 'textfield') return { ...base, type, width: 160, height: 26, text: '' };
-  return { ...base, type, width: 140, height: 26, text: `Toggle${idx}` };
+  if (type === 'button') return { ...base, type, width: 0.063, height: 0.030, text: `Button${idx}` };
+  if (type === 'textfield') return { ...base, type, width: 0.083, height: 0.024, text: '' };
+  return { ...base, type, width: 0.073, height: 0.024, text: `Toggle${idx}` };
 }
 
 interface Props {
@@ -59,7 +59,7 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
     let idx = 1;
     let newId = `${orig.type}${idx}`;
     while (controls.some(c => c.id === newId)) { idx++; newId = `${orig.type}${idx}`; }
-    const copy: UIControl = { ...orig, id: newId, x: orig.x + 20, y: orig.y + 20 };
+    const copy: UIControl = { ...orig, id: newId, x: Math.min(1, orig.x + 0.02), y: Math.min(1, orig.y + 0.02) };
     onChange([...controls, copy]);
     setSelectedId(newId);
   }, [controls, onChange]);
@@ -69,14 +69,12 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
     e.dataTransfer.effectAllowed = 'copy';
   };
 
-  const getCanvasPos = (e: DragEvent | MouseEvent): { x: number; y: number } => {
+  const getCanvasPct = (e: DragEvent | MouseEvent): { x: number; y: number } => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return { x: 0, y: 0 };
-    const scaleX = CANVAS_W / rect.width;
-    const scaleY = CANVAS_H / rect.height;
     return {
-      x: ((e as any).clientX - rect.left) * scaleX,
-      y: ((e as any).clientY - rect.top) * scaleY,
+      x: ((e as any).clientX - rect.left) / rect.width,
+      y: ((e as any).clientY - rect.top) / rect.height,
     };
   };
 
@@ -84,7 +82,7 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
     e.preventDefault();
     const type = e.dataTransfer.getData('text/cublocky-ui-palette') as UIControl['type'];
     if (!type) return;
-    const pos = getCanvasPos(e);
+    const pos = getCanvasPct(e);
     let idx = 1;
     while (controls.some(c => c.id === `${type}${idx}`)) idx++;
     const ctrl = defaultProps(type, pos.x, pos.y, idx);
@@ -95,16 +93,16 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
   const handleControlMouseDown = (e: MouseEvent, ctrl: UIControl) => {
     e.stopPropagation();
     setSelectedId(ctrl.id);
-    const pos = getCanvasPos(e);
+    const pos = getCanvasPct(e);
     dragState.current = { id: ctrl.id, offsetX: pos.x - ctrl.x, offsetY: pos.y - ctrl.y };
   };
 
   const handleCanvasMouseMove = (e: MouseEvent) => {
     if (!dragState.current) return;
     const { id, offsetX, offsetY } = dragState.current;
-    const pos = getCanvasPos(e);
-    const x = Math.max(0, Math.min(CANVAS_W - 10, Math.round(pos.x - offsetX)));
-    const y = Math.max(0, Math.min(CANVAS_H - 10, Math.round(pos.y - offsetY)));
+    const pos = getCanvasPct(e);
+    const x = Math.max(0, Math.min(1, pos.x - offsetX));
+    const y = Math.max(0, Math.min(1, pos.y - offsetY));
     onChange(controls.map(c => (c.id === id ? { ...c, x, y } : c)));
   };
 
@@ -120,10 +118,10 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
     const isSel = ctrl.id === selectedId;
     const style: React.CSSProperties = {
       position: 'absolute',
-      left: `${(ctrl.x / CANVAS_W) * 100}%`,
-      top: `${(ctrl.y / CANVAS_H) * 100}%`,
-      width: `${(ctrl.width / CANVAS_W) * 100}%`,
-      height: `${(ctrl.height / CANVAS_H) * 100}%`,
+      left: `${ctrl.x * 100}%`,
+      top: `${ctrl.y * 100}%`,
+      width: `${ctrl.width * 100}%`,
+      height: `${ctrl.height * 100}%`,
       background: ctrl.backgroundColor,
       border: `${ctrl.strokeWidth}px solid ${ctrl.strokeColor}`,
       borderRadius: `${ctrl.cornerRadius}px`,
@@ -132,7 +130,7 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
       alignItems: 'center',
       justifyContent: 'center',
       color: ctrl.textColor,
-      fontSize: `${(ctrl.fontSize / CANVAS_W) * 100}cqw`,
+      fontSize: `${ctrl.fontSize}px`,
       cursor: 'move',
       userSelect: 'none',
       outline: isSel ? '2px dashed #00acc1' : 'none',
@@ -181,12 +179,12 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
 
         {/* Canvas */}
         <div className="ui-canvas-wrap">
-          <div className="ui-canvas-header">{t('ui.canvas')} ({CANVAS_W}×{CANVAS_H})</div>
+          <div className="ui-canvas-header">{t('ui.canvas')} ({REF_W}×{REF_H} ref)</div>
           <div className="ui-canvas-scroll">
             <div
               ref={canvasRef}
               className="ui-canvas"
-              style={{ aspectRatio: `${CANVAS_W} / ${CANVAS_H}` }}
+              style={{ aspectRatio: `${REF_W} / ${REF_H}` }}
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleCanvasDrop}
               onMouseMove={handleCanvasMouseMove}
@@ -219,22 +217,22 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
               </label>
               <div className="ui-prop-row">
                 <label className="ui-prop">
-                  <span>{t('ui.x')}</span>
-                  <input type="number" value={selected.x} onChange={(e) => updateControl(selected.id, { x: +e.target.value })} />
+                  <span>{t('ui.x')} (px)</span>
+                  <input type="number" value={Math.round(selected.x * REF_W)} onChange={(e) => updateControl(selected.id, { x: +e.target.value / REF_W })} />
                 </label>
                 <label className="ui-prop">
-                  <span>{t('ui.y')}</span>
-                  <input type="number" value={selected.y} onChange={(e) => updateControl(selected.id, { y: +e.target.value })} />
+                  <span>{t('ui.y')} (px)</span>
+                  <input type="number" value={Math.round(selected.y * REF_H)} onChange={(e) => updateControl(selected.id, { y: +e.target.value / REF_H })} />
                 </label>
               </div>
               <div className="ui-prop-row">
                 <label className="ui-prop">
-                  <span>{t('ui.width')}</span>
-                  <input type="number" value={selected.width} onChange={(e) => updateControl(selected.id, { width: +e.target.value })} />
+                  <span>{t('ui.width')} (px)</span>
+                  <input type="number" value={Math.round(selected.width * REF_W)} onChange={(e) => updateControl(selected.id, { width: +e.target.value / REF_W })} />
                 </label>
                 <label className="ui-prop">
-                  <span>{t('ui.height')}</span>
-                  <input type="number" value={selected.height} onChange={(e) => updateControl(selected.id, { height: +e.target.value })} />
+                  <span>{t('ui.height')} (px)</span>
+                  <input type="number" value={Math.round(selected.height * REF_H)} onChange={(e) => updateControl(selected.id, { height: +e.target.value / REF_H })} />
                 </label>
               </div>
               <label className="ui-prop">
