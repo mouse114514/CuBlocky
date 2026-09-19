@@ -14,6 +14,7 @@ public class Blueprint
     public string EventHandlers { get; set; } = "";
     public string EventHandlersXml { get; set; } = "";
     public List<FunctionDef> Functions { get; set; } = new();
+    public List<UIControlEntry> UiControls { get; set; } = new();
     public string? ProjectName { get; set; }
 }
 
@@ -274,4 +275,24 @@ public class ParamDef
 {
     public string Name { get; set; } = "p";
     public string Type { get; set; } = "var";
+}
+
+// ── UI Controls (IMGUI designer) ──────────────────────────────────
+public class UIControlEntry
+{
+    public string Id { get; set; } = "control";
+    public string Type { get; set; } = "button"; // button | textfield | toggle
+    public float X { get; set; } = 0;
+    public float Y { get; set; } = 0;
+    public float Width { get; set; } = 100;
+    public float Height { get; set; } = 30;
+    public string Text { get; set; } = "";
+    public int FontSize { get; set; } = 14;
+    public string TextColor { get; set; } = "#FFFFFF";
+    public string BackgroundColor { get; set; } = "#2a2a3e";
+    public string StrokeColor { get; set; } = "#555577";
+    public float StrokeWidth { get; set; } = 1;
+    public float CornerRadius { get; set; } = 4;
+    public float Opacity { get; set; } = 1;
+    public bool Visible { get; set; } = false;
 }

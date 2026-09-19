@@ -23,7 +23,7 @@ function defaultProps(type: UIControl['type'], x: number, y: number, idx: number
     strokeWidth: 1,
     cornerRadius: 4,
     opacity: 1,
-    visible: true,
+    visible: false,
   };
   if (type === 'button') return { ...base, type, width: 120, height: 32, text: `Button${idx}` };
   if (type === 'textfield') return { ...base, type, width: 160, height: 26, text: '' };
@@ -127,8 +127,8 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
       background: ctrl.backgroundColor,
       border: `${ctrl.strokeWidth}px solid ${ctrl.strokeColor}`,
       borderRadius: `${ctrl.cornerRadius}px`,
-      opacity: ctrl.opacity,
-      display: ctrl.visible ? 'flex' : 'none',
+      opacity: ctrl.visible ? ctrl.opacity : ctrl.opacity * 0.35,
+      display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       color: ctrl.textColor,
