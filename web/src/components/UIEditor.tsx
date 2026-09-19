@@ -143,18 +143,21 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
       const targets = buildSnapTargets(controls, mode.id);
       const rawX = pos.x - mode.offsetX;
       const rawY = pos.y - mode.offsetY;
-      const x = Math.max(0, Math.min(1, rawX));
-      const y = Math.max(0, Math.min(1, rawY));
+      const ctrl = controls.find(c => c.id === mode.id);
+      const cw = ctrl?.width ?? 0;
+      const ch = ctrl?.height ?? 0;
+      const centerX = Math.max(0, Math.min(1, rawX)) + cw / 2;
+      const centerY = Math.max(0, Math.min(1, rawY)) + ch / 2;
 
-      const snapX = snapValue(x, targets.xs);
-      const snapY = snapValue(y, targets.ys);
-      const finalX = Math.max(0, Math.min(1, snapX.snapped));
-      const finalY = Math.max(0, Math.min(1, snapY.snapped));
+      const snapCX = snapValue(centerX, targets.xs);
+      const snapCY = snapValue(centerY, targets.ys);
+      const finalX = Math.max(0, Math.min(1 - cw, (snapCX.snapped - cw / 2)));
+      const finalY = Math.max(0, Math.min(1 - ch, (snapCY.snapped - ch / 2)));
 
       const guidesV: number[] = [];
       const guidesH: number[] = [];
-      if (snapX.guide !== null) guidesV.push(snapX.guide);
-      if (snapY.guide !== null) guidesH.push(snapY.guide);
+      if (snapCX.guide !== null) guidesV.push(snapCX.guide);
+      if (snapCY.guide !== null) guidesH.push(snapCY.guide);
       setSnapGuides({ vertical: guidesV, horizontal: guidesH });
 
       onChange(controls.map(c => (c.id === mode.id ? { ...c, x: finalX, y: finalY } : c)));
