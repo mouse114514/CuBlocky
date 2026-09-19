@@ -45,6 +45,7 @@ const CAT_ICONS: Record<string, string> = {
   CAT_FUNC: `/media/cat-icons/function.png?v=${_t}`,
   CAT_BUILDING: `/media/cat-icons/building.png?v=${_t}`,
   CAT_TILE: `/media/cat-icons/tile.png?v=${_t}`,
+  CAT_UI: '',
   CAT_LOCALE: '',
 };
 
@@ -597,6 +598,13 @@ const TOOLBOX = `
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
     </block>
   </category>
+  <category name="%{BKY_CAT_UI}" colour="#00acc1">
+    <block type="cu_show_control"></block>
+    <block type="cu_hide_control"></block>
+    <block type="cu_set_control_property">
+      <value name="VALUE"><shadow type="cu_text"><field name="TEXT">Hello</field></shadow></value>
+    </block>
+  </category>
 </xml>
 `;
 
@@ -604,13 +612,13 @@ const CAT_MSG_ZH: Record<string, string> = {
   CAT_EVENT: '事件', CAT_REGISTER: '注册', CAT_BODY: '身体', CAT_ITEM: '物品',
   CAT_SOUND: '音效', CAT_WORLD: '世界', CAT_FLOW: '流程', CAT_VALUE: '取值',
   CAT_BOOLEAN: '布尔', CAT_VAR: '变量', CAT_FUNC: '函数',
-  CAT_BUILDING: '建筑', CAT_TILE: '地块', CAT_LOCALE: '本地化',
+  CAT_BUILDING: '建筑', CAT_TILE: '地块', CAT_UI: '界面', CAT_LOCALE: '本地化',
 };
 const CAT_MSG_EN: Record<string, string> = {
   CAT_EVENT: 'Events', CAT_REGISTER: 'Register', CAT_BODY: 'Body', CAT_ITEM: 'Item',
   CAT_SOUND: 'Sound', CAT_WORLD: 'World', CAT_FLOW: 'Flow', CAT_VALUE: 'Value',
   CAT_BOOLEAN: 'Boolean', CAT_VAR: 'Variable', CAT_FUNC: 'Function',
-  CAT_BUILDING: 'Building', CAT_TILE: 'Tile', CAT_LOCALE: 'Locale',
+  CAT_BUILDING: 'Building', CAT_TILE: 'Tile', CAT_UI: 'UI', CAT_LOCALE: 'Locale',
 };
 
 export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, searchTerm }: Props) {

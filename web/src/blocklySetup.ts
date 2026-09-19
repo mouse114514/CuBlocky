@@ -183,6 +183,7 @@ const C = {
   BUILDING: '#00897b',
   TILE:     '#8d6e63',
   LOCALE:   '#5c6bc0',
+  UI:       '#00acc1',
 };
 
 type DdOption = [string, string, string, string]; // [zhLabel, enLabel, ruLabel, value]
@@ -1521,6 +1522,46 @@ const BLOCK_JSON: any[] = [
     nextStatement: null,
     colour: '#5c6bc0',
   },
+  // ── UI blocks ──
+  {
+    type: 'cu_show_control',
+    message0: '%{BKY_CU_SHOW_CONTROL} %1',
+    args0: [
+      { type: 'field_input', name: 'CONTROL_ID', text: 'myButton' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.UI,
+  },
+  {
+    type: 'cu_hide_control',
+    message0: '%{BKY_CU_HIDE_CONTROL} %1',
+    args0: [
+      { type: 'field_input', name: 'CONTROL_ID', text: 'myButton' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.UI,
+  },
+  {
+    type: 'cu_set_control_property',
+    message0: '%{BKY_CU_SET_CONTROL_PROPERTY} %1 %2 %3',
+    args0: [
+      { type: 'field_input', name: 'CONTROL_ID', text: 'myButton' },
+      { type: 'field_dropdown', name: 'PROP', options: [
+        ['text', 'text'], ['visible', 'visible'], ['x', 'x'], ['y', 'y'],
+        ['width', 'width'], ['height', 'height'], ['fontSize', 'fontSize'],
+        ['textColor', 'textColor'], ['backgroundColor', 'backgroundColor'],
+        ['strokeColor', 'strokeColor'], ['strokeWidth', 'strokeWidth'],
+        ['cornerRadius', 'cornerRadius'], ['opacity', 'opacity'],
+      ]},
+      { type: 'input_value', name: 'VALUE' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.UI,
+    inputsInline: true,
+  },
 ];
 
 // ── Messages ──
@@ -1721,6 +1762,10 @@ const MSG_ZH: Record<string, string> = {
   CU_CALL_FUNCTION_VALUE: '调用 %1',
   CU_CALL_FUNCTION_CONTAINER: '参数',
   CU_CALL_FUNCTION_ITEM: '参数',
+  // UI
+  CU_SHOW_CONTROL: '显示控件',
+  CU_HIDE_CONTROL: '隐藏控件',
+  CU_SET_CONTROL_PROPERTY: '设置控件 %1 属性 %2 为 %3',
 };
 
 const MSG_EN: Record<string, string> = {
@@ -1920,6 +1965,10 @@ const MSG_EN: Record<string, string> = {
   CU_CALL_FUNCTION_VALUE: 'call %1',
   CU_CALL_FUNCTION_CONTAINER: 'args',
   CU_CALL_FUNCTION_ITEM: 'arg',
+  // UI
+  CU_SHOW_CONTROL: 'show control',
+  CU_HIDE_CONTROL: 'hide control',
+  CU_SET_CONTROL_PROPERTY: 'set control %1 property %2 to %3',
 };
 
 const MSG_RU: Record<string, string> = {
@@ -2110,6 +2159,10 @@ const MSG_RU: Record<string, string> = {
   CU_CALL_FUNCTION_VALUE: 'вызов %1',
   CU_CALL_FUNCTION_CONTAINER: 'аргументы',
   CU_CALL_FUNCTION_ITEM: 'аргум.',
+  // UI
+  CU_SHOW_CONTROL: 'показать элемент',
+  CU_HIDE_CONTROL: 'скрыть элемент',
+  CU_SET_CONTROL_PROPERTY: 'установить элемент %1 свойство %2 значение %3',
 };
 
 export function setMessages(lang: string) {
@@ -3373,6 +3426,22 @@ csharpGenerator.forBlock['cu_call_function_value'] = (block, gen) => {
     i++;
   }
   return [`EventHandlers.${name}(${args.join(', ')})`, ORDER_ATOMIC];
+};
+
+// ═══ UI block generators ════════════════════════════════════════
+csharpGenerator.forBlock['cu_show_control'] = (block) => {
+  const id = block.getFieldValue('CONTROL_ID') || 'myControl';
+  return `CuUI.Show("${id}");\n`;
+};
+csharpGenerator.forBlock['cu_hide_control'] = (block) => {
+  const id = block.getFieldValue('CONTROL_ID') || 'myControl';
+  return `CuUI.Hide("${id}");\n`;
+};
+csharpGenerator.forBlock['cu_set_control_property'] = (block, gen) => {
+  const id = block.getFieldValue('CONTROL_ID') || 'myControl';
+  const prop = block.getFieldValue('PROP');
+  const val = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  return `CuUI.SetProperty("${id}", "${prop}", ${val});\n`;
 };
 
 // ═══ Extract structured function data from workspace ═════════════
