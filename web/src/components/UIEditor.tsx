@@ -93,41 +93,25 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
     setSelectedId(newId);
   }, [controls, onChange]);
 
-  const handlePaletteDragStart = (e: DragEvent, type: UIControl['type']) => {
-    e.dataTransfer.setData('text/cublocky-ui-palette', type);
-    e.dataTransfer.effectAllowed = 'copy';
+  const handlePaletteMouseDown = (e: MouseEvent, type: UIControl['type']) => {
+    e.preventDefault();
+    let idx = 1;
+    while (controls.some(c => c.id === `${type}${idx}`)) idx++;
+    const defaults = defaultProps(type, 0, 0, idx);
+    const pos = getCanvasPct(e);
+    const x = Math.max(0, Math.min(1 - defaults.width, pos.x - defaults.width / 2));
+    const y = Math.max(0, Math.min(1 - defaults.height, pos.y - defaults.height / 2));
+    const ctrl = { ...defaults, x, y };
+    onChange([...controls, ctrl]);
+    setSelectedId(ctrl.id);
+    const offset = { x: defaults.width / 2, y: defaults.height / 2 };
+    dragRef.current = { type: 'move', id: ctrl.id, offsetX: offset.x, offsetY: offset.y };
   };
 
   const getCanvasPct = (e: DragEvent | MouseEvent): { x: number; y: number } => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return { x: 0, y: 0 };
     return { x: (e.clientX - rect.left) / rect.width, y: (e.clientY - rect.top) / rect.height };
-  };
-
-  const handleCanvasDrop = (e: DragEvent) => {
-    e.preventDefault();
-    const type = e.dataTransfer.getData('text/cublocky-ui-palette') as UIControl['type'];
-    if (!type) return;
-    const pos = getCanvasPct(e);
-    const targets = buildSnapTargets(controls, '__new__');
-    const snapX = snapValue(Math.max(0, Math.min(1, pos.x)), targets.xs);
-    const snapY = snapValue(Math.max(0, Math.min(1, pos.y)), targets.ys);
-    const dropX = Math.max(0, Math.min(1, snapX.snapped));
-    const dropY = Math.max(0, Math.min(1, snapY.snapped));
-    const defaults = defaultProps(type, 0, 0, 1);
-    const finalX = Math.max(0, Math.min(1 - defaults.width, dropX - defaults.width / 2));
-    const finalY = Math.max(0, Math.min(1 - defaults.height, dropY - defaults.height / 2));
-    let idx = 1;
-    while (controls.some(c => c.id === `${type}${idx}`)) idx++;
-    const ctrl = { ...defaults, id: `${type}${idx}`, x: finalX, y: finalY };
-    const guidesV: number[] = [];
-    const guidesH: number[] = [];
-    if (snapX.guide !== null) guidesV.push(snapX.guide);
-    if (snapY.guide !== null) guidesH.push(snapY.guide);
-    setSnapGuides({ vertical: guidesV, horizontal: guidesH });
-    setTimeout(() => setSnapGuides({ vertical: [], horizontal: [] }), 800);
-    onChange([...controls, ctrl]);
-    setSelectedId(ctrl.id);
   };
 
   const handleControlMouseDown = (e: MouseEvent, ctrl: UIControl) => {
@@ -304,8 +288,7 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
             <div
               key={p.type}
               className="ui-palette-item"
-              draggable
-              onDragStart={(e) => handlePaletteDragStart(e, p.type)}
+              onMouseDown={(e) => handlePaletteMouseDown(e, p.type)}
             >
               <span className="ui-palette-icon">{p.icon}</span>
               <span>{t(p.key)}</span>
@@ -321,8 +304,6 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
               ref={canvasRef}
               className="ui-canvas"
               style={{ aspectRatio: `${REF_W} / ${REF_H}` }}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handleCanvasDrop}
               onMouseMove={handleCanvasMouseMove}
               onMouseUp={handleCanvasMouseUp}
               onMouseLeave={handleCanvasMouseUp}
