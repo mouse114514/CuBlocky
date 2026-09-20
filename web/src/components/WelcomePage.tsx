@@ -5,60 +5,60 @@ import { useI18n, LANG_LABELS, type Lang } from '../i18n';
 import GradientBg from './GradientBg';
 import { getConfig, updateConfig, type ServerConfig } from '../api';
 
-const SPLASH_TEXTS = [
-  'Also try Terraria!',
-  '100% pure C#!',
-  'Now with more blocks!',
-  'Roguelike!',
-  'Spelunky vibes!',
-  'Procedurally generated!',
-  'Contains no actual casualties!',
-  'Made with BepInEx!',
-  'Harmony patches go brrr!',
-  'Blockly is fun!',
-  'Unity when?',
-  'Open source!',
-  'Bug-free guarantee!*',
-  '*Offer not valid',
-  'Touch grass!',
-  'Hello world!',
-  'It compiles!',
-  'Ship it!',
-  'It\'s not a bug, it\'s a feature!',
-  'Have you tried turning it off and on again?',
-  'Works on my machine!',
-  'The cake is a lie!',
-  'This text is yellow!',
-  'Wow!',
-  'Such splash!',
-  'Much random!',
-  'Very Minecraft!',
-  'So procedural!',
-  'Amazing!',
-  'Incredible!',
-  'Technically correct is the best kind of correct!',
-  '404: Splash text not found',
-  'Loading...',
-  'Please wait...',
-  'Error: Success!',
-  'Do not touch the forbidden code!',
-  'Ctrl+C, Ctrl+V',
-  'git commit -m "fixed everything"',
-  'npm install coffee',
-  'Stack overflow: The real MVP',
-  'The code is the documentation',
-  'TODO: Write better TODOs',
-  'It works, don\'t touch it!',
-  'Magic numbers: Engaged!',
-  'Refactoring tomorrow...',
-  'This is fine 🔥',
-  'Zero bugs found (that we know of)',
-  'Ctrl+Z is my best friend',
-  'Code like nobody is watching!',
-  'One more commit before bed...',
+const SPLASH_TEXTS: [string, string, string][] = [
+  ['Also try Terraria!', '也是泰拉瑞亚!', 'Также попробуйте Terraria!'],
+  ['100% pure C#!', '100% 纯 C#!', '100% чистый C#!'],
+  ['Now with more blocks!', '更多积木了!', 'Теперь с ещё блоками!'],
+  ['Roguelike!', 'Roguelike!', 'Рогалик!'],
+  ['Spelunky vibes!', '洞穴探险既视感!', 'Настроение Спеланки!'],
+  ['Procedurally generated!', '程序化生成!', 'Процедурная генерация!'],
+  ['Contains no actual casualties!', '不含任何真实伤亡!', 'Без реальных жертв!'],
+  ['Made with BepInEx!', '用 BepInEx 做的!', 'Сделано в BepInEx!'],
+  ['Harmony patches go brrr!', 'Harmony 补丁冲冲冲!', 'Harmony патчи летят!'],
+  ['Blockly is fun!', 'Blockly 好玩!', 'Blockly — это весело!'],
+  ['Unity when?', 'Unity 什么时候?', 'Unity когда?'],
+  ['Open source!', '开源!', 'Открытый код!'],
+  ['Bug-free guarantee!*', '无 bug 保证!*', 'Гарантия без багов!*'],
+  ['*Offer not valid', '*此保证无效', '*Предложение не действительно'],
+  ['Touch grass!', '出去摸摸草!', 'Потрогай траву!'],
+  ['Hello world!', 'Hello world!', 'Привет мир!'],
+  ['It compiles!', '编译通过了!', 'Компилируется!'],
+  ['Ship it!', '直接发!', 'Отправляй!'],
+  ['It\'s not a bug, it\'s a feature!', '这不是 bug，是功能!', 'Это не баг, это фича!'],
+  ['Have you tried turning it off and on again?', '试过关机重启吗?', 'Вы пробовали выключить и включить?'],
+  ['Works on my machine!', '我机器上能跑!', 'На моей машине работает!'],
+  ['The cake is a lie!', '蛋糕是骗局!', 'Торт — ложь!'],
+  ['This text is yellow!', '这段文字是黄色的!', 'Этот текст жёлтый!'],
+  ['Wow!', '哇!', 'Вау!'],
+  ['Such splash!', '好闪屏!', 'Какая вспышка!'],
+  ['Much random!', '好随机!', 'Очень случайно!'],
+  ['Very Minecraft!', '好 MC!', 'Очень Minecraft!'],
+  ['So procedural!', '好程序化!', 'Очень процедурно!'],
+  ['Amazing!', '太棒了!', 'Невероятно!'],
+  ['Incredible!', '难以置信!', 'Неправдоподобно!'],
+  ['Technically correct is the best kind of correct!', '技术上正确就是最好的正确!', 'Технически верно — лучшая верность!'],
+  ['404: Splash text not found', '404: 标语没找到', '404: Текст вспышки не найден'],
+  ['Loading...', '加载中...', 'Загрузка...'],
+  ['Please wait...', '请稍候...', 'Подождите...'],
+  ['Error: Success!', '错误: 成功!', 'Ошибка: Успех!'],
+  ['Do not touch the forbidden code!', '别碰禁止的代码!', 'Не трогай запретный код!'],
+  ['Ctrl+C, Ctrl+V', 'Ctrl+C, Ctrl+V', 'Ctrl+C, Ctrl+V'],
+  ['git commit -m "fixed everything"', 'git commit -m "修好了"', 'git commit -m "всё исправлено"'],
+  ['npm install coffee', 'npm install coffee', 'npm install кофе'],
+  ['Stack overflow: The real MVP', 'StackOverflow: 真正的 MVP', 'StackOverflow: Настоящий MVP'],
+  ['The code is the documentation', '代码即文档', 'Код — это документация'],
+  ['TODO: Write better TODOs', 'TODO: 写更好的 TODO', 'TODO: Написать лучшие TODO'],
+  ['It works, don\'t touch it!', '能跑就别动!', 'Работает — не трогай!'],
+  ['Magic numbers: Engaged!', '魔法数字: 启动!', 'Магические числа: Активированы!'],
+  ['Refactoring tomorrow...', '明天重构...', 'Рефакторинг завтра...'],
+  ['This is fine 🔥', '这很合理 🔥', 'Всё нормально 🔥'],
+  ['Zero bugs found (that we know of)', '零 bug（我们知道的）', 'Ноль багов (известных нам)'],
+  ['Ctrl+Z is my best friend', 'Ctrl+Z 是我最好的朋友', 'Ctrl+Z — мой лучший друг'],
+  ['Code like nobody is watching!', '像没人看着一样写代码!', 'Кодь так, будто никто не смотрит!'],
+  ['One more commit before bed...', '睡前再提交一次...', 'Ещё один коммит перед сном...'],
 ];
 
-function pickSplash(): string {
+function pickSplash(lang: Lang): [string, string, string] {
   return SPLASH_TEXTS[Math.floor(Math.random() * SPLASH_TEXTS.length)];
 }
 
@@ -87,16 +87,26 @@ export default function WelcomePage({ onOpenProject }: Props) {
   const [gamePath, setGamePath] = useState('');
   const [showLang, setShowLang] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [splashText, setSplashText] = useState(() => pickSplash());
+  const [splashText, setSplashText] = useState(() => {
+    const entry = pickSplash(lang);
+    const idx = lang === 'zh' ? 0 : lang === 'ru' ? 2 : 1;
+    return entry[idx];
+  });
   const [showSplash, setShowSplash] = useState(() => {
     return localStorage.getItem('cublocky-splash') !== 'off';
   });
+
+  const refreshSplash = () => {
+    const entry = pickSplash(lang);
+    const idx = lang === 'zh' ? 0 : lang === 'ru' ? 2 : 1;
+    setSplashText(entry[idx]);
+  };
 
   const toggleSplash = () => {
     const next = !showSplash;
     setShowSplash(next);
     localStorage.setItem('cublocky-splash', next ? 'on' : 'off');
-    if (next) setSplashText(pickSplash());
+    if (next) refreshSplash();
   };
 
   const openSettings = () => {
@@ -192,13 +202,15 @@ export default function WelcomePage({ onOpenProject }: Props) {
 
       <div className="wp-body">
         <GradientBg />
-        <h1 className="wp-title">CuBlocky</h1>
+        <div className="wp-title-row">
+          <h1 className="wp-title">CuBlocky</h1>
+          {showSplash && (
+            <span className="wp-splash" onClick={refreshSplash}>
+              {splashText}
+            </span>
+          )}
+        </div>
         <p className="wp-sub">{t('app.subtitle')}</p>
-        {showSplash && (
-          <span className="wp-splash" onClick={() => setSplashText(pickSplash())}>
-            {splashText}
-          </span>
-        )}
         <div className="wp-actions">
           <button onClick={() => setShowNew(true)}>{t('app.newProject')}</button>
           <button onClick={loadProjects}>{t('app.openProject')}</button>
