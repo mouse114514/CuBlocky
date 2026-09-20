@@ -53,12 +53,11 @@ export default function WelcomePage({ onOpenProject }: Props) {
 
   useLayoutEffect(() => {
     if (!showSplash || !titleRef.current || !splashRef.current) return;
-    const titleW = titleRef.current.offsetWidth;
     const splashW = splashRef.current.offsetWidth;
     const angle = 12 * Math.PI / 180;
     const dx = splashW * Math.cos(angle);
     const dy = splashW * Math.sin(angle);
-    setSplashLeft((titleW - dx) / 2);
+    setSplashLeft(-dx / 2);
     setSplashTop(8 + dy / 2);
   }, [showSplash, splashText, lang]);
 
