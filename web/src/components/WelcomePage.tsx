@@ -49,12 +49,17 @@ export default function WelcomePage({ onOpenProject }: Props) {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const splashRef = useRef<HTMLSpanElement>(null);
   const [splashLeft, setSplashLeft] = useState(0);
+  const [splashTop, setSplashTop] = useState(8);
 
   useLayoutEffect(() => {
     if (!showSplash || !titleRef.current || !splashRef.current) return;
     const titleW = titleRef.current.offsetWidth;
     const splashW = splashRef.current.offsetWidth;
-    setSplashLeft(-(titleW - splashW) / 2);
+    const angle = 12 * Math.PI / 180;
+    const dx = splashW * Math.cos(angle);
+    const dy = splashW * Math.sin(angle);
+    setSplashLeft((titleW - dx) / 2);
+    setSplashTop(8 + dy / 2);
   }, [showSplash, splashText, lang]);
 
   const toggleSplash = () => {
@@ -163,7 +168,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
             <span
               className="wp-splash"
               ref={splashRef}
-              style={{ left: splashLeft }}
+              style={{ left: splashLeft, top: splashTop }}
               onClick={refreshSplash}
             >
               {splashText}
