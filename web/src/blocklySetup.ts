@@ -3644,11 +3644,40 @@ const STATUS_FIELD_OPTIONS: DdOption[] = [
   ['等级', 'Level', 'Уровень', 'level'], ['剩余时长', 'Remaining time', 'Оставшееся время', 'remaining'],
 ];
 
+const DECAY_BOOL_OPTIONS: DdOption[] = [
+  ['真', 'True', 'Истина', 'TRUE'],
+  ['假', 'False', 'Ложь', 'FALSE'],
+];
+
+const RETURN_TYPE_OPTIONS: DdOption[] = [
+  ['无', 'Void', 'Нет', 'void'],
+  ['整数', 'Integer', 'Целое', 'int'],
+  ['浮点数', 'Float', 'Дробное', 'float'],
+  ['字符串', 'String', 'Строка', 'string'],
+  ['布尔', 'Boolean', 'Логический', 'bool'],
+];
+
+const TAG_OPTIONS: DdOption[] = [
+  ['可放置(placeable)', 'Placeable', 'Размещаемый', 'placeable'],
+  ['可食用(edible)', 'Edible', 'Съедобный', 'edible'],
+  ['可饮用(drinkable)', 'Drinkable', 'Питьевой', 'drinkable'],
+  ['可穿戴(wearable)', 'Wearable', 'Носимый', 'wearable'],
+  ['可堆叠(stackable)', 'Stackable', 'Стакающийся', 'stackable'],
+];
+
+const NUMBER_CMP_OPTIONS: DdOption[] = [
+  ['>', '>', '>', '>'],
+  ['<', '<', '<', '<'],
+  ['=', '=', '=', '='],
+  ['≥', '≥', '≥', '>='],
+  ['≤', '≤', '≤', '<='],
+];
+
 const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_set_item_category: { CATEGORY: CATEGORY_OPTIONS },
   cu_item_gun: { AMMO_TYPE: AMMO_TYPE_OPTIONS, FIRING_MODE: FIRING_MODE_OPTIONS, FEED_TYPE: FEED_TYPE_OPTIONS },
   cu_item_set_property: { PROP: PROP_OPTIONS },
-  cu_item_set_tag: {},
+  cu_item_set_tag: { TAG: TAG_OPTIONS },
   cu_item_use: { TARGET: TARGET_OPTIONS, ACTION: ACTION_OPTIONS },
   cu_item_consume: { TARGET: TARGET_OPTIONS },
   cu_item_set_condition: { TARGET: TARGET_OPTIONS, OP: COND_OP_OPTIONS },
@@ -3668,6 +3697,10 @@ const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_item_vanilla: { ID: VANILLA_ITEMS },
   cu_register_status: { TYPE: STATUS_TYPE_OPTIONS },
   cu_status_get: { FIELD: STATUS_FIELD_OPTIONS },
+  cu_define_function: { RETURN_TYPE: RETURN_TYPE_OPTIONS },
+  cu_item_magazine: { AMMO_TYPE: AMMO_TYPE_OPTIONS },
+  cu_set_item_base_stats: { DECAY_ENABLED: DECAY_BOOL_OPTIONS },
+  cu_number_compare: { OP: NUMBER_CMP_OPTIONS },
 };
 
 function dd(lang: string, opts: DdOption[]): [string, string][] {
