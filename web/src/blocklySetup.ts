@@ -2467,12 +2467,7 @@ const origBlockToCode = csharpGenerator.blockToCode.bind(csharpGenerator);
 csharpGenerator.blockToCode = (block: Blockly.Block, opt_thisOnly?: boolean) => {
   if (block && EVENT_TYPES.has(block.type) && !opt_thisOnly) {
     const opening = origBlockToCode(block, true);
-    let rest = '';
-    let cur = block.getNextBlock();
-    while (cur) {
-      rest += origBlockToCode(cur);
-      cur = cur.getNextBlock();
-    }
+    const rest = (origBlockToCode(block.getNextBlock()) as string) || '';
     return opening + rest + '//ENDPATCH\n';
   }
   return origBlockToCode(block, opt_thisOnly);
@@ -2560,23 +2555,13 @@ csharpGenerator.forBlock['cu_status_set'] = (block, gen) => {
 csharpGenerator.forBlock['cu_define_item_use'] = (block, gen) => {
   const item = gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || '"myItem"';
   const itemId = item.replace(/^"|"$/g, '');
-  let inner = '';
-  let child = block.getNextBlock();
-  while (child) {
-    inner += gen.blockToCode(child);
-    child = child.getNextBlock();
-  }
+  const inner = gen.blockToCode(block.getNextBlock()) as string || '';
   return `//ITEM_USE_ACTION:${itemId}\n${inner}//END_ITEM_USE_ACTION\n`;
 };
 csharpGenerator.forBlock['cu_define_item_limb_use'] = (block, gen) => {
   const item = gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || '"myItem"';
   const itemId = item.replace(/^"|"$/g, '');
-  let inner = '';
-  let child = block.getNextBlock();
-  while (child) {
-    inner += gen.blockToCode(child);
-    child = child.getNextBlock();
-  }
+  const inner = gen.blockToCode(block.getNextBlock()) as string || '';
   return `//ITEM_LIMB_USE_ACTION:${itemId}\n${inner}//END_ITEM_LIMB_USE_ACTION\n`;
 };
 csharpGenerator.forBlock['cu_item_set_property'] = (block, gen) => {
@@ -3420,12 +3405,7 @@ csharpGenerator.forBlock['cu_define_function'] = (block, gen) => {
     params.push({ type: pType, name: pName });
     i++;
   }
-  let body = '';
-  let child = block.getInputTargetBlock('BODY');
-  while (child) {
-    body += gen.blockToCode(child);
-    child = child.getNextBlock();
-  }
+  const body = gen.blockToCode(block.getInputTargetBlock('BODY')) as string || '';
   const json = JSON.stringify({ name, returnType, params });
   return `//DEFINE_FUNCTION:${json}\n${body}//END_FUNCTION\n`;
 };
@@ -3493,13 +3473,8 @@ export function extractFunctions(ws: Blockly.Workspace): FunctionDef[] {
       });
       i++;
     }
-    let body = '';
-    let child = block.getInputTargetBlock('BODY');
-    while (child) {
-      body += csharpGenerator.blockToCode(child);
-      child = child.getNextBlock();
-    }
-    result.push({ name, returnType, params, body: body.trim() });
+    const body = (csharpGenerator.blockToCode(block.getInputTargetBlock('BODY')) as string || '').trim();
+    result.push({ name, returnType, params, body });
   }
   return result;
 }

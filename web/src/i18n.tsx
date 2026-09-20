@@ -32,6 +32,9 @@ const dict = {
   'app.gamePathDesc':  { zh: 'Casualties Unknown Demo 的安装目录', en: 'Installation directory of Casualties Unknown Demo', ru: 'Каталог установки Casualties Unknown Demo' },
   'app.saveSettings':  { zh: '保存设置', en: 'Save Settings', ru: 'Сохранить настройки' },
   'app.deploy':        { zh: '部署', en: 'Deploy', ru: 'Развернуть' },
+  'app.deleteProject': { zh: '删除项目', en: 'Delete Project', ru: 'Удалить проект' },
+  'app.deleteConfirm': { zh: '确定删除 {count} 个项目？此操作不可撤销。', en: 'Delete {count} project(s)? This cannot be undone.', ru: 'Удалить {count} проект(ов)? Это нельзя отменить.' },
+  'app.selected':      { zh: '已选 {count} 项', en: '{count} selected', ru: '{count} выбрано' },
 
   // ── Sidebar ──
   'side.mod':          { zh: '模组', en: 'Mod', ru: 'Мод' },

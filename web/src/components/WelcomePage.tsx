@@ -21,6 +21,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
   const [showNew, setShowNew] = useState(false);
   const [showOpen, setShowOpen] = useState(false);
   const [projects, setProjects] = useState<ProjectInfo[]>([]);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [newName, setNewName] = useState('');
   const [newGuid, setNewGuid] = useState('');
@@ -28,6 +29,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
   const [showSettings, setShowSettings] = useState(false);
   const [gamePath, setGamePath] = useState('');
   const [showLang, setShowLang] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const openSettings = () => {
     getConfig().then(cfg => setGamePath(cfg.gamePath)).catch(() => {});
@@ -55,6 +57,36 @@ export default function WelcomePage({ onOpenProject }: Props) {
       if (!res.ok) throw new Error('failed');
       const bp = await res.json();
       onOpenProject(bp, name);
+    } catch {} finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleSelect = (name: string) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name); else next.add(name);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selected.size === projects.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(projects.map(p => p.name)));
+    }
+  };
+
+  const deleteSelected = async () => {
+    setLoading(true);
+    try {
+      for (const name of selected) {
+        await fetch(`${API}/api/projects/${encodeURIComponent(name)}`, { method: 'DELETE' });
+      }
+      setSelected(new Set());
+      setShowDeleteConfirm(false);
+      loadProjects();
     } catch {} finally {
       setLoading(false);
     }
@@ -150,16 +182,63 @@ export default function WelcomePage({ onOpenProject }: Props) {
               {projects.length === 0 ? (
                 <div className="wp-empty">{t('app.noProjects')}</div>
               ) : (
-                projects.map(p => (
-                  <div key={p.name} className="wp-item" onClick={() => loadProject(p.name)}>
-                    <span className="wp-item-name">{p.name}</span>
-                    <span className="wp-item-meta">{p.cbpFile}</span>
+                <>
+                  <div className="wp-item wp-item-header">
+                    <label className="wp-item-select">
+                      <input
+                        type="checkbox"
+                        checked={selected.size === projects.length && projects.length > 0}
+                        onChange={toggleSelectAll}
+                      />
+                    </label>
+                    <span className="wp-item-name" />
                   </div>
-                ))
+                  {projects.map(p => (
+                    <div
+                      key={p.name}
+                      className={`wp-item${selected.has(p.name) ? ' selected' : ''}`}
+                    >
+                      <label className="wp-item-select" onClick={e => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={selected.has(p.name)}
+                          onChange={() => toggleSelect(p.name)}
+                        />
+                      </label>
+                      <span className="wp-item-name" onClick={() => loadProject(p.name)}>
+                        {p.name}
+                      </span>
+                      <span className="wp-item-meta">{p.cbpFile}</span>
+                    </div>
+                  ))}
+                </>
               )}
             </div>
             <div className="modal-actions">
+              {selected.size > 0 && (
+                <span className="wp-selected-count">{t('app.selected', { count: String(selected.size) })}</span>
+              )}
               <button onClick={() => setShowOpen(false)}>{t('app.close')}</button>
+              {selected.size > 0 && (
+                <button className="wp-delete-btn" onClick={() => setShowDeleteConfirm(true)}>
+                  {t('app.deleteProject')} ({selected.size})
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteConfirm && (
+        <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3>{t('app.deleteProject')}</h3>
+            <p>{t('app.deleteConfirm', { count: String(selected.size) })}</p>
+            <div className="modal-actions">
+              <button onClick={() => setShowDeleteConfirm(false)}>{t('app.close')}</button>
+              <button className="wp-delete-btn" onClick={deleteSelected} disabled={loading}>
+                {t('app.deleteProject')}
+              </button>
             </div>
           </div>
         </div>

@@ -280,8 +280,17 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
   transition:border-color .15s;margin-bottom:6px;
 }
 .wp-project-list .wp-item:hover{border-color:#1a8a1a}
-.wp-item-name{font-size:14px;font-weight:600;color:#222}
+.wp-project-list .wp-item.selected{border-color:#1a8a1a;background:#f0f8f0}
+.wp-project-list .wp-item-header{cursor:default;background:transparent;border:none;padding:4px 14px}
+.wp-project-list .wp-item-header:hover{border-color:#e0e0e0}
+.wp-item-select{display:flex;align-items:center;cursor:pointer}
+.wp-item-select input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:#1a8a1a}
+.wp-item-name{font-size:14px;font-weight:600;color:#222;cursor:pointer}
+.wp-item-name:hover{text-decoration:underline}
 .wp-item-meta{font-size:12px;color:#888;flex:1}
+.wp-selected-count{font-size:12px;color:#888;margin-right:auto}
+.wp-delete-btn{background:#c0392b!important;color:#fff!important}
+.wp-delete-btn:hover{background:#a93226!important}
 .wp-empty{font-size:13px;color:#999;font-style:italic;padding:12px;text-align:center}
 .wp-form{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
 .wp-form label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#666}
