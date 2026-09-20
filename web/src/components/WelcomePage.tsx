@@ -1,9 +1,66 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { Blueprint } from '../types';
 import { defaultBlueprint } from '../types';
 import { useI18n, LANG_LABELS, type Lang } from '../i18n';
 import GradientBg from './GradientBg';
 import { getConfig, updateConfig, type ServerConfig } from '../api';
+
+const SPLASH_TEXTS = [
+  'Also try Terraria!',
+  '100% pure C#!',
+  'Now with more blocks!',
+  'Roguelike!',
+  'Spelunky vibes!',
+  'Procedurally generated!',
+  'Contains no actual casualties!',
+  'Made with BepInEx!',
+  'Harmony patches go brrr!',
+  'Blockly is fun!',
+  'Unity when?',
+  'Open source!',
+  'Bug-free guarantee!*',
+  '*Offer not valid',
+  'Touch grass!',
+  'Hello world!',
+  'It compiles!',
+  'Ship it!',
+  'It\'s not a bug, it\'s a feature!',
+  'Have you tried turning it off and on again?',
+  'Works on my machine!',
+  'The cake is a lie!',
+  'This text is yellow!',
+  'Wow!',
+  'Such splash!',
+  'Much random!',
+  'Very Minecraft!',
+  'So procedural!',
+  'Amazing!',
+  'Incredible!',
+  'Technically correct is the best kind of correct!',
+  '404: Splash text not found',
+  'Loading...',
+  'Please wait...',
+  'Error: Success!',
+  'Do not touch the forbidden code!',
+  'Ctrl+C, Ctrl+V',
+  'git commit -m "fixed everything"',
+  'npm install coffee',
+  'Stack overflow: The real MVP',
+  'The code is the documentation',
+  'TODO: Write better TODOs',
+  'It works, don\'t touch it!',
+  'Magic numbers: Engaged!',
+  'Refactoring tomorrow...',
+  'This is fine 🔥',
+  'Zero bugs found (that we know of)',
+  'Ctrl+Z is my best friend',
+  'Code like nobody is watching!',
+  'One more commit before bed...',
+];
+
+function pickSplash(): string {
+  return SPLASH_TEXTS[Math.floor(Math.random() * SPLASH_TEXTS.length)];
+}
 
 interface ProjectInfo {
   name: string;
@@ -30,6 +87,17 @@ export default function WelcomePage({ onOpenProject }: Props) {
   const [gamePath, setGamePath] = useState('');
   const [showLang, setShowLang] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [splashText, setSplashText] = useState(() => pickSplash());
+  const [showSplash, setShowSplash] = useState(() => {
+    return localStorage.getItem('cublocky-splash') !== 'off';
+  });
+
+  const toggleSplash = () => {
+    const next = !showSplash;
+    setShowSplash(next);
+    localStorage.setItem('cublocky-splash', next ? 'on' : 'off');
+    if (next) setSplashText(pickSplash());
+  };
 
   const openSettings = () => {
     getConfig().then(cfg => setGamePath(cfg.gamePath)).catch(() => {});
@@ -126,6 +194,11 @@ export default function WelcomePage({ onOpenProject }: Props) {
         <GradientBg />
         <h1 className="wp-title">CuBlocky</h1>
         <p className="wp-sub">{t('app.subtitle')}</p>
+        {showSplash && (
+          <span className="wp-splash" onClick={() => setSplashText(pickSplash())}>
+            {splashText}
+          </span>
+        )}
         <div className="wp-actions">
           <button onClick={() => setShowNew(true)}>{t('app.newProject')}</button>
           <button onClick={loadProjects}>{t('app.openProject')}</button>
@@ -256,6 +329,18 @@ export default function WelcomePage({ onOpenProject }: Props) {
               onChange={(e) => setGamePath(e.target.value)}
               placeholder="C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo"
             />
+            <div className="wp-setting-row">
+              <label className="wp-toggle-label">
+                <span>{t('app.splash')}</span>
+                <span className="modal-hint">{t('app.splashDesc')}</span>
+              </label>
+              <button
+                className={`wp-toggle-btn${showSplash ? ' on' : ''}`}
+                onClick={toggleSplash}
+              >
+                {showSplash ? 'ON' : 'OFF'}
+              </button>
+            </div>
             <div className="modal-actions">
               <button onClick={() => setShowSettings(false)}>{t('app.close')}</button>
               <button className="build-btn" onClick={saveSettings}>{t('app.saveSettings')}</button>

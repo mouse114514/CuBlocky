@@ -35,6 +35,8 @@ const dict = {
   'app.deleteProject': { zh: '删除项目', en: 'Delete Project', ru: 'Удалить проект' },
   'app.deleteConfirm': { zh: '确定删除 {count} 个项目？此操作不可撤销。', en: 'Delete {count} project(s)? This cannot be undone.', ru: 'Удалить {count} проект(ов)? Это нельзя отменить.' },
   'app.selected':      { zh: '已选 {count} 项', en: '{count} selected', ru: '{count} выбрано' },
+  'app.splash':        { zh: '闪烁标语', en: 'Splash Text', ru: 'Текст-вспышка' },
+  'app.splashDesc':    { zh: '在欢迎页显示随机闪烁标语', en: 'Show random splash text on welcome page', ru: 'Показывать случайный текст-вспышку на главной' },
 
   // ── Sidebar ──
   'side.mod':          { zh: '模组', en: 'Mod', ru: 'Мод' },

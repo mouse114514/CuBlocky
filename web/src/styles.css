@@ -244,6 +244,36 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 .wp-actions button:hover{background:#333;transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.15)}
 .wp-actions button:active{transform:translateY(0);box-shadow:none}
 
+/* ── Splash text (Minecraft style) ── */
+.wp-splash{
+  position:relative;z-index:1;
+  color:#ffff00;font-weight:700;font-size:16px;
+  text-shadow:1px 1px 0 #3f3f00,-1px -1px 0 #3f3f00,1px -1px 0 #3f3f00,-1px 1px 0 #3f3f00;
+  transform:rotate(-12deg) scale(1.1);
+  animation:splash-flash 1.5s ease-in-out infinite alternate;
+  cursor:pointer;user-select:none;
+  transition:transform .2s;
+  margin-top:-8px;
+}
+.wp-splash:hover{transform:rotate(-12deg) scale(1.2)}
+@keyframes splash-flash{
+  0%{opacity:1;transform:rotate(-12deg) scale(1.1)}
+  50%{opacity:.7;transform:rotate(-12deg) scale(1.15)}
+  100%{opacity:1;transform:rotate(-12deg) scale(1.1)}
+}
+
+/* ── Toggle switch ── */
+.wp-setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid #e0e0e0;margin-top:12px}
+.wp-toggle-label{display:flex;flex-direction:column;gap:2px}
+.wp-toggle-label span:first-child{font-size:13px;font-weight:600;color:#333}
+.wp-toggle-label .modal-hint{font-size:11px;color:#999;margin:0}
+.wp-toggle-btn{
+  padding:6px 16px;border-radius:12px;border:1px solid #d0d0d0;background:#e0e0e0;color:#888;
+  font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;min-width:52px;
+}
+.wp-toggle-btn.on{background:#1a8a1a;color:#fff;border-color:#1a8a1a}
+.wp-toggle-btn:hover{box-shadow:0 2px 8px rgba(0,0,0,.1)}
+
 @keyframes wp-title-in{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
 @keyframes wp-fade-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 
