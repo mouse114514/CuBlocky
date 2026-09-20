@@ -246,7 +246,7 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 
 /* ── Splash text (Minecraft style) ── */
 .wp-splash{
-  position:absolute;left:-20px;top:8px;z-index:2;
+  position:absolute;top:8px;z-index:2;
   color:#ffff00;font-weight:700;font-size:14px;
   text-shadow:1px 1px 0 #3f3f00,-1px -1px 0 #3f3f00,1px -1px 0 #3f3f00,-1px 1px 0 #3f3f00;
   transform:rotate(-12deg);

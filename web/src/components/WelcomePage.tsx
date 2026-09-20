@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import type { Blueprint } from '../types';
 import { defaultBlueprint } from '../types';
 import { useI18n, LANG_LABELS, type Lang } from '../i18n';
@@ -45,6 +45,17 @@ export default function WelcomePage({ onOpenProject }: Props) {
   const refreshSplash = () => setSplashText(pickSplash(lang));
 
   useEffect(() => { if (showSplash) setSplashText(pickSplash(lang)); }, [lang]);
+
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const splashRef = useRef<HTMLSpanElement>(null);
+  const [splashLeft, setSplashLeft] = useState(0);
+
+  useLayoutEffect(() => {
+    if (!showSplash || !titleRef.current || !splashRef.current) return;
+    const titleW = titleRef.current.offsetWidth;
+    const splashW = splashRef.current.offsetWidth;
+    setSplashLeft((titleW - splashW) / 2);
+  }, [showSplash, splashText, lang]);
 
   const toggleSplash = () => {
     const next = !showSplash;
@@ -146,10 +157,15 @@ export default function WelcomePage({ onOpenProject }: Props) {
 
       <div className="wp-body">
         <GradientBg />
-        <h1 className="wp-title">
+        <h1 className="wp-title" ref={titleRef}>
           CuBlocky
           {showSplash && (
-            <span className="wp-splash" onClick={refreshSplash}>
+            <span
+              className="wp-splash"
+              ref={splashRef}
+              style={{ left: splashLeft }}
+              onClick={refreshSplash}
+            >
               {splashText}
             </span>
           )}
