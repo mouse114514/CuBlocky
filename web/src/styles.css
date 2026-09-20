@@ -228,7 +228,7 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 .wp-root{display:flex;flex-direction:column;height:100vh;background:#f5f5f5}
 .wp-body{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
-  background:#f5f5f5;position:relative;overflow:hidden;
+  background:#f5f5f5;position:relative;
 }
 .wp-title{
   font-size:32px;font-weight:700;color:#222;position:relative;z-index:1;margin:0;
@@ -247,21 +247,21 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 
 /* ── Splash text (Minecraft style) ── */
 .wp-splash{
-  position:absolute;top:-8px;left:100%;margin-left:8px;
+  position:absolute;top:-6px;left:65%;
   color:#ffff00;font-weight:700;font-size:14px;
   text-shadow:1px 1px 0 #3f3f00,-1px -1px 0 #3f3f00,1px -1px 0 #3f3f00,-1px 1px 0 #3f3f00;
   transform:rotate(-12deg);
   transform-origin:left center;
-  animation:splash-flash 1.5s ease-in-out infinite alternate;
+  animation:splash-pulse 1.5s ease-in-out infinite;
   cursor:pointer;user-select:none;
   transition:transform .2s;
   white-space:nowrap;
 }
 .wp-splash:hover{transform:rotate(-12deg) scale(1.15)}
-@keyframes splash-flash{
-  0%{opacity:1}
-  50%{opacity:.65}
-  100%{opacity:1}
+@keyframes splash-pulse{
+  0%{transform:rotate(-12deg) scale(1)}
+  50%{transform:rotate(-12deg) scale(1.18)}
+  100%{transform:rotate(-12deg) scale(1)}
 }
 
 /* ── Toggle switch ── */

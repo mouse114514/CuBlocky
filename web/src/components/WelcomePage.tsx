@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Blueprint } from '../types';
 import { defaultBlueprint } from '../types';
 import { useI18n, LANG_LABELS, type Lang } from '../i18n';
@@ -43,6 +43,8 @@ export default function WelcomePage({ onOpenProject }: Props) {
   });
 
   const refreshSplash = () => setSplashText(pickSplash(lang));
+
+  useEffect(() => { if (showSplash) setSplashText(pickSplash(lang)); }, [lang]);
 
   const toggleSplash = () => {
     const next = !showSplash;

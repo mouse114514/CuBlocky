@@ -1,7 +1,7 @@
 export type SplashEntry = [string, string, string]; // [zh, en, ru]
 
 const SPLASH_TEXTS: SplashEntry[] = [
-  ['Also try Terraria!', 'Also try Terraria!', 'Также попробуйте Terraria!'],
+  ['也去玩泰拉瑞亚吧!', 'Also try Terraria!', 'Также попробуйте Terraria!'],
   ['100% 纯 C#!', '100% pure C#!', '100% чистый C#!'],
   ['更多积木了!', 'Now with more blocks!', 'Теперь с ещё блоками!'],
   ['Roguelike!', 'Roguelike!', 'Рогалик!'],
