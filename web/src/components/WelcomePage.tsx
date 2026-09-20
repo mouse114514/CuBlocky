@@ -146,14 +146,14 @@ export default function WelcomePage({ onOpenProject }: Props) {
 
       <div className="wp-body">
         <GradientBg />
-        <div className="wp-title-row">
-          <h1 className="wp-title">CuBlocky</h1>
+        <h1 className="wp-title">
+          CuBlocky
           {showSplash && (
             <span className="wp-splash" onClick={refreshSplash}>
               {splashText}
             </span>
           )}
-        </div>
+        </h1>
         <p className="wp-sub">{t('app.subtitle')}</p>
         <div className="wp-actions">
           <button onClick={() => setShowNew(true)}>{t('app.newProject')}</button>
