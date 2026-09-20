@@ -1,34 +1,18 @@
 export type SplashEntry = [string, string, string]; // [zh, en, ru]
 
 const SPLASH_TEXTS: SplashEntry[] = [
-  // 游戏/模组相关
   ['也去玩泰拉瑞亚吧!', 'Also try Terraria!', 'Также попробуйте Terraria!'],
   ['更多积木了!', 'Now with more blocks!', 'Теперь с ещё блоками!'],
-  ['Roguelike!', 'Roguelike!', 'Рогалик!'],
-  ['洞穴探险既视感!', 'Spelunky vibes!', 'Настроение Спеланки!'],
   ['程序化生成!', 'Procedurally generated!', 'Процедурная генерация!'],
   ['不含任何真实伤亡!', 'Contains no actual casualties!', 'Без реальных жертв!'],
   ['Casualties Unknown 模组!', 'Casualties Unknown modding!', 'Моддинг Casualties Unknown!'],
   ['为 CU 做模组!', 'Modding for CU!', 'Моды для CU!'],
-  ['尖叫着跑进洞穴!', 'Screaming into the caves!', 'Крича, бежим в пещеры!'],
-  ['矿车轨道延伸至无限!', 'Minecart tracks to infinity!', 'Рельсы в бесконечность!'],
-  ['尖刺陷阱? 不存在的!', 'Spike traps? Never heard of them!', 'Шипы? Не слышал!'],
-  ['地雷也是积木的一种!', 'Landmines are blocks too!', 'Мины — тоже блоки!'],
-  ['捕兽夹夹住的不只是脚', 'Bear traps catch more than feet', 'Капканы ловят не только ноги'],
-  ['岩石是最好的朋友!', 'Rock is your best friend!', 'Камень — твой лучший друг!'],
-  ['光岩石能照亮黑暗!', 'Lightrock lights the dark!', 'Светлый камень просвещает тьму!'],
-  ['锤子砸碎一切!', 'Hammer smashes all!', 'Молоток ломает всё!'],
-  ['药水喝了变强壮!', 'Drink potions, get strong!', 'Пей зелья — будь сильным!'],
-  ['老鼠比你看起来更危险!', 'Rats are deadlier than they look!', 'Крысы опаснее, чем кажутся!'],
-  ['幽灵不吃这一套!', 'Ghosts don\'t fall for that!', 'Призраки на это не купятся!'],
-  ['BOSS 就在下一层!', 'The boss is on the next floor!', 'Босс на следующем этаже!'],
 
-  // 通用幽默/生活
   ['出去摸摸草!', 'Touch grass!', 'Потрогай траву!'],
   ['这段文字是黄色的!', 'This text is yellow!', 'Этот текст жёлтый!'],
   ['哇!', 'Wow!', 'Вау!'],
-  ['好随机!', 'Much random!', 'Очень случайно!'],
-  ['好 MC!', 'Very Minecraft!', 'Очень Minecraft!'],
+  ['非常随机!', 'Much random!', 'Очень случайно!'],
+  ['非常 MC!', 'Very Minecraft!', 'Очень Minecraft!'],
   ['太棒了!', 'Amazing!', 'Невероятно!'],
   ['难以置信!', 'Incredible!', 'Неправдоподобно!'],
   ['这很合理 🔥', 'This is fine 🔥', 'Всё нормально 🔥'],
@@ -41,7 +25,6 @@ const SPLASH_TEXTS: SplashEntry[] = [
   ['周一又来了...', 'Monday again...', 'Снова понедельник...'],
   ['五点下班倒计时', 'Counting down to 5 PM', 'Обратный отсчёт до 17:00'],
 
-  // 程序员梗（保留经典，但更地道）
   ['Hello world!', 'Hello world!', 'Привет мир!'],
   ['编译通过了!', 'It compiles!', 'Компилируется!'],
   ['直接发!', 'Ship it!', 'Отправляй!'],
@@ -61,28 +44,23 @@ const SPLASH_TEXTS: SplashEntry[] = [
   ['Ctrl+Z 拯救世界', 'Ctrl+Z saves the world', 'Ctrl+Z спасает мир'],
   ['睡前再提交一次...', 'One more commit before bed...', 'Ещё один коммит перед сном...'],
 
-  // CuBlocky 专属 / 彩蛋
-  ['CuBlocky: 让模组制作像搭积木一样简单', 'CuBlocky: Modding made block-simple', 'CuBlocky: Моддинг простой как кубики'],
+  ['让模组制作像搭积木一样简单', 'Modding made block-simple', 'Моддинг простой как кубики'],
   ['Blockly 积木不只是给小孩玩的!', 'Blockly blocks aren\'t just for kids!', 'Блоки Blockly не только для детей!'],
   ['拖拽生成 C# 代码!', 'Drag blocks, get C#!', 'Перетаскивай блоки — получай C#!'],
   ['无需写代码也能做模组!', 'Make mods without writing code!', 'Создавай моды без кода!'],
-  ['Harmony 补丁? 拖拽搞定!', 'Harmony patches? Drag and drop!', 'Harmony патчи? Перетащи и отпусти!'],
-  ['物品、配方、掉落表 — 全搞定!', 'Items, recipes, loot tables — all done!', 'Предметы, рецепты, лут — всё готово!'],
-  ['UI 编辑器所见即所得!', 'UI editor: WYSIWYG!', 'UI редактор: что видишь, то и есть!'],
+  ['所见即所得!', 'WYSIWYG!', 'что видишь, то и есть!'],
   ['一键导出 BepInEx 插件!', 'One-click BepInEx plugin export!', 'Экспорт BepInEx плагина за клик!'],
   ['感谢 BepInEx 团队!', 'Thanks BepInEx team!', 'Спасибо команде BepInEx!'],
   ['感谢 0Harmony!', 'Thanks 0Harmony!', 'Спасибо 0Harmony!'],
   ['Orsoniks 制作了很棒的游戏!', 'Orsoniks made a great game!', 'Orsoniks сделал крутую игру!'],
-  ['这是个彩蛋 🥚', 'This is an easter egg 🥚', 'Это пасхалка 🥚'],
-  ['你找到彩蛋了!', 'You found the easter egg!', 'Ты нашёл пасхалку!'],
+  ['别告诉他们这段标语在中文下与其他语言不一致', 'This is an easter egg 🥚', 'Это пасхалка 🥚'],
   ['按 F 致敬', 'Press F to pay respects', 'Нажми F чтобы почтить память'],
   ['按 R 重新开始', 'Press R to restart', 'Нажми R чтобы начать заново'],
   ['Shift+点击 = 快速放置', 'Shift+click = quick place', 'Shift+клик = быстрая установка'],
   ['Alt+点击 = 复制方块', 'Alt+click = copy block', 'Alt+клик = копировать блок'],
   ['支持中英俄三语!', 'Supports CN/EN/RU!', 'Поддержка CN/EN/RU!'],
   ['夜间构建也能玩!', 'Night builds are playable too!', 'Ночные сборки тоже играбельны!'],
-  ['v0.1.9 已发布!', 'v0.1.9 released!', 'v0.1.9 выпущен!'],
-  ['由 mouse114514 开发', 'Developed by mouse114514', 'Разработано mouse114514'],
+  ['由 ouse114514 开发', 'Developed by ouse114514', 'Разработано ouse114514'],
 ];
 
 export default SPLASH_TEXTS;
