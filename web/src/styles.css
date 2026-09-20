@@ -234,7 +234,7 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
   font-size:32px;font-weight:700;color:#222;position:relative;z-index:1;margin:0;
   animation:wp-title-in .8s cubic-bezier(.22,1,.36,1) both;
 }
-.wp-title-row{position:relative;display:inline-block;z-index:1;animation:wp-title-in .8s cubic-bezier(.22,1,.36,1) both}
+.wp-title-row{position:relative;width:fit-content;z-index:1;animation:wp-title-in .8s cubic-bezier(.22,1,.36,1) both}
 .wp-sub{font-size:14px;color:#888;margin-top:-8px;position:relative;z-index:1;animation:wp-fade-up .8s .15s cubic-bezier(.22,1,.36,1) both}
 .wp-actions{display:flex;gap:10px;position:relative;z-index:1;animation:wp-fade-up .8s .3s cubic-bezier(.22,1,.36,1) both}
 .wp-actions button{
@@ -247,7 +247,7 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 
 /* ── Splash text (Minecraft style) ── */
 .wp-splash{
-  position:absolute;top:-6px;left:65%;
+  position:absolute;top:-6px;right:-10px;
   color:#ffff00;font-weight:700;font-size:14px;
   text-shadow:1px 1px 0 #3f3f00,-1px -1px 0 #3f3f00,1px -1px 0 #3f3f00,-1px 1px 0 #3f3f00;
   transform:rotate(-12deg);
