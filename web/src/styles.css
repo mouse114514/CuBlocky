@@ -234,7 +234,7 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
   font-size:32px;font-weight:700;color:#222;position:relative;z-index:1;margin:0;
   animation:wp-title-in .8s cubic-bezier(.22,1,.36,1) both;
 }
-.wp-title-row{display:inline-flex;align-items:flex-start;gap:12px;position:relative;z-index:1;animation:wp-title-in .8s cubic-bezier(.22,1,.36,1) both}
+.wp-title-row{position:relative;display:inline-block;z-index:1;animation:wp-title-in .8s cubic-bezier(.22,1,.36,1) both}
 .wp-sub{font-size:14px;color:#888;margin-top:-8px;position:relative;z-index:1;animation:wp-fade-up .8s .15s cubic-bezier(.22,1,.36,1) both}
 .wp-actions{display:flex;gap:10px;position:relative;z-index:1;animation:wp-fade-up .8s .3s cubic-bezier(.22,1,.36,1) both}
 .wp-actions button{
@@ -247,14 +247,15 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 
 /* ── Splash text (Minecraft style) ── */
 .wp-splash{
+  position:absolute;top:-8px;left:100%;margin-left:8px;
   color:#ffff00;font-weight:700;font-size:14px;
   text-shadow:1px 1px 0 #3f3f00,-1px -1px 0 #3f3f00,1px -1px 0 #3f3f00,-1px 1px 0 #3f3f00;
   transform:rotate(-12deg);
+  transform-origin:left center;
   animation:splash-flash 1.5s ease-in-out infinite alternate;
   cursor:pointer;user-select:none;
   transition:transform .2s;
   white-space:nowrap;
-  margin-top:4px;
 }
 .wp-splash:hover{transform:rotate(-12deg) scale(1.15)}
 @keyframes splash-flash{
