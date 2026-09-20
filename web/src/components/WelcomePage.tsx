@@ -54,7 +54,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
     if (!showSplash || !titleRef.current || !splashRef.current) return;
     const titleW = titleRef.current.offsetWidth;
     const splashW = splashRef.current.offsetWidth;
-    setSplashLeft((titleW - splashW) / 2);
+    setSplashLeft(-(titleW - splashW) / 2);
   }, [showSplash, splashText, lang]);
 
   const toggleSplash = () => {
