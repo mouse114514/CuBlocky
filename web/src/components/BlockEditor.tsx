@@ -93,6 +93,8 @@ const TOOLBOX = `
     <block type="cu_register_tile"></block>
     <block type="cu_register_locale"></block>
     <sep></sep>
+    <block type="cu_register_creature"></block>
+    <sep></sep>
     <block type="cu_register_liquid"></block>
     <block type="cu_liquid_color"></block>
     <block type="cu_liquid_value"></block>
@@ -607,6 +609,15 @@ const TOOLBOX = `
     </block>
     <block type="cu_get_textfield_content"></block>
   </category>
+  <category name="%{BKY_CAT_CREATURE}" colour="#8bc34a">
+    <block type="cu_spawn_creature"></block>
+    <block type="cu_set_creature_pos"></block>
+    <block type="cu_move_creature_to"></block>
+    <block type="cu_destroy_creature"></block>
+    <sep></sep>
+    <block type="cu_creature_pos_x"></block>
+    <block type="cu_creature_pos_y"></block>
+  </category>
 </xml>
 `;
 
@@ -614,13 +625,13 @@ const CAT_MSG_ZH: Record<string, string> = {
   CAT_EVENT: '事件', CAT_REGISTER: '注册', CAT_BODY: '身体', CAT_ITEM: '物品',
   CAT_SOUND: '音效', CAT_WORLD: '世界', CAT_FLOW: '流程', CAT_VALUE: '取值',
   CAT_BOOLEAN: '布尔', CAT_VAR: '变量', CAT_FUNC: '函数',
-  CAT_BUILDING: '建筑', CAT_TILE: '地块', CAT_UI: '界面', CAT_LOCALE: '本地化',
+  CAT_BUILDING: '建筑', CAT_TILE: '地块', CAT_UI: '界面', CAT_LOCALE: '本地化', CAT_CREATURE: '生物',
 };
 const CAT_MSG_EN: Record<string, string> = {
   CAT_EVENT: 'Events', CAT_REGISTER: 'Register', CAT_BODY: 'Body', CAT_ITEM: 'Item',
   CAT_SOUND: 'Sound', CAT_WORLD: 'World', CAT_FLOW: 'Flow', CAT_VALUE: 'Value',
   CAT_BOOLEAN: 'Boolean', CAT_VAR: 'Variable', CAT_FUNC: 'Function',
-  CAT_BUILDING: 'Building', CAT_TILE: 'Tile', CAT_UI: 'UI', CAT_LOCALE: 'Locale',
+  CAT_BUILDING: 'Building', CAT_TILE: 'Tile', CAT_UI: 'UI', CAT_LOCALE: 'Locale', CAT_CREATURE: 'Creature',
 };
 
 export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, searchTerm }: Props) {

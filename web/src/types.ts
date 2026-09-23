@@ -95,6 +95,16 @@ export interface UIControl {
   visible: boolean;
 }
 
+// ── Creature ──
+export interface CreatureEntry {
+  id: string;
+  name: string;
+  desc: string;
+  health: number;
+  x: number;
+  y: number;
+}
+
 // ── Blueprint root ──
 export interface Blueprint {
   mod: ModMeta;
@@ -105,6 +115,7 @@ export interface Blueprint {
   eventHandlers?: string;
   eventHandlersXml?: string;
   uiControls?: UIControl[];
+  creatures?: CreatureEntry[];
 }
 
 // ── Defaults ──

@@ -15,6 +15,7 @@ public class Blueprint
     public string EventHandlersXml { get; set; } = "";
     public List<FunctionDef> Functions { get; set; } = new();
     public List<UIControlEntry> UiControls { get; set; } = new();
+    public List<CreatureEntry>? Creatures { get; set; }
     public string? ProjectName { get; set; }
 }
 
@@ -241,6 +242,17 @@ public class BuildingEntry
     public string Desc { get; set; } = "";
     public float Health { get; set; } = 250f;
     public string Placement { get; set; } = "Floor";
+}
+
+// ── Creatures ─────────────────────────────────────────────────────
+public class CreatureEntry
+{
+    public string Id { get; set; } = "newcreature";
+    public string Name { get; set; } = "New Creature";
+    public string Desc { get; set; } = "";
+    public float Health { get; set; } = 100f;
+    public float X { get; set; }
+    public float Y { get; set; }
 }
 
 // ── Tiles ──────────────────────────────────────────────────────────

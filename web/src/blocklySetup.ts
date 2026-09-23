@@ -184,6 +184,7 @@ const C = {
   TILE:     '#8d6e63',
   LOCALE:   '#5c6bc0',
   UI:       '#00acc1',
+  CREATURE: '#8bc34a',
 };
 
 type DdOption = [string, string, string, string]; // [zhLabel, enLabel, ruLabel, value]
@@ -1581,6 +1582,76 @@ const BLOCK_JSON: any[] = [
     output: 'String',
     colour: C.UI,
   },
+
+  // ═══ Creature (green) ═══════════════════════════════════════════
+  {
+    type: 'cu_register_creature',
+    message0: '%{BKY_CU_REGISTER_CREATURE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myCreature' },
+      { type: 'field_input', name: 'NAME', text: 'My Creature' },
+      { type: 'field_input', name: 'DESC', text: 'A creature' },
+    ],
+    colour: C.REGISTER, inputsInline: true,
+  },
+  {
+    type: 'cu_spawn_creature',
+    message0: '%{BKY_CU_SPAWN_CREATURE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myCreature' },
+      { type: 'input_value', name: 'POS', check: 'Vector2', align: 'RIGHT' },
+    ],
+    previousStatement: null, nextStatement: null,
+    colour: C.CREATURE, inputsInline: true,
+  },
+  {
+    type: 'cu_set_creature_pos',
+    message0: '%{BKY_CU_SET_CREATURE_POS}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myCreature' },
+      { type: 'input_value', name: 'POS', check: 'Vector2', align: 'RIGHT' },
+    ],
+    previousStatement: null, nextStatement: null,
+    colour: C.CREATURE, inputsInline: true,
+  },
+  {
+    type: 'cu_move_creature_to',
+    message0: '%{BKY_CU_MOVE_CREATURE_TO}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myCreature' },
+      { type: 'input_value', name: 'TARGET', check: 'Vector2', align: 'RIGHT' },
+      { type: 'input_value', name: 'SPEED', check: 'Number', align: 'RIGHT' },
+    ],
+    previousStatement: null, nextStatement: null,
+    colour: C.CREATURE, inputsInline: true,
+  },
+  {
+    type: 'cu_destroy_creature',
+    message0: '%{BKY_CU_DESTROY_CREATURE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myCreature' },
+    ],
+    previousStatement: null, nextStatement: null,
+    colour: C.CREATURE,
+  },
+  {
+    type: 'cu_creature_pos_x',
+    message0: '%{BKY_CU_CREATURE_POS_X}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myCreature' },
+    ],
+    output: 'Number',
+    colour: C.CREATURE,
+  },
+  {
+    type: 'cu_creature_pos_y',
+    message0: '%{BKY_CU_CREATURE_POS_Y}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myCreature' },
+    ],
+    output: 'Number',
+    colour: C.CREATURE,
+  },
 ];
 
 // ── Messages ──
@@ -1787,6 +1858,13 @@ const MSG_ZH: Record<string, string> = {
   CU_HIDE_CONTROL: '隐藏控件 %1',
   CU_SET_CONTROL_PROPERTY: '设置控件 %1 属性 %2 为 %3',
   CU_GET_TEXTFIELD_CONTENT: '文本框 %1 的内容',
+  CU_REGISTER_CREATURE: '注册生物 id %1 名称 %2 描述 %3',
+  CU_SPAWN_CREATURE: '生成生物 %1 位置 %2',
+  CU_SET_CREATURE_POS: '设置生物 %1 位置 %2',
+  CU_MOVE_CREATURE_TO: '移动生物 %1 到 %2 速度 %3',
+  CU_DESTROY_CREATURE: '销毁生物 %1',
+  CU_CREATURE_POS_X: '生物 %1 的X坐标',
+  CU_CREATURE_POS_Y: '生物 %1 的Y坐标',
 };
 
 const MSG_EN: Record<string, string> = {
@@ -1992,6 +2070,13 @@ const MSG_EN: Record<string, string> = {
   CU_HIDE_CONTROL: 'hide control %1',
   CU_SET_CONTROL_PROPERTY: 'set control %1 property %2 to %3',
   CU_GET_TEXTFIELD_CONTENT: 'content of textfield %1',
+  CU_REGISTER_CREATURE: 'register creature id %1 name %2 desc %3',
+  CU_SPAWN_CREATURE: 'spawn creature %1 at %2',
+  CU_SET_CREATURE_POS: 'set creature %1 position to %2',
+  CU_MOVE_CREATURE_TO: 'move creature %1 to %2 speed %3',
+  CU_DESTROY_CREATURE: 'destroy creature %1',
+  CU_CREATURE_POS_X: 'creature %1 X position',
+  CU_CREATURE_POS_Y: 'creature %1 Y position',
 };
 
 const MSG_RU: Record<string, string> = {
@@ -2188,6 +2273,13 @@ const MSG_RU: Record<string, string> = {
   CU_HIDE_CONTROL: 'скрыть элемент %1',
   CU_SET_CONTROL_PROPERTY: 'установить элемент %1 свойство %2 значение %3',
   CU_GET_TEXTFIELD_CONTENT: 'содержимое текстового поля %1',
+  CU_REGISTER_CREATURE: 'зарегистрировать существо id %1 имя %2 описание %3',
+  CU_SPAWN_CREATURE: 'породить существо %1 в %2',
+  CU_SET_CREATURE_POS: 'установить позицию существа %1 на %2',
+  CU_MOVE_CREATURE_TO: 'переместить существо %1 в %2 скорость %3',
+  CU_DESTROY_CREATURE: 'уничтожить существо %1',
+  CU_CREATURE_POS_X: 'X позиция существа %1',
+  CU_CREATURE_POS_Y: 'Y позиция существа %1',
 };
 
 export function setMessages(lang: string) {
@@ -3455,6 +3547,43 @@ csharpGenerator.forBlock['cu_set_control_property'] = (block, gen) => {
 csharpGenerator.forBlock['cu_get_textfield_content'] = (block) => {
   const id = block.getFieldValue('CONTROL_ID') || 'myTextField';
   return [`CuUI.GetText("${id}")`, ORDER_ATOMIC];
+};
+
+// ═══ Creature code generators ════════════════════════════════════
+csharpGenerator.forBlock['cu_register_creature'] = (block) => {
+  const id = block.getFieldValue('ID');
+  const name = block.getFieldValue('NAME').replace(/"/g, '\\"');
+  const desc = block.getFieldValue('DESC').replace(/"/g, '\\"');
+  const json = JSON.stringify({Id: id, Name: name, Desc: desc});
+  return `//REGISTER_CREATURE:${json}\n`;
+};
+csharpGenerator.forBlock['cu_spawn_creature'] = (block, gen) => {
+  const id = block.getFieldValue('ID');
+  const pos = gen.valueToCode(block, 'POS', ORDER_ATOMIC) || 'Vector2.zero';
+  return `CuCreatureManager.Spawn("${id}", ${pos});\n`;
+};
+csharpGenerator.forBlock['cu_set_creature_pos'] = (block, gen) => {
+  const id = block.getFieldValue('ID');
+  const pos = gen.valueToCode(block, 'POS', ORDER_ATOMIC) || 'Vector2.zero';
+  return `CuCreatureManager.SetPosition("${id}", ${pos});\n`;
+};
+csharpGenerator.forBlock['cu_move_creature_to'] = (block, gen) => {
+  const id = block.getFieldValue('ID');
+  const target = gen.valueToCode(block, 'TARGET', ORDER_ATOMIC) || 'Vector2.zero';
+  const speed = gen.valueToCode(block, 'SPEED', ORDER_ATOMIC) || '5f';
+  return `CuCreatureManager.MoveTo("${id}", ${target}, ${speed});\n`;
+};
+csharpGenerator.forBlock['cu_destroy_creature'] = (block) => {
+  const id = block.getFieldValue('ID');
+  return `CuCreatureManager.Destroy("${id}");\n`;
+};
+csharpGenerator.forBlock['cu_creature_pos_x'] = (block) => {
+  const id = block.getFieldValue('ID');
+  return [`CuCreatureManager.GetPosition("${id}").x`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_creature_pos_y'] = (block) => {
+  const id = block.getFieldValue('ID');
+  return [`CuCreatureManager.GetPosition("${id}").y`, ORDER_ATOMIC];
 };
 
 // ═══ Extract structured function data from workspace ═════════════
