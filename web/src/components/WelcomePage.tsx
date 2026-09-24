@@ -246,6 +246,8 @@ export default function WelcomePage({ onOpenProject }: Props) {
                     <div
                       key={p.name}
                       className={`wp-item${selected.has(p.name) ? ' selected' : ''}`}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => loadProject(p.name)}
                     >
                       <label className="wp-item-select" onClick={e => e.stopPropagation()}>
                         <input
@@ -254,7 +256,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
                           onChange={() => toggleSelect(p.name)}
                         />
                       </label>
-                      <span className="wp-item-name" onClick={() => loadProject(p.name)}>
+                      <span className="wp-item-name">
                         {p.name}
                       </span>
                       <span className="wp-item-meta">{p.cbpFile}</span>
