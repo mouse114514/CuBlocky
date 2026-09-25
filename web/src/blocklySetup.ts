@@ -2685,7 +2685,7 @@ csharpGenerator.forBlock['cu_talk'] = (block, gen) => {
 };
 csharpGenerator.forBlock['cu_run_command'] = (block, gen) => {
   const cmd = gen.valueToCode(block, 'COMMAND', ORDER_ATOMIC) || '"help"';
-  return `ConsoleScript.ExecuteCommand(${cmd});\n`;
+  return `ConsoleScript.instance.ExecuteCommand(${cmd});\n`;
 };
 csharpGenerator.forBlock['cu_set_pain'] = (block, gen) => {
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
