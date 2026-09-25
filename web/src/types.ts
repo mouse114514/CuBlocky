@@ -122,6 +122,16 @@ export interface CreatureEntry {
   health: number;
 }
 
+// ── Animation registration (sprite sheet -> frames) ──
+export interface AnimationEntry {
+  id: string;
+  sheetAssetId?: string | null;
+  frameWidth: number;
+  frameHeight: number;
+  fps: number;
+  loop: boolean;
+}
+
 // ── Blueprint root ──
 export interface Blueprint {
   mod: ModMeta;

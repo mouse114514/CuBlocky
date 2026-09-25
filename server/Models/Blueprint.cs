@@ -272,6 +272,17 @@ public class CreatureEntry
     public float Health { get; set; } = 100f;
 }
 
+// ── Animations (sprite sheet sliced into frames) ────────────────────
+public class AnimationEntry
+{
+    public string Id { get; set; } = "myAnim";
+    public string? SheetAssetId { get; set; }
+    public int FrameWidth { get; set; } = 16;
+    public int FrameHeight { get; set; } = 16;
+    public float Fps { get; set; } = 12f;
+    public bool Loop { get; set; } = true;
+}
+
 // ── Functions (define/call/return from Blockly) ────────────────────
 public class FunctionDef
 {

@@ -94,6 +94,9 @@ const TOOLBOX = `
     <block type="cu_register_creature">
       <value name="SPRITE"><shadow type="cu_sprite_ref"><field name="ASSET">creature.png</field></shadow></value>
     </block>
+    <block type="cu_register_animation">
+      <value name="SPRITE"><shadow type="cu_sprite_ref"><field name="ASSET">walk.png</field></shadow></value>
+    </block>
     <block type="cu_register_tile"></block>
     <block type="cu_register_locale"></block>
     <sep></sep>
@@ -463,8 +466,7 @@ const TOOLBOX = `
     <block type="cu_temperature"></block>
     <block type="cu_hunger"></block>
     <block type="cu_weight"></block>
-    <block type="cu_position_x"></block>
-    <block type="cu_position_y"></block>
+    <block type="cu_player_position"></block>
     <sep></sep>
     <block type="cu_status_ref"></block>
     <block type="cu_status_get">
@@ -617,9 +619,9 @@ const TOOLBOX = `
       <value name="SPEED"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
     </block>
     <block type="cu_destroy_creature"></block>
+    <block type="cu_play_creature_animation"></block>
     <sep></sep>
-    <block type="cu_creature_pos_x"></block>
-    <block type="cu_creature_pos_y"></block>
+    <block type="cu_creature_position"></block>
   </category>
   <category name="%{BKY_CAT_UI}" colour="#00acc1">
     <block type="cu_sprite_ref"></block>
