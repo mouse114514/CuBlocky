@@ -65,9 +65,9 @@ public static class ProjectEmitter
         var remainingLines = new List<string>();
 
         var lines = eventCode.Split('\n');
-        string capturingItemUse = null;
+        string? capturingItemUse = null;
         var itemUseBody = new System.Text.StringBuilder();
-        FunctionDef capturingFunction = null;
+        FunctionDef? capturingFunction = null;
         var functionBody = new System.Text.StringBuilder();
 
         foreach (var raw in lines)
@@ -203,7 +203,7 @@ public static class ProjectEmitter
             else if (line.StartsWith("//DEFINE_FUNCTION:"))
             {
                 var json = line.Substring(18).Trim();
-                FunctionDef fn = null;
+                FunctionDef? fn = null;
                 try
                 {
                     var doc = JsonDocument.Parse(json);
@@ -557,7 +557,6 @@ Copy the built DLL from `bin/Release/` into
 
         var lines = eventCode.Split('\n');
         var patchIdx = 0;
-        var eventIdx = 0;
         var currentMethod = "";
         var currentBody = new StringBuilder();
         var hasCclEvents = false;

@@ -116,7 +116,7 @@ app.MapGet("/api/projects/{name}/assets/raw/{assetName}", (string name, string a
 });
 
 // Legacy upload endpoint (redirects to project-scoped)
-app.MapPost("/api/upload", async (HttpRequest req) =>
+app.MapPost("/api/upload", (HttpRequest req) =>
 {
     return Results.BadRequest("use /api/projects/{name}/assets/upload instead");
 });
