@@ -262,6 +262,16 @@ public class LocaleEntry
     public string En { get; set; } = "English Name";
 }
 
+// ── Creatures (BuildingEntity with Animal = true) ──────────────────
+public class CreatureEntry
+{
+    public string Id { get; set; } = "myCreature";
+    public string Name { get; set; } = "My Creature";
+    public string Desc { get; set; } = "";
+    public string? SpriteAssetId { get; set; }
+    public float Health { get; set; } = 100f;
+}
+
 // ── Functions (define/call/return from Blockly) ────────────────────
 public class FunctionDef
 {

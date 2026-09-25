@@ -23,15 +23,16 @@ public static class ProjectEmitter
         var hasUI = bp.UiControls != null && bp.UiControls.Count > 0;
 
         // Extract register markers from event code
-        var (eventCode, registerItems, registerRecipes, registerBuildings, registerTiles, registerLocales, registerLiquids, statuses, functions) = ExtractRegisterMarkers(bp.EventHandlers!);
+        var (eventCode, registerItems, registerRecipes, registerBuildings, registerTiles, registerLocales, registerLiquids, registerCreatures, statuses, functions) = ExtractRegisterMarkers(bp.EventHandlers!);
         var hasStatuses = statuses.Count > 0;
+        var hasCreatureMgr = registerCreatures.Count > 0 || eventCode.Contains("CuCreatureManager.");
 
         var gPath = gamePath ?? DefaultGamePath;
 
         var files = new Dictionary<string, string>
         {
             ["Plugin.cs"] = EmitPlugin(ns, guid, name, ver, desc, hasEvents, hasStatuses, hasUI),
-            ["RegisterContent.cs"] = CodeEmitter.EmitRegisterContent(bp, registerItems, registerRecipes, registerBuildings, registerTiles, registerLocales, registerLiquids),
+            ["RegisterContent.cs"] = CodeEmitter.EmitRegisterContent(bp, registerItems, registerRecipes, registerBuildings, registerTiles, registerLocales, registerLiquids, registerCreatures),
             [asmName + ".csproj"] = EmitCsproj(asmName, ns, gPath),
             ["README.md"] = EmitReadme(name, ver),
         };
@@ -45,10 +46,13 @@ public static class ProjectEmitter
         if (hasUI)
             files["CuUI.cs"] = EmitCuUI(ns, bp.UiControls!);
 
+        if (hasCreatureMgr)
+            files["CuCreatureManager.cs"] = CodeEmitter.EmitCreatureManager(ns);
+
         return files;
     }
 
-    private static (string eventCode, List<ItemEntry> items, List<RecipeEntry> recipes, List<BuildingEntry> buildings, List<TileEntry> tiles, List<LocaleEntry> locales, List<LiquidEntry> liquids, List<StatusEntry> statuses, List<FunctionDef> functions) ExtractRegisterMarkers(string eventCode)
+    private static (string eventCode, List<ItemEntry> items, List<RecipeEntry> recipes, List<BuildingEntry> buildings, List<TileEntry> tiles, List<LocaleEntry> locales, List<LiquidEntry> liquids, List<CreatureEntry> creatures, List<StatusEntry> statuses, List<FunctionDef> functions) ExtractRegisterMarkers(string eventCode)
     {
         var items = new List<ItemEntry>();
         var recipes = new List<RecipeEntry>();
@@ -56,6 +60,7 @@ public static class ProjectEmitter
         var tiles = new List<TileEntry>();
         var locales = new List<LocaleEntry>();
         var liquids = new List<LiquidEntry>();
+        var creatures = new List<CreatureEntry>();
         var statuses = new List<StatusEntry>();
         var functions = new List<FunctionDef>();
         var itemProps = new List<(string id, JsonElement json)>();
@@ -121,6 +126,11 @@ public static class ProjectEmitter
             {
                 var json = line.Substring(16).Trim();
                 try { var tile = JsonSerializer.Deserialize<TileEntry>(json); if (tile != null) tiles.Add(tile); } catch { }
+            }
+            else if (line.StartsWith("//REGISTER_CREATURE:"))
+            {
+                var json = line.Substring(20).Trim();
+                try { var creature = JsonSerializer.Deserialize<CreatureEntry>(json); if (creature != null) creatures.Add(creature); } catch { }
             }
             else if (line.StartsWith("//REGISTER_LOCALE:"))
             {
@@ -385,7 +395,7 @@ public static class ProjectEmitter
             if (json.TryGetProperty("SpawnFrequency", out var sEl)) { item.SpawnFrequency = int.TryParse(Raw(sEl), out var sVal) ? sVal : 1; item.IsAdvanced = true; }
         }
 
-        return (string.Join('\n', remainingLines), items, recipes, buildings, tiles, locales, liquids, statuses, functions);
+        return (string.Join('\n', remainingLines), items, recipes, buildings, tiles, locales, liquids, creatures, statuses, functions);
     }
 
     // Strip quotes from JSON string values; pass through numbers/booleans as-is.

@@ -184,6 +184,7 @@ const C = {
   TILE:     '#8d6e63',
   LOCALE:   '#5c6bc0',
   UI:       '#00acc1',
+  CREATURE: '#ff6f00',
 };
 
 type DdOption = [string, string, string, string]; // [zhLabel, enLabel, ruLabel, value]
@@ -957,6 +958,77 @@ const BLOCK_JSON: any[] = [
     colour: C.REGISTER, inputsInline: true,
   },
 
+  // ═══ Creature registration (register red) ═══════════════════
+  {
+    type: 'cu_register_creature',
+    message0: '%{BKY_CU_REGISTER_CREATURE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myCreature' },
+      { type: 'field_input', name: 'NAME', text: 'My Creature' },
+      { type: 'field_input', name: 'DESC', text: 'A creature' },
+      { type: 'input_value', name: 'SPRITE', check: 'Sprite', align: 'RIGHT' },
+      { type: 'field_number', name: 'HEALTH', value: 100, min: 0, precision: 1 },
+    ],
+    colour: C.REGISTER, inputsInline: true,
+  },
+
+  // ═══ Creature control (orange) ═══════════════════════════════
+  {
+    type: 'cu_spawn_creature',
+    message0: '%{BKY_CU_SPAWN_CREATURE}',
+    args0: [
+      { type: 'field_input', name: 'CREATURE_ID', text: 'myCreature' },
+      { type: 'input_value', name: 'X', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'Y', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_set_creature_pos',
+    message0: '%{BKY_CU_SET_CREATURE_POS}',
+    args0: [
+      { type: 'field_input', name: 'CREATURE_ID', text: 'myCreature' },
+      { type: 'input_value', name: 'X', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'Y', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_move_creature_to',
+    message0: '%{BKY_CU_MOVE_CREATURE_TO}',
+    args0: [
+      { type: 'field_input', name: 'CREATURE_ID', text: 'myCreature' },
+      { type: 'input_value', name: 'X', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'Y', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'SPEED', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_destroy_creature',
+    message0: '%{BKY_CU_DESTROY_CREATURE}',
+    args0: [
+      { type: 'field_input', name: 'CREATURE_ID', text: 'myCreature' },
+    ],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_creature_pos_x',
+    message0: '%{BKY_CU_CREATURE_POS_X}',
+    args0: [
+      { type: 'field_input', name: 'CREATURE_ID', text: 'myCreature' },
+    ],
+    output: 'Number', colour: C.CREATURE,
+  },
+  {
+    type: 'cu_creature_pos_y',
+    message0: '%{BKY_CU_CREATURE_POS_Y}',
+    args0: [
+      { type: 'field_input', name: 'CREATURE_ID', text: 'myCreature' },
+    ],
+    output: 'Number', colour: C.CREATURE,
+  },
+
   // ═══ Player state getters (green-ish) ════════════════════════
   { type: 'cu_player_health', message0: '%{BKY_CU_PLAYER_HEALTH}', output: 'Number', colour: C.BODY },
   { type: 'cu_player_max_health', message0: '%{BKY_CU_PLAYER_MAX_HEALTH}', output: 'Number', colour: C.BODY },
@@ -1686,6 +1758,13 @@ const MSG_ZH: Record<string, string> = {
   CU_REGISTER_TILE: '注册地块 id %1 名称 %2 描述 %3',
   CU_TILE_SET_PROPERTY: '地块 %1 设置 %2 为 %3',
   CU_REGISTER_LOCALE: '本地化 %1 id %2 中文 %3 英文 %4',
+  CU_REGISTER_CREATURE: '注册生物 id %1 名称 %2 描述 %3 精灵图 %4 血量 %5',
+  CU_SPAWN_CREATURE: '生成生物 %1 于 X %2 Y %3',
+  CU_SET_CREATURE_POS: '设置生物 %1 位置 X %2 Y %3',
+  CU_MOVE_CREATURE_TO: '移动生物 %1 到 X %2 Y %3 速度 %4',
+  CU_DESTROY_CREATURE: '销毁生物 %1',
+  CU_CREATURE_POS_X: '生物 %1 的X坐标',
+  CU_CREATURE_POS_Y: '生物 %1 的Y坐标',
   CU_PLAYER_HEALTH: '玩家血量',
   CU_PLAYER_MAX_HEALTH: '玩家最大血量',
   CU_PLAYER_STAMINA: '玩家体力',
@@ -1893,6 +1972,13 @@ const MSG_EN: Record<string, string> = {
   CU_REGISTER_TILE: 'register tile id %1 name %2 desc %3',
   CU_TILE_SET_PROPERTY: 'tile %1 set %2 to %3',
   CU_REGISTER_LOCALE: 'locale %1 id %2 zh %3 en %4',
+  CU_REGISTER_CREATURE: 'register creature id %1 name %2 desc %3 sprite %4 health %5',
+  CU_SPAWN_CREATURE: 'spawn creature %1 at X %2 Y %3',
+  CU_SET_CREATURE_POS: 'set creature %1 position X %2 Y %3',
+  CU_MOVE_CREATURE_TO: 'move creature %1 to X %2 Y %3 speed %4',
+  CU_DESTROY_CREATURE: 'destroy creature %1',
+  CU_CREATURE_POS_X: 'x position of creature %1',
+  CU_CREATURE_POS_Y: 'y position of creature %1',
   CU_PLAYER_HEALTH: 'player health',
   CU_PLAYER_MAX_HEALTH: 'player max health',
   CU_PLAYER_STAMINA: 'player stamina',
@@ -2100,6 +2186,13 @@ const MSG_RU: Record<string, string> = {
   CU_REGISTER_TILE: 'зарегистрировать тайл id %1 название %2 описание %3',
   CU_TILE_SET_PROPERTY: 'тайл %1 установить %2 = %3',
   CU_REGISTER_LOCALE: 'локализация %1 id %2 кит %3 анг %4',
+  CU_REGISTER_CREATURE: 'зарегистрировать существо id %1 название %2 описание %3 спрайт %4 здоровье %5',
+  CU_SPAWN_CREATURE: 'создать существо %1 на X %2 Y %3',
+  CU_SET_CREATURE_POS: 'установить существу %1 позицию X %2 Y %3',
+  CU_MOVE_CREATURE_TO: 'переместить существо %1 к X %2 Y %3 скорость %4',
+  CU_DESTROY_CREATURE: 'уничтожить существо %1',
+  CU_CREATURE_POS_X: 'координата X существа %1',
+  CU_CREATURE_POS_Y: 'координата Y существа %1',
   CU_PLAYER_HEALTH: 'здоровье игрока',
   CU_PLAYER_MAX_HEALTH: 'макс. здоровье',
   CU_PLAYER_STAMINA: 'выносливость',
@@ -3009,6 +3102,49 @@ csharpGenerator.forBlock['cu_register_locale'] = (block) => {
   const en = block.getFieldValue('EN').replace(/"/g, '\\"');
   const json = JSON.stringify({Type: type, Id: id, Zh: zh, En: en});
   return `//REGISTER_LOCALE:${json}\n`;
+};
+
+// Creature
+csharpGenerator.forBlock['cu_register_creature'] = (block, gen) => {
+  const id = block.getFieldValue('ID').replace(/"/g, '\\"');
+  const name = block.getFieldValue('NAME').replace(/"/g, '\\"');
+  const desc = block.getFieldValue('DESC').replace(/"/g, '\\"');
+  const spriteCode = gen.valueToCode(block, 'SPRITE', ORDER_ATOMIC) || '';
+  const spriteId = spriteCode.replace(/^"|"$/g, '') || null;
+  const health = Number(block.getFieldValue('HEALTH')) || 100;
+  const json = JSON.stringify({Id: id, Name: name, Desc: desc, SpriteAssetId: spriteId, Health: health});
+  return `//REGISTER_CREATURE:${json}\n`;
+};
+csharpGenerator.forBlock['cu_spawn_creature'] = (block, gen) => {
+  const id = (block.getFieldValue('CREATURE_ID') || 'myCreature').replace(/"/g, '\\"');
+  const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
+  const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
+  return `CuCreatureManager.Spawn("${id}", new Vector3(${x}, ${y}, 0f));\n`;
+};
+csharpGenerator.forBlock['cu_set_creature_pos'] = (block, gen) => {
+  const id = (block.getFieldValue('CREATURE_ID') || 'myCreature').replace(/"/g, '\\"');
+  const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
+  const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
+  return `CuCreatureManager.SetPosition("${id}", new Vector3(${x}, ${y}, 0f));\n`;
+};
+csharpGenerator.forBlock['cu_move_creature_to'] = (block, gen) => {
+  const id = (block.getFieldValue('CREATURE_ID') || 'myCreature').replace(/"/g, '\\"');
+  const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
+  const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
+  const speed = gen.valueToCode(block, 'SPEED', ORDER_ATOMIC) || '1';
+  return `CuCreatureManager.MoveTo("${id}", new Vector3(${x}, ${y}, 0f), ${speed});\n`;
+};
+csharpGenerator.forBlock['cu_destroy_creature'] = (block) => {
+  const id = (block.getFieldValue('CREATURE_ID') || 'myCreature').replace(/"/g, '\\"');
+  return `CuCreatureManager.Destroy("${id}");\n`;
+};
+csharpGenerator.forBlock['cu_creature_pos_x'] = (block) => {
+  const id = (block.getFieldValue('CREATURE_ID') || 'myCreature').replace(/"/g, '\\"');
+  return [`CuCreatureManager.GetPosition("${id}").x`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_creature_pos_y'] = (block) => {
+  const id = (block.getFieldValue('CREATURE_ID') || 'myCreature').replace(/"/g, '\\"');
+  return [`CuCreatureManager.GetPosition("${id}").y`, ORDER_ATOMIC];
 };
 
 // Player state getters

@@ -113,6 +113,15 @@ export interface UIControl {
   alignV?: 'top' | 'center' | 'bottom';
 }
 
+// ── Creature (registered via blocks) ──
+export interface CreatureEntry {
+  id: string;
+  name: string;
+  desc: string;
+  spriteAssetId?: string | null;
+  health: number;
+}
+
 // ── Blueprint root ──
 export interface Blueprint {
   mod: ModMeta;

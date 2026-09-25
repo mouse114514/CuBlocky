@@ -45,6 +45,7 @@ const CAT_ICONS: Record<string, string> = {
   CAT_FUNC: `/media/cat-icons/function.png?v=${_t}`,
   CAT_BUILDING: `/media/cat-icons/building.png?v=${_t}`,
   CAT_TILE: `/media/cat-icons/tile.png?v=${_t}`,
+  CAT_CREATURE: `/media/cat-icons/creature.png?v=${_t}`,
   CAT_UI: '',
   CAT_LOCALE: '',
 };
@@ -90,6 +91,9 @@ const TOOLBOX = `
       <value name="INT"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
     </block>
     <block type="cu_register_building"></block>
+    <block type="cu_register_creature">
+      <value name="SPRITE"><shadow type="cu_sprite_ref"><field name="ASSET">creature.png</field></shadow></value>
+    </block>
     <block type="cu_register_tile"></block>
     <block type="cu_register_locale"></block>
     <sep></sep>
@@ -598,6 +602,25 @@ const TOOLBOX = `
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
     </block>
   </category>
+  <category name="%{BKY_CAT_CREATURE}" colour="#ff6f00">
+    <block type="cu_spawn_creature">
+      <value name="X"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
+      <value name="Y"><shadow type="cu_number"><field name="NUM">5</field></shadow></value>
+    </block>
+    <block type="cu_set_creature_pos">
+      <value name="X"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
+      <value name="Y"><shadow type="cu_number"><field name="NUM">5</field></shadow></value>
+    </block>
+    <block type="cu_move_creature_to">
+      <value name="X"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
+      <value name="Y"><shadow type="cu_number"><field name="NUM">5</field></shadow></value>
+      <value name="SPEED"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
+    </block>
+    <block type="cu_destroy_creature"></block>
+    <sep></sep>
+    <block type="cu_creature_pos_x"></block>
+    <block type="cu_creature_pos_y"></block>
+  </category>
   <category name="%{BKY_CAT_UI}" colour="#00acc1">
     <block type="cu_sprite_ref"></block>
     <block type="cu_show_control"></block>
@@ -617,12 +640,14 @@ const CAT_MSG_ZH: Record<string, string> = {
   CAT_SOUND: '音效', CAT_WORLD: '世界', CAT_FLOW: '流程', CAT_VALUE: '取值',
   CAT_BOOLEAN: '布尔', CAT_VAR: '变量', CAT_FUNC: '函数',
   CAT_BUILDING: '建筑', CAT_TILE: '地块', CAT_UI: '界面', CAT_LOCALE: '本地化',
+  CAT_CREATURE: '生物',
 };
 const CAT_MSG_EN: Record<string, string> = {
   CAT_EVENT: 'Events', CAT_REGISTER: 'Register', CAT_BODY: 'Body', CAT_ITEM: 'Item',
   CAT_SOUND: 'Sound', CAT_WORLD: 'World', CAT_FLOW: 'Flow', CAT_VALUE: 'Value',
   CAT_BOOLEAN: 'Boolean', CAT_VAR: 'Variable', CAT_FUNC: 'Function',
   CAT_BUILDING: 'Building', CAT_TILE: 'Tile', CAT_UI: 'UI', CAT_LOCALE: 'Locale',
+  CAT_CREATURE: 'Creature',
 };
 
 export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, searchTerm }: Props) {
