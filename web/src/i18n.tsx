@@ -148,6 +148,16 @@ const dict = {
   'asset.empty':       { zh: '暂无资源，请上传', en: 'No assets. Upload one.', ru: 'Нет ресурсов. Загрузите.' },
   'asset.delete':      { zh: '删除', en: 'Delete', ru: 'Удалить' },
   'asset.generate':    { zh: '生成积木', en: 'Generate Block', ru: 'Создать блок' },
+  'asset.selectAll':   { zh: '全选', en: 'Select All', ru: 'Выделить всё' },
+  'asset.clearSel':    { zh: '清空选择', en: 'Clear', ru: 'Снять выделение' },
+  'asset.selected':    { zh: '已选', en: 'selected', ru: 'выбрано' },
+  'asset.merge':       { zh: '合并图表', en: 'Merge Sheet', ru: 'Склеить лист' },
+  'asset.merging':     { zh: '合并中...', en: 'Merging...', ru: 'Склейка...' },
+  'asset.mergeFailed': { zh: '合并失败', en: 'Merge failed', ru: 'Ошибка склейки' },
+  'asset.mergeName':   { zh: '文件名', en: 'File name', ru: 'Имя файла' },
+  'asset.mergeHint':   { zh: '点击顺序即为帧顺序（左→右）', en: 'Click order = frame order (left → right)', ru: 'Порядок кликов = порядок кадров (слева направо)' },
+  'asset.frameW':      { zh: '帧宽', en: 'Frame W', ru: 'Ширина кадра' },
+  'asset.frameH':      { zh: '帧高', en: 'Frame H', ru: 'Высота кадра' },
 
   // ── Language modal ──
   'lang.title':        { zh: '选择语言', en: 'Select Language', ru: 'Выбрать язык' },

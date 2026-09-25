@@ -364,6 +364,19 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 }
 .asset-card:hover .asset-del{opacity:1}
 .asset-del:hover{background:rgba(200,0,0,.8)}
+.asset-badge{
+  position:absolute;top:2px;left:2px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;
+  background:#1a8a1a;color:#fff;font-size:11px;line-height:18px;text-align:center;font-weight:700;z-index:1;
+}
+.asset-merge-bar{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;margin-bottom:8px;
+  background:#eef7ee;border:1px solid #c8e6c9;border-radius:6px;
+}
+.asset-merge-bar label{font-size:12px;color:#333;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.asset-merge-bar input[type=number]{width:56px;padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;background:#fff}
+.asset-merge-bar input[type=text]{width:130px;padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;background:#fff}
+.asset-merge-bar input:focus{outline:none;border-color:#1a8a1a}
+.asset-merge-hint{font-size:11px;color:#777;width:100%}
 
 /* ── UI Editor ───────────────────────────────────────────────── */
 .ui-editor{display:flex;flex-direction:column;height:100vh}
