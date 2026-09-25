@@ -1564,6 +1564,9 @@ const BLOCK_JSON: any[] = [
         ['textColor', 'textColor'], ['backgroundColor', 'backgroundColor'],
         ['strokeColor', 'strokeColor'], ['strokeWidth', 'strokeWidth'],
         ['cornerRadius', 'cornerRadius'], ['opacity', 'opacity'],
+        ['value', 'value'], ['min', 'min'], ['max', 'max'],
+        ['fillColor', 'fillColor'], ['sprite', 'sprite'], ['options', 'options'],
+        ['selected', 'selected'], ['alignH', 'alignH'], ['alignV', 'alignV'],
       ]},
       { type: 'input_value', name: 'VALUE' },
     ],
@@ -1579,6 +1582,24 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'CONTROL_ID', text: 'myTextField' },
     ],
     output: 'String',
+    colour: C.UI,
+  },
+  {
+    type: 'cu_get_control_value',
+    message0: '%{BKY_CU_GET_CONTROL_VALUE}',
+    args0: [
+      { type: 'field_input', name: 'CONTROL_ID', text: 'mySlider' },
+    ],
+    output: 'Number',
+    colour: C.UI,
+  },
+  {
+    type: 'cu_get_toggle_state',
+    message0: '%{BKY_CU_GET_TOGGLE_STATE}',
+    args0: [
+      { type: 'field_input', name: 'CONTROL_ID', text: 'myToggle' },
+    ],
+    output: 'Boolean',
     colour: C.UI,
   },
 ];
@@ -1787,6 +1808,8 @@ const MSG_ZH: Record<string, string> = {
   CU_HIDE_CONTROL: '隐藏控件 %1',
   CU_SET_CONTROL_PROPERTY: '设置控件 %1 属性 %2 为 %3',
   CU_GET_TEXTFIELD_CONTENT: '文本框 %1 的内容',
+  CU_GET_CONTROL_VALUE: '控件 %1 的值',
+  CU_GET_TOGGLE_STATE: '开关 %1 的状态',
 };
 
 const MSG_EN: Record<string, string> = {
@@ -1992,6 +2015,8 @@ const MSG_EN: Record<string, string> = {
   CU_HIDE_CONTROL: 'hide control %1',
   CU_SET_CONTROL_PROPERTY: 'set control %1 property %2 to %3',
   CU_GET_TEXTFIELD_CONTENT: 'content of textfield %1',
+  CU_GET_CONTROL_VALUE: 'value of control %1',
+  CU_GET_TOGGLE_STATE: 'state of toggle %1',
 };
 
 const MSG_RU: Record<string, string> = {
@@ -2188,6 +2213,8 @@ const MSG_RU: Record<string, string> = {
   CU_HIDE_CONTROL: 'скрыть элемент %1',
   CU_SET_CONTROL_PROPERTY: 'установить элемент %1 свойство %2 значение %3',
   CU_GET_TEXTFIELD_CONTENT: 'содержимое текстового поля %1',
+  CU_GET_CONTROL_VALUE: 'значение элемента %1',
+  CU_GET_TOGGLE_STATE: 'состояние переключателя %1',
 };
 
 export function setMessages(lang: string) {
@@ -3455,6 +3482,14 @@ csharpGenerator.forBlock['cu_set_control_property'] = (block, gen) => {
 csharpGenerator.forBlock['cu_get_textfield_content'] = (block) => {
   const id = block.getFieldValue('CONTROL_ID') || 'myTextField';
   return [`CuUI.GetText("${id}")`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_get_control_value'] = (block) => {
+  const id = block.getFieldValue('CONTROL_ID') || 'mySlider';
+  return [`CuUI.GetValue("${id}")`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_get_toggle_state'] = (block) => {
+  const id = block.getFieldValue('CONTROL_ID') || 'myToggle';
+  return [`CuUI.GetToggle("${id}")`, ORDER_ATOMIC];
 };
 
 // ═══ Extract structured function data from workspace ═════════════

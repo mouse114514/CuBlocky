@@ -606,6 +606,8 @@ const TOOLBOX = `
       <value name="VALUE"><shadow type="cu_text"><field name="TEXT">Hello</field></shadow></value>
     </block>
     <block type="cu_get_textfield_content"></block>
+    <block type="cu_get_control_value"></block>
+    <block type="cu_get_toggle_state"></block>
   </category>
 </xml>
 `;

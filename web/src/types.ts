@@ -77,9 +77,14 @@ export interface FunctionDef {
 }
 
 // ── UI Control ──
+export type UIControlType =
+  | 'button' | 'textfield' | 'toggle'
+  | 'label' | 'box' | 'image'
+  | 'slider' | 'progressbar' | 'dropdown';
+
 export interface UIControl {
   id: string;
-  type: 'button' | 'textfield' | 'toggle';
+  type: UIControlType;
   x: number;
   y: number;
   width: number;
@@ -93,6 +98,19 @@ export interface UIControl {
   cornerRadius: number;
   opacity: number;
   visible: boolean;
+  /** image: embedded sprite name */
+  sprite?: string;
+  /** slider/progressbar: current value */
+  value?: number;
+  min?: number;
+  max?: number;
+  /** progressbar: fill color */
+  fillColor?: string;
+  /** dropdown: '|' separated options */
+  options?: string;
+  /** text alignment */
+  alignH?: 'left' | 'center' | 'right';
+  alignV?: 'top' | 'center' | 'bottom';
 }
 
 // ── Blueprint root ──

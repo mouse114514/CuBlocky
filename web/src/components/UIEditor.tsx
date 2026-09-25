@@ -8,8 +8,14 @@ const SNAP_THRESHOLD = 0.008;
 
 const PALETTE: { type: UIControl['type']; icon: string; key: string }[] = [
   { type: 'button', icon: '▣', key: 'ui.button' },
+  { type: 'label', icon: 'T', key: 'ui.label' },
   { type: 'textfield', icon: '▭', key: 'ui.textfield' },
   { type: 'toggle', icon: '◐', key: 'ui.toggle' },
+  { type: 'slider', icon: '☰', key: 'ui.slider' },
+  { type: 'progressbar', icon: '▮', key: 'ui.progressbar' },
+  { type: 'dropdown', icon: '▾', key: 'ui.dropdown' },
+  { type: 'box', icon: '⬚', key: 'ui.box' },
+  { type: 'image', icon: '🖼', key: 'ui.image' },
 ];
 
 function defaultProps(type: UIControl['type'], xPct: number, yPct: number, idx: number): UIControl {
@@ -19,20 +25,47 @@ function defaultProps(type: UIControl['type'], xPct: number, yPct: number, idx: 
     y: Math.max(0, yPct - 0.015),
     fontSize: 14,
     textColor: '#FFFFFF',
-    backgroundColor: '#2a2a3e',
-    strokeColor: '#555577',
+    backgroundColor: '#000000',
+    strokeColor: '#000000',
     strokeWidth: 1,
     cornerRadius: 4,
     opacity: 1,
     visible: true,
+    alignH: 'center' as const,
+    alignV: 'center' as const,
   };
-  if (type === 'button') return { ...base, type, width: 0.063, height: 0.030, text: `Button${idx}`, backgroundColor: '#000000', textColor: '#ffffff', cornerRadius: 20 };
-  if (type === 'textfield') return { ...base, type, width: 0.083, height: 0.024, text: '' };
-  return { ...base, type, width: 0.073, height: 0.024, text: `Toggle${idx}` };
+  switch (type) {
+    case 'button': return { ...base, type, width: 0.063, height: 0.030, text: `Button${idx}` };
+    case 'textfield': return { ...base, type, width: 0.083, height: 0.024, text: '' };
+    case 'toggle': return { ...base, type, width: 0.073, height: 0.024, text: `Toggle${idx}` };
+    case 'label': return { ...base, type, width: 0.060, height: 0.024, text: `Label${idx}`, strokeWidth: 0, alignH: 'left' as const };
+    case 'box': return { ...base, type, width: 0.150, height: 0.120, text: '', backgroundColor: '#DDDDDD', strokeColor: '#999999', textColor: '#000000', cornerRadius: 8 };
+    case 'image': return { ...base, type, width: 0.080, height: 0.080, text: '', sprite: '', strokeWidth: 0 };
+    case 'slider': return { ...base, type, width: 0.120, height: 0.020, text: '', value: 0.5, min: 0, max: 1, backgroundColor: '#DDDDDD', strokeColor: '#999999', fillColor: '#4caf50', textColor: '#000000', strokeWidth: 0, cornerRadius: 6 };
+    case 'progressbar': return { ...base, type, width: 0.120, height: 0.020, text: '', value: 0.7, min: 0, max: 1, backgroundColor: '#DDDDDD', strokeColor: '#999999', fillColor: '#4caf50', textColor: '#000000', strokeWidth: 0, cornerRadius: 6 };
+    case 'dropdown': return { ...base, type, width: 0.083, height: 0.026, text: 'Option1', options: 'Option1|Option2|Option3', backgroundColor: '#DDDDDD', strokeColor: '#999999', textColor: '#000000', alignH: 'left' as const };
+  }
 }
 
 // Snap positions: screen edges, 1/5, 1/3, 1/2, 2/3, 4/5
 const SNAP_POSITIONS = [0, 1 / 5, 1 / 3, 1 / 2, 2 / 3, 4 / 5, 1];
+
+// #RRGGBB or #RRGGBBAA → css color
+function hexA(hex: string): string {
+  if (!hex) return 'transparent';
+  if (hex.length === 9) {
+    const a = parseInt(hex.slice(7, 9), 16) / 255;
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+  return hex;
+}
+
+function alignH(a?: string): string {
+  return a === 'left' ? 'flex-start' : a === 'right' ? 'flex-end' : 'center';
+}
 
 function buildSnapTargets(controls: UIControl[], excludeId: string) {
   const xs: number[] = [...SNAP_POSITIONS];
@@ -223,13 +256,13 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
       top: `${ctrl.y * 100}%`,
       width: `${ctrl.width * 100}%`,
       height: `${ctrl.height * 100}%`,
-      background: ctrl.backgroundColor,
-      border: `${ctrl.strokeWidth}px solid ${ctrl.strokeColor}`,
+      background: hexA(ctrl.backgroundColor),
+      border: ctrl.strokeWidth > 0 ? `${ctrl.strokeWidth}px solid ${ctrl.strokeColor}` : 'none',
       borderRadius: `${ctrl.cornerRadius}px`,
       opacity: ctrl.visible ? ctrl.opacity : ctrl.opacity * 0.35,
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: alignH(ctrl.alignH),
       color: ctrl.textColor,
       fontSize: `${ctrl.fontSize}px`,
       cursor: 'move',
@@ -238,6 +271,8 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
       boxSizing: 'border-box',
       overflow: 'hidden',
       whiteSpace: 'nowrap',
+      flexDirection: 'row',
+      textAlign: ctrl.alignH === 'left' ? 'left' : ctrl.alignH === 'right' ? 'right' : 'center',
     };
 
     const handleStyle = (corner: 'tl' | 'tr' | 'bl' | 'br'): React.CSSProperties => {
@@ -252,6 +287,49 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
       };
     };
 
+    const label = <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{ctrl.text || (ctrl.type === 'textfield' ? '…' : '')}</span>;
+
+    let inner: React.ReactNode;
+    switch (ctrl.type) {
+      case 'toggle':
+        inner = <><span style={{ marginRight: 4, fontSize: '0.8em' }}>○</span>{label}</>;
+        break;
+      case 'label':
+        inner = label;
+        break;
+      case 'slider': {
+        const v = Math.max(0, Math.min(1, ((ctrl.value ?? 0) - (ctrl.min ?? 0)) / ((ctrl.max ?? 1) - (ctrl.min ?? 0)) || 0));
+        inner = (
+          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${v * 100}%`, background: ctrl.fillColor || '#4caf50', borderRadius: ctrl.cornerRadius }} />
+            <div style={{ position: 'absolute', left: `${v * 100}%`, top: '50%', width: 10, height: '100%', transform: 'translateX(-50%)', background: ctrl.textColor, borderRadius: 2 }} />
+          </div>
+        );
+        break;
+      }
+      case 'progressbar': {
+        const v = Math.max(0, Math.min(1, ((ctrl.value ?? 0) - (ctrl.min ?? 0)) / ((ctrl.max ?? 1) - (ctrl.min ?? 0)) || 0));
+        inner = (
+          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${v * 100}%`, background: ctrl.fillColor || '#4caf50', borderRadius: ctrl.cornerRadius }} />
+            {ctrl.text && <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{ctrl.text}</span>}
+          </div>
+        );
+        break;
+      }
+      case 'dropdown':
+        inner = <><span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', paddingLeft: 4 }}>{ctrl.text}</span><span style={{ paddingRight: 4 }}>▾</span></>;
+        break;
+      case 'image':
+        inner = <span style={{ fontSize: '0.85em', opacity: 0.7 }}>{ctrl.sprite ? ctrl.sprite : '🖼'}</span>;
+        break;
+      case 'box':
+        inner = ctrl.text ? label : null;
+        break;
+      default:
+        inner = label;
+    }
+
     return (
       <div
         key={ctrl.id}
@@ -259,10 +337,7 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
         onMouseDown={(e) => handleControlMouseDown(e, ctrl)}
         onClick={(e) => e.stopPropagation()}
       >
-        {ctrl.type === 'toggle' && (
-          <span style={{ marginRight: 4, fontSize: '0.8em' }}>○</span>
-        )}
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{ctrl.text || (ctrl.type === 'textfield' ? '…' : '')}</span>
+        {inner}
         {isSel && (['tl', 'tr', 'bl', 'br'] as const).map(corner => (
           <div
             key={corner}
@@ -348,6 +423,40 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
                 <span>{t('ui.text')}</span>
                 <input value={selected.text} onChange={(e) => updateControl(selected.id, { text: e.target.value })} />
               </label>
+              {selected.type === 'image' && (
+                <label className="ui-prop">
+                  <span>{t('ui.sprite')}</span>
+                  <input value={selected.sprite ?? ''} placeholder="sprite.png" onChange={(e) => updateControl(selected.id, { sprite: e.target.value })} />
+                </label>
+              )}
+              {selected.type === 'dropdown' && (
+                <label className="ui-prop">
+                  <span>{t('ui.options')}</span>
+                  <input value={selected.options ?? ''} placeholder="A|B|C" onChange={(e) => updateControl(selected.id, { options: e.target.value })} />
+                </label>
+              )}
+              {(selected.type === 'slider' || selected.type === 'progressbar') && (
+                <div className="ui-prop-row">
+                  <label className="ui-prop">
+                    <span>{t('ui.value')}</span>
+                    <input type="number" step="0.1" value={selected.value ?? 0} onChange={(e) => updateControl(selected.id, { value: +e.target.value })} />
+                  </label>
+                  <label className="ui-prop">
+                    <span>{t('ui.min')}</span>
+                    <input type="number" value={selected.min ?? 0} onChange={(e) => updateControl(selected.id, { min: +e.target.value })} />
+                  </label>
+                  <label className="ui-prop">
+                    <span>{t('ui.max')}</span>
+                    <input type="number" value={selected.max ?? 1} onChange={(e) => updateControl(selected.id, { max: +e.target.value })} />
+                  </label>
+                </div>
+              )}
+              {selected.type === 'progressbar' && (
+                <label className="ui-prop">
+                  <span>{t('ui.fillColor')}</span>
+                  <input type="color" value={(selected.fillColor || '#4caf50').slice(0, 7)} onChange={(e) => updateControl(selected.id, { fillColor: e.target.value })} />
+                </label>
+              )}
               <div className="ui-prop-row">
                 <label className="ui-prop">
                   <span>{t('ui.x')} (px)</span>
@@ -379,7 +488,7 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
                 </label>
                 <label className="ui-prop">
                   <span>{t('ui.bgColor')}</span>
-                  <input type="color" value={selected.backgroundColor} onChange={(e) => updateControl(selected.id, { backgroundColor: e.target.value })} />
+                  <input type="color" value={selected.backgroundColor.slice(0, 7)} onChange={(e) => updateControl(selected.id, { backgroundColor: e.target.value })} />
                 </label>
               </div>
               <div className="ui-prop-row">
@@ -400,6 +509,24 @@ export function UIEditor({ controls, onChange, onBack }: Props) {
                 <label className="ui-prop">
                   <span>{t('ui.opacity')}</span>
                   <input type="number" step="0.1" min="0" max="1" value={selected.opacity} onChange={(e) => updateControl(selected.id, { opacity: +e.target.value })} />
+                </label>
+              </div>
+              <div className="ui-prop-row">
+                <label className="ui-prop">
+                  <span>{t('ui.alignH')}</span>
+                  <select value={selected.alignH ?? 'center'} onChange={(e) => updateControl(selected.id, { alignH: e.target.value as UIControl['alignH'] })}>
+                    <option value="left">{t('ui.alignLeft')}</option>
+                    <option value="center">{t('ui.alignCenterH')}</option>
+                    <option value="right">{t('ui.alignRight')}</option>
+                  </select>
+                </label>
+                <label className="ui-prop">
+                  <span>{t('ui.alignV')}</span>
+                  <select value={selected.alignV ?? 'center'} onChange={(e) => updateControl(selected.id, { alignV: e.target.value as UIControl['alignV'] })}>
+                    <option value="top">{t('ui.alignTop')}</option>
+                    <option value="center">{t('ui.alignCenterV')}</option>
+                    <option value="bottom">{t('ui.alignBottom')}</option>
+                  </select>
                 </label>
               </div>
               <label className="ui-prop ui-prop-check">

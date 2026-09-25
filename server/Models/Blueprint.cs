@@ -281,7 +281,7 @@ public class ParamDef
 public class UIControlEntry
 {
     public string Id { get; set; } = "control";
-    public string Type { get; set; } = "button"; // button | textfield | toggle
+    public string Type { get; set; } = "button"; // button | textfield | toggle | label | box | image | slider | progressbar | dropdown
     public float X { get; set; } = 0;
     public float Y { get; set; } = 0;
     public float Width { get; set; } = 100;
@@ -289,10 +289,22 @@ public class UIControlEntry
     public string Text { get; set; } = "";
     public int FontSize { get; set; } = 14;
     public string TextColor { get; set; } = "#FFFFFF";
-    public string BackgroundColor { get; set; } = "#2a2a3e";
-    public string StrokeColor { get; set; } = "#555577";
+    public string BackgroundColor { get; set; } = "#000000";
+    public string StrokeColor { get; set; } = "#000000";
     public float StrokeWidth { get; set; } = 1;
     public float CornerRadius { get; set; } = 4;
     public float Opacity { get; set; } = 1;
     public bool Visible { get; set; } = true;
+    // image
+    public string Sprite { get; set; } = "";
+    // slider / progressbar
+    public float Value { get; set; } = 0;
+    public float Min { get; set; } = 0;
+    public float Max { get; set; } = 1;
+    public string FillColor { get; set; } = "#4caf50";
+    // dropdown ('|' separated)
+    public string Options { get; set; } = "";
+    // text alignment: left|center|right, top|center|bottom
+    public string AlignH { get; set; } = "center";
+    public string AlignV { get; set; } = "center";
 }
