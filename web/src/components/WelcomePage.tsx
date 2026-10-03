@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import type { Blueprint } from '../types';
 import { defaultBlueprint, isValidProjectName } from '../types';
-import { useI18n, LANG_LABELS, type Lang } from '../i18n';
+import { useI18n, type Lang } from '../i18n';
 import GradientBg from './GradientBg';
+import { LangPicker } from './LangPicker';
 import { getConfig, updateConfig, type ServerConfig } from '../api';
 import SPLASH_TEXTS from '../splashTexts';
 
@@ -36,6 +37,11 @@ export default function WelcomePage({ onOpenProject }: Props) {
   const [showSettings, setShowSettings] = useState(false);
   const [gamePath, setGamePath] = useState('');
   const [showLang, setShowLang] = useState(false);
+  const [firstLang, setFirstLang] = useState(() => localStorage.getItem('cublocky-lang-chosen') !== '1');
+  const [showLangHint, setShowLangHint] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState<string | null>(null);
+  const importInputRef = useRef<HTMLInputElement | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [splashText, setSplashText] = useState(() => pickSplash(lang));
   const [showSplash, setShowSplash] = useState(() => {
@@ -80,11 +86,76 @@ export default function WelcomePage({ onOpenProject }: Props) {
     } catch { /* ignore */ }
   };
 
-  const loadProjects = () => {
+  const fetchProjects = useCallback(() => {
     fetch(`${API}/api/projects`)
       .then(r => r.json())
-      .then((data: ProjectInfo[]) => { setProjects(data); setShowOpen(true); })
+      .then((data: ProjectInfo[]) => setProjects(data))
       .catch(() => {});
+  }, []);
+
+  useEffect(() => { fetchProjects(); }, [fetchProjects]);
+
+  const loadProjects = () => {
+    fetchProjects();
+    setShowOpen(true);
+  };
+
+  const chooseLang = (l: Lang) => {
+    setLang(l);
+    if (firstLang) {
+      localStorage.setItem('cublocky-lang-chosen', '1');
+      setFirstLang(false);
+      setShowLangHint(true);
+    }
+    setShowLang(false);
+  };
+
+  // Give the first-run hint time to be read, then clear it.
+  useEffect(() => {
+    if (!showLangHint) return;
+    const id = setTimeout(() => setShowLangHint(false), 20000);
+    return () => clearTimeout(id);
+  }, [showLangHint]);
+
+  // Auto-clear the import status message.
+  useEffect(() => {
+    if (!importMsg) return;
+    const id = setTimeout(() => setImportMsg(null), 12000);
+    return () => clearTimeout(id);
+  }, [importMsg]);
+
+  const doImport = async (files: FileList | null) => {
+    const list = files ? Array.from(files) : [];
+    if (list.length === 0) return;
+    setImporting(true);
+    setImportMsg(null);
+    let ok = 0;
+    const bad: string[] = [];
+    const renamed: string[] = [];
+    for (const f of list) {
+      try {
+        const bp = JSON.parse(await f.text()) as Blueprint;
+        if (!bp || typeof bp !== 'object' || !bp.mod || !bp.mod.name) throw new Error('bad');
+        const res = await fetch(`${API}/api/projects/import`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bp),
+        });
+        if (!res.ok) throw new Error((await res.text()) || 'failed');
+        const data = await res.json() as { name: string; renamed: boolean };
+        if (data.renamed) renamed.push(data.name);
+        ok++;
+      } catch {
+        bad.push(f.name);
+      }
+    }
+    setImporting(false);
+    const parts: string[] = [];
+    if (ok > 0) parts.push(t('app.importDone', { count: String(ok) }));
+    for (const n of renamed) parts.push(t('app.importRenamed', { name: n }));
+    if (bad.length > 0) parts.push(t('app.importBad', { names: bad.join(', ') }));
+    if (parts.length > 0) setImportMsg(parts.join(' · '));
+    if (ok > 0) fetchProjects();
   };
 
   const loadProject = async (name: string) => {
@@ -160,8 +231,18 @@ export default function WelcomePage({ onOpenProject }: Props) {
         <span className="logo">CuBlocky</span>
         <span className="spacer" />
         <button onClick={openSettings}>{t('app.settings')}</button>
-        <button onClick={() => setShowLang(true)}>{t('app.lang')}</button>
+        <button className={`nav-lang${showLangHint ? ' hl' : ''}`} onClick={() => setShowLang(true)}>
+          {t('app.lang')}
+        </button>
       </header>
+      <input
+        ref={importInputRef}
+        type="file"
+        accept=".cbp,.json,application/json"
+        multiple
+        className="wp-file-input"
+        onChange={e => { doImport(e.target.files); e.target.value = ''; }}
+      />
 
       <div className="wp-body">
         <GradientBg />
@@ -191,7 +272,13 @@ export default function WelcomePage({ onOpenProject }: Props) {
             <h3>{showNew ? t('app.newProject') : t('app.openProject')}</h3>
             <div className="wp-form">
               <label>
-                {t('mod.name')}
+                <span className="wp-field-label">
+                  {t('mod.name')}
+                  <span className="i-btn" tabIndex={0}>
+                    i
+                    <span className="i-tip">{t('mod.nameHint')}</span>
+                  </span>
+                </span>
                 <input
                   placeholder={t('app.placeholder.name')}
                   value={newName}
@@ -200,10 +287,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
                   autoFocus
                 />
               </label>
-              <div className="form-note">{t('mod.nameHint')}</div>
-              {nameBad && (
-                <div className="form-note" style={{ color: '#ff8080' }}>{t('mod.nameInvalid')}</div>
-              )}
+              {nameBad && <div className="form-note form-note-err">{t('mod.nameInvalid')}</div>}
               <label>
                 {t('mod.guid')}
                 <input
@@ -235,6 +319,22 @@ export default function WelcomePage({ onOpenProject }: Props) {
         <div className="modal-overlay">
           <div className="modal">
             <h3>{t('app.openProject')}</h3>
+            <div className="wp-import-row">
+              <button
+                className="wp-import-btn"
+                onClick={() => importInputRef.current?.click()}
+                disabled={importing}
+                title={t('app.importHint')}
+              >
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 16V4" />
+                  <path d="m7 9 5-5 5 5" />
+                  <path d="M4 20h16" />
+                </svg>
+                {importing ? t('app.importing') : t('app.importProject')}
+              </button>
+              {importMsg && <span className="wp-import-msg">{importMsg}</span>}
+            </div>
             <div className="wp-project-list">
               {projects.length === 0 ? (
                 <div className="wp-empty">{t('app.noProjects')}</div>
@@ -335,25 +435,27 @@ export default function WelcomePage({ onOpenProject }: Props) {
         </div>
       )}
 
-      {showLang && (
-        <div className="modal-overlay" onClick={() => setShowLang(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <h3>{t('lang.title')}</h3>
-            <div className="lang-list">
-              {(Object.keys(LANG_LABELS) as Lang[]).map(l => (
-                <button
-                  key={l}
-                  className={`lang-option${l === lang ? ' active' : ''}`}
-                  onClick={() => { setLang(l); setShowLang(false); }}
-                >
-                  {LANG_LABELS[l]}
-                </button>
-              ))}
-            </div>
-            <div className="modal-actions">
-              <button onClick={() => setShowLang(false)}>{t('app.close')}</button>
-            </div>
-          </div>
+      {showLang && !firstLang && (
+        <LangPicker
+          title={t('lang.title')}
+          current={lang}
+          onPick={chooseLang}
+          onClose={() => setShowLang(false)}
+        />
+      )}
+
+      {firstLang && (
+        <LangPicker
+          title={t('lang.firstTitle')}
+          desc={t('lang.firstDesc')}
+          current={lang}
+          onPick={chooseLang}
+        />
+      )}
+
+      {showLangHint && (
+        <div className="lang-hint" onClick={() => setShowLangHint(false)}>
+          {t('lang.firstHint')}
         </div>
       )}
     </div>

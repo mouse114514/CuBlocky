@@ -406,6 +406,60 @@ app.MapPost("/api/projects", async (HttpRequest req) =>
     return Results.Ok(new { name = safeName });
 });
 
+// Import a foreign .cbp: the name is coerced instead of rejected, and an
+// _2/_3/... suffix is appended rather than overwriting an existing project.
+app.MapPost("/api/projects/import", async (HttpRequest req) =>
+{
+    byte[] body;
+    using (var ms = new MemoryStream())
+    {
+        await req.Body.CopyToAsync(ms);
+        body = ms.ToArray();
+    }
+    if (body.Length == 0) return Results.BadRequest("invalid blueprint");
+
+    // Validate against the raw JSON, not the deserialized model: defaults
+    // ("My Mod") would otherwise let an empty body slip through.
+    string? original;
+    try
+    {
+        using var doc = JsonDocument.Parse(body);
+        var root = doc.RootElement;
+        if (root.ValueKind != JsonValueKind.Object
+            || !root.TryGetProperty("mod", out var mod)
+            || mod.ValueKind != JsonValueKind.Object
+            || !mod.TryGetProperty("name", out var nm)
+            || nm.ValueKind != JsonValueKind.String
+            || string.IsNullOrWhiteSpace(nm.GetString()))
+            return Results.BadRequest("invalid blueprint: missing mod.name");
+        original = nm.GetString()!;
+    }
+    catch
+    {
+        return Results.BadRequest("invalid blueprint json");
+    }
+
+    var bp = JsonSerializer.Deserialize<Blueprint>(body, jsonOpts);
+    if (bp == null || bp.Mod == null) return Results.BadRequest("invalid blueprint");
+
+    var baseName = ProjectEmitter.IsProjectNameOk(original)
+        ? original
+        : ProjectEmitter.SafeProjectName(original);
+    var name = baseName;
+    var suffix = 2;
+    while (Directory.Exists(Path.Combine(projectsDir, name)))
+    {
+        name = baseName + "_" + suffix;
+        suffix++;
+    }
+    bp.Mod.Name = name;
+    var dir = Path.Combine(projectsDir, name);
+    Directory.CreateDirectory(dir);
+    var cbpPath = Path.Combine(dir, name + ".cbp");
+    await File.WriteAllTextAsync(cbpPath, JsonSerializer.Serialize(bp, jsonOpts));
+    return Results.Ok(new { name = name, renamed = name != original });
+});
+
 app.MapPut("/api/projects/{name}", async (string name, HttpRequest req) =>
 {
     if (!ProjectEmitter.IsSafePathSegment(name)) return Results.BadRequest("invalid project name");

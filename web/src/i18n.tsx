@@ -37,6 +37,12 @@ const dict = {
   'app.selected':      { zh: '已选 {count} 项', en: '{count} selected', ru: '{count} выбрано' },
   'app.splash':        { zh: '闪烁标语', en: 'Splash Text', ru: 'Текст-вспышка' },
   'app.splashDesc':    { zh: '在欢迎页显示随机闪烁标语', en: 'Show random splash text on welcome page', ru: 'Показывать случайный текст-вспышку на главной' },
+  'app.importProject': { zh: '导入项目', en: 'Import Project', ru: 'Импортировать проект' },
+  'app.importHint':    { zh: '选择 .cbp 文件导入为本地项目', en: 'Choose .cbp files to import as local projects', ru: 'Выберите файлы .cbp для импорта' },
+  'app.importing':     { zh: '导入中...', en: 'Importing...', ru: 'Импорт...' },
+  'app.importDone':    { zh: '已导入 {count} 个项目', en: 'Imported {count} project(s)', ru: 'Импортировано {count} проект(ов)' },
+  'app.importRenamed': { zh: '名称无效,已改为 {name}', en: 'Invalid name, renamed to {name}', ru: 'Недопустимое имя, переименовано в {name}' },
+  'app.importBad':     { zh: '无法导入: {names}', en: 'Could not import: {names}', ru: 'Не удалось импортировать: {names}' },
 
   // ── Sidebar ──
   'side.mod':          { zh: '模组', en: 'Mod', ru: 'Мод' },
@@ -162,6 +168,24 @@ const dict = {
 
   // ── Language modal ──
   'lang.title':        { zh: '选择语言', en: 'Select Language', ru: 'Выбрать язык' },
+  'lang.firstTitle':   { zh: '请选择语言', en: 'Please Select a Language', ru: 'Пожалуйста, выберите язык' },
+  'lang.firstDesc':    { zh: '请选择你要使用的语言。选择完成后，此窗口将不再显示。', en: 'Select the language you want to use. This window will not appear again after selection.', ru: 'Выберите язык, которым вы хотите пользоваться. После выбора это окно не будет появляться вновь.' },
+  'lang.firstHint':    { zh: '如需切换语言，请单击右上角的 Language 按钮', en: 'To change the language later, click the Language button in the top-right corner', ru: 'Чтобы позже сменить язык, нажмите кнопку Language в правом верхнем углу' },
+
+  // ── Toolbar guide (spotlight tour) ──
+  'guide.help':        { zh: '查看导航栏引导', en: 'Show the toolbar guide', ru: 'Показать справку по панели' },
+  'guide.open':        { zh: '打开本地已有的 .cbp 工程文件', en: 'Open a local .cbp project file', ru: 'Открыть локальный проект .cbp' },
+  'guide.save':        { zh: '保存至浏览器本地存储与服务器', en: 'Save to local browser storage and the server', ru: 'Сохранить в локальном хранилище браузера и на сервере' },
+  'guide.saveAs':      { zh: '将当前工程导出为 .cbp 文件', en: 'Export the current project as a .cbp file', ru: 'Экспортировать текущий проект в файл .cbp' },
+  'guide.build':       { zh: '编译为 DLL，并可部署至游戏', en: 'Compile to DLL, and deploy to the game if needed', ru: 'Собрать DLL и при необходимости развернуть его в игру' },
+  'guide.search':      { zh: '搜索积木', en: 'Search blocks', ru: 'Поиск блоков' },
+  'guide.searchDesc':  { zh: '在左侧控件面板中检索积木', en: 'Search for blocks in the palette on the left', ru: 'Поиск блоков в панели слева' },
+  'guide.assets':      { zh: '上传并管理贴图与音频资源', en: 'Upload and manage sprite and audio assets', ru: 'Загрузка и управление спрайтами и звуками' },
+  'guide.ui':          { zh: '打开游戏界面编辑器', en: 'Open the UI editor for in-game interface editing', ru: 'Открыть редактор UI для интерфейса игры' },
+  'guide.code':        { zh: '查看当前生成的 C# 代码', en: 'View the currently generated C# code', ru: 'Просмотреть сгенерированный код C#' },
+  'guide.next':        { zh: '下一步', en: 'Next', ru: 'Далее' },
+  'guide.done':        { zh: '完成', en: 'Done', ru: 'Готово' },
+  'guide.skip':        { zh: '跳过引导', en: 'Skip the tour', ru: 'Пропустить' },
 
   // ── UI Editor ──
   'app.uiEditor':      { zh: '界面编辑器', en: 'UI Editor', ru: 'Редактор UI' },

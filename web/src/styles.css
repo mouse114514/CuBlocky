@@ -119,6 +119,14 @@ code{background:#0d1b2a;padding:1px 4px;border-radius:3px;font-size:12px}
 .lang-option.active{background:#d6eaf8;border-color:#85c1e9;color:#1a5276}
 .code-toggle{font-size:12px;padding:4px 10px}
 .code-toggle.active{background:#555;color:#fff}
+.toolbar button.help-btn{
+  width:26px;height:26px;border-radius:50%;padding:0;flex:none;
+  background:#f0f0f0;color:#555;border:1px solid #dcdcdc;
+  font-size:13px;font-weight:700;line-height:1;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background .15s,color .15s,border-color .15s;
+}
+.toolbar button.help-btn:hover{background:#e4e4e4;border-color:#c4c4c4;color:#222}
 
 .editor-full{flex:1;overflow:hidden;position:relative}
 .editor-full .be{width:100%;height:100%}
@@ -180,7 +188,8 @@ label.full textarea,.label.full input{font-size:13px}
 .decay-row{display:flex;flex-direction:row;align-items:center;gap:4px!important}
 .decay-row input[type=checkbox]{width:auto;margin:0}
 .decay-row input[type=number]{width:60px}
-.form-note{font-size:12px;color:var(--fg3);background:#0d1b2a;padding:8px 12px;border-radius:4px}
+.form-note{font-size:12px;color:#666;background:#f5f5f5;border:1px solid #e8e8e8;padding:8px 12px;border-radius:6px}
+.form-note-err{background:#fff5f5;border-color:#ffc9c9;color:#c0392b}
 .form-actions{margin-top:8px}
 
 .ingredient-card{
@@ -225,7 +234,7 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 .empty{color:var(--fg3);font-style:italic;padding:12px}
 
 /* ── Welcome page ────────────────────────────────────────────── */
-.wp-root{display:flex;flex-direction:column;height:100vh;background:#f5f5f5}
+.wp-root{display:flex;flex-direction:column;height:100vh;background:#f5f5f5;position:relative}
 .wp-body{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
   background:#f5f5f5;position:relative;
@@ -448,3 +457,130 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 .ui-align-label{font-size:10px;color:#888;min-width:50px;display:flex;align-items:center}
 .ui-align-btn{width:24px;height:22px;font-size:12px;border:1px solid #444;background:#2a2a3e;color:#ccc;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
 .ui-align-btn:hover{background:#444;border-color:#00acc1}
+
+/* ── Import / first-run language / toolbar tour (2026-10-03) ───────────── */
+.wp-file-input{display:none}
+
+/* field label + hover info button */
+.wp-field-label{display:inline-flex;align-items:center;gap:6px}
+.i-btn{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  width:15px;height:15px;border-radius:50%;border:1px solid #ccc;color:#aaa;
+  font-size:10px;font-style:italic;font-family:Georgia,'Times New Roman',serif;line-height:1;
+  cursor:help;
+}
+.i-btn:hover,.i-btn:focus-visible{border-color:#888;color:#333;outline:none}
+.i-tip{
+  position:absolute;bottom:calc(100% + 10px);left:50%;transform:translate(-50%,5px);
+  width:300px;background:#fff;border:1px solid #e2e2e2;border-radius:10px;
+  padding:11px 13px;font-size:11px;line-height:1.75;color:#555;
+  font-family:inherit;font-style:normal;font-weight:400;white-space:normal;
+  box-shadow:0 10px 30px rgba(0,0,0,.16);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .18s ease,transform .18s ease;
+}
+.i-btn:hover .i-tip,.i-btn:focus-visible .i-tip{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.i-tip::before{
+  content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-top-color:#e2e2e2;
+}
+.i-tip::after{
+  content:'';position:absolute;top:calc(100% - 2px);left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-top-color:#fff;
+}
+
+/* import row inside the open-project modal */
+.wp-import-row{display:flex;align-items:center;gap:10px;margin:-2px 0 12px}
+.wp-import-btn{
+  display:inline-flex;align-items:center;gap:6px;flex:none;
+  background:#f2f2f2;color:#333;border:1px solid #dcdcdc;border-radius:16px;
+  padding:6px 14px;font-size:12px;cursor:pointer;
+  transition:background .15s,border-color .15s;
+}
+.wp-import-btn:hover:not(:disabled){background:#e8e8e8;border-color:#c4c4c4}
+.wp-import-btn:disabled{opacity:.55;cursor:wait}
+.wp-import-btn svg{flex:none}
+.wp-import-msg{
+  flex:1;font-size:11px;line-height:1.6;color:#888;
+  word-break:break-word;animation:wp-fade-up .3s ease both;
+}
+
+/* first-run language hint */
+.nav-lang.hl{animation:lang-pulse 1.5s ease-in-out infinite}
+@keyframes lang-pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(74,144,226,.6)}
+  50%{box-shadow:0 0 0 9px rgba(74,144,226,0)}
+}
+.lang-hint{
+  position:absolute;top:58px;right:16px;z-index:30;max-width:300px;
+  background:#fff;border:1px solid #e2e2e2;border-radius:10px;padding:10px 13px;
+  font-size:12px;line-height:1.6;color:#333;cursor:pointer;
+  box-shadow:0 12px 32px rgba(0,0,0,.15);
+  animation:lang-hint-in .35s cubic-bezier(.22,1,.36,1) both;
+}
+.lang-hint:hover{border-color:#c4c4c4}
+@keyframes lang-hint-in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.lang-hint::before{
+  content:'';position:absolute;top:-8px;right:34px;width:0;height:0;
+  border-left:8px solid transparent;border-right:8px solid transparent;
+  border-bottom:8px solid #e2e2e2;
+}
+.lang-hint::after{
+  content:'';position:absolute;top:-6px;right:35px;width:0;height:0;
+  border-left:7px solid transparent;border-right:7px solid transparent;
+  border-bottom:7px solid #fff;
+}
+
+/* language picker */
+.lang-picker{max-width:330px}
+
+/* toolbar spotlight tour */
+.guide-layer{position:fixed;inset:0;z-index:1200;animation:guide-fade .28s ease both}
+@keyframes guide-fade{from{opacity:0}to{opacity:1}}
+.guide-spot{
+  position:absolute;border-radius:20px;pointer-events:none;
+  box-shadow:0 0 0 9999px rgba(0,0,0,.55),0 0 0 2px rgba(74,144,226,.95);
+  transition:top .32s cubic-bezier(.22,1,.36,1),left .32s cubic-bezier(.22,1,.36,1),
+             width .32s cubic-bezier(.22,1,.36,1),height .32s cubic-bezier(.22,1,.36,1);
+  animation:guide-spot-pulse 1.6s ease-in-out .4s infinite;
+}
+@keyframes guide-spot-pulse{
+  0%,100%{box-shadow:0 0 0 9999px rgba(0,0,0,.55),0 0 0 2px rgba(74,144,226,.95),0 0 0 0 rgba(74,144,226,.35)}
+  50%{box-shadow:0 0 0 9999px rgba(0,0,0,.55),0 0 0 2px rgba(74,144,226,.95),0 0 0 13px rgba(74,144,226,0)}
+}
+.guide-tip{
+  position:absolute;background:#fff;border:1px solid #e2e2e2;border-radius:12px;
+  box-shadow:0 14px 40px rgba(0,0,0,.2);overflow:hidden;
+  transition:left .32s cubic-bezier(.22,1,.36,1),top .32s cubic-bezier(.22,1,.36,1);
+}
+.guide-tip-body{padding:12px 14px;animation:guide-tip-in .3s ease both}
+@keyframes guide-tip-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.guide-tip-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px}
+.guide-tip-title{font-size:13px;font-weight:700;color:#111}
+.guide-tip-count{font-size:10px;color:#bbb;flex:none}
+.guide-tip-text{font-size:12px;line-height:1.65;color:#555}
+.guide-tip-foot{
+  display:flex;align-items:center;justify-content:flex-end;gap:12px;
+  padding:8px 12px;background:#f7f7f7;border-top:1px solid #efefef;
+}
+.guide-skip{
+  position:absolute;right:20px;bottom:20px;
+  display:inline-flex;align-items:center;gap:7px;
+  background:#fff;border:1px solid #d8d8d8;border-radius:18px;
+  padding:8px 16px;font-size:13px;color:#555;cursor:pointer;
+  box-shadow:0 10px 28px rgba(0,0,0,.25);
+  transition:background .15s,border-color .15s,color .15s;
+}
+.guide-skip:hover{background:#f2f2f2;border-color:#b8b8b8;color:#111}
+.guide-kbd{
+  font-size:10px;line-height:1.3;color:#999;background:#fafafa;
+  border:1px solid #ddd;border-radius:3px;padding:1px 5px;
+}
+.guide-dots{display:flex;gap:5px}
+.guide-dots i{width:6px;height:6px;border-radius:50%;background:#e0e0e0;transition:background .2s,transform .2s}
+.guide-dots i.on{background:#4a90e2;transform:scale(1.3)}
+.guide-next{
+  background:#333;color:#fff;border:none;border-radius:12px;padding:5px 14px;
+  font-size:12px;cursor:pointer;flex:none;
+}
+.guide-next:hover{background:#444}

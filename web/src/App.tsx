@@ -5,6 +5,7 @@ import { useI18n } from './i18n';
 import { BlockEditor } from './components/BlockEditor';
 import { UIEditor } from './components/UIEditor';
 import WelcomePage from './components/WelcomePage';
+import { ToolbarGuide } from './components/ToolbarGuide';
 import AssetManager from './components/AssetManager';
 import { download, buildProject, saveProject, getConfig, updateConfig, deployDll, type BuildResult, type ServerConfig } from './api';
 import * as Blockly from 'blockly/core';
@@ -58,6 +59,7 @@ export function App() {
   const [errCopied, setErrCopied] = useState(false);
   const [showSpritePicker, setShowSpritePicker] = useState(false);
   const [showAssetManager, setShowAssetManager] = useState(false);
+  const [showGuide, setShowGuide] = useState(() => localStorage.getItem('cublocky-toolbar-guide') !== '1');
   const [blockSearch, setBlockSearch] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const [gamePath, setGamePath] = useState('');
@@ -83,7 +85,9 @@ export function App() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (!e.ctrlKey || !inEditor) return;
+      if (!inEditor) return;
+      if (e.key === 'F1') { e.preventDefault(); setShowGuide(true); return; }
+      if (!e.ctrlKey) return;
       const tag = (e.target as HTMLElement).tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       const key = e.key.toLowerCase();
@@ -210,10 +214,10 @@ export function App() {
       <div className="editor-full">
         <header className="toolbar editor-toolbar">
           <span className="logo">{t('app.title')}</span>
-          <button onClick={openFile}>{t('app.open')}</button>
-          <button onClick={saveLocal}>{t('app.save')}</button>
-          <button onClick={saveAs}>{t('app.saveAs')}</button>
-          <button className="build-btn" onClick={handleBuild} disabled={building}>
+          <button data-guide="open" onClick={openFile}>{t('app.open')}</button>
+          <button data-guide="save" onClick={saveLocal}>{t('app.save')}</button>
+          <button data-guide="saveAs" onClick={saveAs}>{t('app.saveAs')}</button>
+          <button className="build-btn" data-guide="build" onClick={handleBuild} disabled={building}>
             {building ? t('app.building') : t('app.build')}
           </button>
           {buildResult && (
@@ -229,12 +233,14 @@ export function App() {
             value={blockSearch}
             onChange={(e) => setBlockSearch(e.target.value)}
             onMouseDown={(e) => e.stopPropagation()}
+            data-guide="search"
           />
-          <button onClick={() => setShowAssetManager(true)} disabled={!currentProjectName}>{t('asset.manageTitle')}</button>
-          <button onClick={() => setView('ui')}>{t('app.uiEditor')}</button>
-          <button className={`code-toggle ${showCode ? 'active' : ''}`} onClick={() => setShowCode(!showCode)}>
+          <button data-guide="assets" onClick={() => setShowAssetManager(true)} disabled={!currentProjectName}>{t('asset.manageTitle')}</button>
+          <button data-guide="ui" onClick={() => setView('ui')}>{t('app.uiEditor')}</button>
+          <button className={`code-toggle ${showCode ? 'active' : ''}`} data-guide="code" onClick={() => setShowCode(!showCode)}>
             {t('code.toggle')}
           </button>
+          <button className="help-btn" title={t('guide.help')} onClick={() => setShowGuide(true)}>?</button>
         </header>
 
         {view === 'blocks' ? (
@@ -260,6 +266,11 @@ export function App() {
             onBack={() => setView('blocks')}
           />
         )}
+
+        {showGuide && <ToolbarGuide onDone={() => {
+          localStorage.setItem('cublocky-toolbar-guide', '1');
+          setShowGuide(false);
+        }} />}
       </div>
 
       {showCode && (
