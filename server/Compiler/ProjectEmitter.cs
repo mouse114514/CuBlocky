@@ -12,6 +12,8 @@ public static class ProjectEmitter
 {
     private const string DefaultGamePath = @"C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo";
     private const int MaxNameLen = 60;
+    // Characters Windows refuses in file names. 0x00–0x1F and 0x7F are control chars.
+    private static readonly char[] IllegalNameChars = { '<', '>', ':', '"', '/', '\\', '|', '?', '*' };
 
     private static readonly HashSet<string> ReservedNames = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -20,27 +22,30 @@ public static class ProjectEmitter
         "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
     };
 
-    private static bool IsNameChar(char c) =>
-        (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_';
+    private static bool IsIllegalNameChar(char c) =>
+        c < 0x20 || c == 0x7F || Array.IndexOf(IllegalNameChars, c) >= 0;
 
-    // Project name rule: A-Za-z0-9_ only, must start with a letter, max 60 chars.
-    // The same string is used for the project folder, the C# namespace and the DLL name.
+    // Project name rule: whatever Windows allows in a folder name. Chinese and
+    // other non-ASCII names are perfectly fine; only the characters above block.
     public static bool IsProjectNameOk(string? s)
     {
         if (string.IsNullOrWhiteSpace(s) || s.Length > MaxNameLen) return false;
-        if (!IsNameChar(s[0]) || char.IsDigit(s[0])) return false;
-        foreach (var c in s) if (!IsNameChar(c)) return false;
+        if (s == "." || s == "..") return false;
+        // Windows silently strips trailing spaces and dots, which would rename the folder.
+        if (s.Trim() != s || s.EndsWith('.')) return false;
+        foreach (var c in s) if (IsIllegalNameChar(c)) return false;
         return !ReservedNames.Contains(s);
     }
 
     // Lenient guard for /api/projects/{name} routes: blocks path traversal but
-    // still accepts legacy project folders that predate the strict naming rule.
+    // still accepts legacy project folders that predate this naming rule.
     public static bool IsSafePathSegment(string? s)
     {
         if (string.IsNullOrWhiteSpace(s) || s.Length > 256) return false;
         if (s == "." || s == "..") return false;
         if (Path.GetFileName(s) != s) return false;
-        return s.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
+        foreach (var c in s) if (IsIllegalNameChar(c)) return false;
+        return true;
     }
 
     // Coerce any string (e.g. a legacy or hand-edited project name) into a valid name.
@@ -49,17 +54,23 @@ public static class ProjectEmitter
         if (string.IsNullOrWhiteSpace(raw)) return "MyMod";
         var sb = new StringBuilder();
         foreach (var c in raw)
-            sb.Append(IsNameChar(c) ? c : '_');
-        var s = Regex.Replace(sb.ToString(), @"_+", "_").Trim('_');
-        if (s.Length == 0 || char.IsDigit(s[0])) s = "M" + s;
-        if (s.Length > MaxNameLen) s = s.Substring(0, MaxNameLen).TrimEnd('_');
+            sb.Append(IsIllegalNameChar(c) ? '_' : c);
+        var s = Regex.Replace(sb.ToString(), @"_+", "_").Trim('_').Trim();
+        if (s.Length == 0 || s == "." || s == "..") return "MyMod";
+        s = s.TrimEnd('.');
+        if (s.Length > MaxNameLen) s = s.Substring(0, MaxNameLen).Trim().TrimEnd('.');
         return ReservedNames.Contains(s) ? "M" + s : s;
     }
 
-    public static Dictionary<string, string> EmitProject(Blueprint bp, string? gamePath = null)
+    public static Dictionary<string, string> EmitProject(Blueprint bp, string? gamePath = null, string? projectName = null)
     {
-        var asmName = SafeProjectName(bp.Mod.Name);
-        var ns = asmName;
+        // Project name drives the folder and the DLL name; the namespace is a
+        // C#-identifier rendering of the same name. The caller may supply the
+        // project directory name, which wins over mod.name (editable in the form).
+        var asmName = SafeProjectName(projectName ?? bp.Mod.Name);
+        var ns = SafeIdent(asmName);
+        // CodeEmitter reads bp.Mod.RootNamespace, so publish the derived namespace.
+        bp.Mod.RootNamespace = ns;
         var guid = bp.Mod.Guid;
         var name = bp.Mod.Name.Replace("\"", "\\\"");
         var ver = bp.Mod.Version;
@@ -518,6 +529,9 @@ namespace {ns}
 
     private static string EmitCsproj(string asmName, string ns, string gamePath)
     {
+        // The assembly name comes from the project name, which may contain '&'.
+        var asm = asmName.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
+        var nss = ns.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
         // net4.7.2 to match BepInEx 5 / Unity / Mono. CUCoreLib.dll resolved from
         // the game's BepInEx/plugins folder (CCL setup docs convention).
         var g = gamePath.Replace("\\", "\\\\");
@@ -527,8 +541,8 @@ namespace {ns}
     <TargetFramework>net472</TargetFramework>
     <LangVersion>10.0</LangVersion>
     <Nullable>disable</Nullable>
-    <AssemblyName>{asmName}</AssemblyName>
-    <RootNamespace>{ns}</RootNamespace>
+    <AssemblyName>{asm}</AssemblyName>
+    <RootNamespace>{nss}</RootNamespace>
     <Version>1.0.0</Version>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>

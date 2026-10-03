@@ -145,10 +145,15 @@ export interface Blueprint {
 }
 
 // ── Project naming ──
-// Rule (shared with the server): letters, digits and underscore; must start
-// with a letter; max 60 chars. The name is reused verbatim for the project
-// folder, the C# namespace and the generated DLL name.
-export const PROJECT_NAME_RE = /^[A-Za-z][A-Za-z0-9_]{0,59}$/;
+// Rule (shared with the server): anything Windows allows in a file name is
+// allowed here. Only the characters the filesystem rejects are blocked:
+// control chars (U+0000–U+001F, U+007F) and < > : " / \ | ? *
+// Chinese and other non-ASCII names are fine.
+// The name is reused verbatim for the project folder and the DLL name; the
+// C# namespace is a C#-identifier-safe rendering of the same name.
+export const PROJECT_NAME_MAX = 60;
+const CONTROL_RE = /[\u0000-\u001f\u007f]/;
+const ILLEGAL_RE = /[<>:"/\\|?*]/;
 const RESERVED_NAMES = [
   'CON', 'PRN', 'AUX', 'NUL',
   'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9',
@@ -156,15 +161,25 @@ const RESERVED_NAMES = [
 ];
 
 export function isValidProjectName(s: string): boolean {
-  if (!PROJECT_NAME_RE.test(s)) return false;
+  if (!s || s.length > PROJECT_NAME_MAX) return false;
+  if (s === '.' || s === '..') return false;
+  // Windows silently strips trailing spaces and dots, which would rename the folder.
+  if (s.trim() !== s || s.endsWith('.')) return false;
+  if (CONTROL_RE.test(s) || ILLEGAL_RE.test(s)) return false;
   return !RESERVED_NAMES.includes(s.toUpperCase());
 }
 
 // Coerce any string (legacy or hand-edited project) into a valid project name.
 export function sanitizeProjectName(s: string): string {
-  let t = String(s || '').replace(/[^A-Za-z0-9_]/g, '_').replace(/_{2,}/g, '_').replace(/^_|_$/g, '');
-  if (!t) t = 'MyMod';
-  if (/^[0-9]/.test(t)) t = 'M' + t;
+  let t = String(s || '')
+    .replace(ILLEGAL_RE, '_')
+    .replace(CONTROL_RE, '')
+    .replace(/_{2,}/g, '_')
+    .replace(/^_|_$/g, '')
+    .trim()
+    .replace(/\.+$/, '');
+  if (!t || t === '.' || t === '..') t = 'MyMod';
+  if (t.length > PROJECT_NAME_MAX) t = t.slice(0, PROJECT_NAME_MAX).trim().replace(/\.+$/, '');
   if (RESERVED_NAMES.includes(t.toUpperCase())) t = 'M' + t;
   return t;
 }

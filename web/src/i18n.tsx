@@ -50,8 +50,8 @@ const dict = {
   'mod.version':       { zh: '版本', en: 'Version', ru: 'Версия' },
   'mod.author':        { zh: '作者', en: 'Author', ru: 'Автор' },
   'mod.desc':          { zh: '描述', en: 'Description', ru: 'Описание' },
-  'mod.nameHint':      { zh: 'C# 命名空间与 DLL 文件名均自动取自项目名,仅允许英文字母、数字和下划线,且须以字母开头', en: 'The C# namespace and DLL name are derived from the project name. Only letters, digits and underscore are allowed, and it must start with a letter.', ru: 'Пространство имен C# и имя DLL берутся из имени проекта. Допустимы только буквы, цифры и подчёркивание, имя должно начинаться с буквы.' },
-  'mod.nameInvalid':   { zh: '项目名无效:仅允许英文字母、数字和下划线,须以字母开头,最长 60 字符', en: 'Invalid project name: letters, digits and underscore only, must start with a letter, max 60 chars.', ru: 'Недопустимое имя проекта: только буквы, цифры и подчёркивание, первая буква — буква, макс. 60 символов.' },
+  'mod.nameHint':      { zh: '项目名用作文件夹名和 DLL 文件名,C# 命名空间自动派生;不可包含 < > : " / \\ | ? * 和控制字符', en: 'Used as the folder name and DLL name; the C# namespace is derived from it. Cannot contain < > : " / \\ | ? * or control characters.', ru: 'Используется как имя папки и имя DLL; пространство имен C# выводится из него. Недопустимы символы < > : " / \\ | ? * и управляющие символы.' },
+  'mod.nameInvalid':   { zh: '项目名无效:不可包含 < > : " / \\ | ? * 和控制字符,不可为 . 或 ..,不能以空格或点结尾,最长 60 字符', en: 'Invalid project name: cannot contain < > : " / \\ | ? * or control characters, cannot be . or .., no trailing space or dot, max 60 chars.', ru: 'Недопустимое имя проекта: запрещены < > : " / \\ | ? * и управляющие символы, нельзя . или .., без пробела или точки в конце, макс. 60 символов.' },
   'mod.guidHint':      { zh: '反向域名格式,如 com.yourName.modName', en: 'Reverse-domain format, e.g. com.yourName.modName', ru: 'Формат обратного домена, например com.yourName.modName' },
 
   // ── Item form ──

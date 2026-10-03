@@ -164,10 +164,7 @@ app.MapPost("/api/build", async (HttpRequest req) =>
         : (bp.Mod?.Name ?? "");
     var asmName = ProjectEmitter.SafeProjectName(rawName);
 
-    // C# namespace and assembly name both follow the project name.
-    bp.Mod.RootNamespace = asmName;
-
-    var files = ProjectEmitter.EmitProject(bp, config.GamePath);
+    var files = ProjectEmitter.EmitProject(bp, config.GamePath, asmName);
     var buildDir = Path.Combine(Directory.GetCurrentDirectory(), "builds", asmName);
 
     // Project name is also the source for the assets folder.
@@ -401,7 +398,6 @@ app.MapPost("/api/projects", async (HttpRequest req) =>
     if (!ProjectEmitter.IsProjectNameOk(bp.Mod.Name))
         return Results.BadRequest("invalid project name");
     var safeName = ProjectEmitter.SafeProjectName(bp.Mod.Name);
-    bp.Mod.RootNamespace = safeName;
     var dir = Path.Combine(projectsDir, safeName);
     Directory.CreateDirectory(dir);
     var cbpPath = Path.Combine(dir, safeName + ".cbp");

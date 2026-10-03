@@ -198,7 +198,6 @@ export default function WelcomePage({ onOpenProject }: Props) {
                   onChange={e => setNewName(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && createProject()}
                   autoFocus
-                  style={{ fontFamily: 'monospace', textTransform: 'none' }}
                 />
               </label>
               <div className="form-note">{t('mod.nameHint')}</div>
