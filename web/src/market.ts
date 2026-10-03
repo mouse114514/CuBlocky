@@ -12,7 +12,6 @@ const BRANCH = 'main';
 const RAW = 'https://raw.githubusercontent.com/' + REPO + '/' + BRANCH;
 const API = 'https://api.github.com/repos/' + REPO;
 const CACHE_KEY = 'cublocky-market-manifest';
-const CACHE_MS = 15 * 60 * 1000;
 const TOK_SESSION = 'cublocky-github-token';
 const TOK_LOCAL = 'cublocky-github-token-persist';
 
@@ -48,22 +47,35 @@ export interface SubmitResult {
 
 // ── Browse / download ──
 
-export async function fetchManifest(force = false): Promise<MarketEntry[]> {
-  if (!force) {
+// Always read the manifest from the CDN. It is tiny and the marketplace is
+// only opened on purpose, so there is no reason to ever show a stale list -
+// a 15-minute TTL used to make a just-merged delist look like it did nothing
+// (and Ctrl+F5 does not touch localStorage). localStorage is only a fallback
+// for when the network is down, and it is reported to the caller so the UI can
+// say so instead of pretending it is fresh.
+export interface ManifestResult {
+  entries: MarketEntry[];
+  fromCache: boolean;
+}
+
+export async function fetchManifest(): Promise<ManifestResult> {
+  try {
+    const res = await fetch(RAW + '/projects/manifest.json?_=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status + ' fetching manifest');
+    const data = await res.json();
+    const entries = Array.isArray(data) ? data : [];
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), entries }));
+    return { entries, fromCache: false };
+  } catch {
     const raw = localStorage.getItem(CACHE_KEY);
     if (raw) {
       try {
         const c = JSON.parse(raw);
-        if (Date.now() - c.t < CACHE_MS && Array.isArray(c.entries)) return c.entries;
-      } catch { /* stale or corrupt: refetch */ }
+        if (Array.isArray(c.entries)) return { entries: c.entries, fromCache: true };
+      } catch { /* corrupt cache: fall through */ }
     }
+    throw new Error('marketplace unreachable and no cached list');
   }
-  const res = await fetch(RAW + '/projects/manifest.json?_=' + Date.now());
-  if (!res.ok) throw new Error('HTTP ' + res.status + ' fetching manifest');
-  const data = await res.json();
-  const entries = Array.isArray(data) ? data : [];
-  localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), entries }));
-  return entries;
 }
 
 export async function rawText(path: string): Promise<string> {

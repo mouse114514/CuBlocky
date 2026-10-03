@@ -241,6 +241,7 @@ const dict = {
   'market.title':        { zh: '工程市场', en: 'Marketplace', ru: 'Маркетплейс' },
   'market.sub':          { zh: '浏览和安装社区分享的项目。提交的项目需要人工审核。', en: 'Browse and install community projects. Submissions are reviewed manually.', ru: 'Просмотр и установка проектов сообщества. Отправки проверяются вручную.' },
   'market.search':       { zh: '搜索项目名或作者', en: 'Search by name or author', ru: 'Поиск по имени или автору' },
+  'market.staleCache':   { zh: '连不上项目市场，下面显示的是上次保存的列表。', en: 'Marketplace unreachable; showing the last saved list.', ru: 'Не удалось подключиться к магазину; показывается последний сохранённый список.' },
   'market.install':      { zh: '安装', en: 'Install', ru: 'Установить' },
   'market.installing':   { zh: '安装中…', en: 'Installing…', ru: 'Установка…' },
   'market.installed':    { zh: '已安装到 {name} ({count} 个资源)', en: 'Installed to {name} ({count} assets)', ru: 'Установлено в {name} ({count} ресурсов)' },

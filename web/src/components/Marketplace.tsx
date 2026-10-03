@@ -59,12 +59,13 @@ export default function Marketplace({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     (async () => {
       try {
-        const [cfg, manifest] = await Promise.all([
+        const [cfg, m] = await Promise.all([
           getConfig().catch(() => null),
           fetchManifest(),
         ]);
         if (cfg && cfg.partSizeMb) setPartSize(cfg.partSizeMb);
-        setEntries(manifest);
+        setEntries(m.entries);
+        if (m.fromCache) setErr(t('market.staleCache'));
       } catch (e: any) {
         setErr(String(e?.message || e));
       } finally {
