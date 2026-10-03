@@ -553,6 +553,40 @@ Copy the built DLL from `bin/Release/` into
 ";
     }
 
+    // cu_var_set emits a bare assignment ("_x = v;"), which is not a declaration in C#.
+    // First assignment / increment of each variable gets an explicit declaration.
+    private static readonly System.Text.RegularExpressions.Regex LocalAssign =
+        new System.Text.RegularExpressions.Regex(@"^\s*(_[A-Za-z_]\w*)\s*([+]?)=(?!=)", System.Text.RegularExpressions.RegexOptions.Compiled);
+    private static readonly System.Text.RegularExpressions.Regex StringInit =
+        new System.Text.RegularExpressions.Regex("\"|fullName|\\.category|\\.Tags");
+
+    private static string DeclareLocals(string bodyCode)
+    {
+        var seen = new HashSet<string>();
+        var decls = new List<string>();
+
+        foreach (var raw in bodyCode.Split('\n'))
+        {
+            var m = LocalAssign.Match(raw);
+            if (!m.Success) continue;
+            var name = m.Groups[1].Value;
+            if (!seen.Add(name)) continue;
+
+            var expr = raw.Substring(raw.IndexOf('=') + 1).TrimEnd(';').Trim();
+
+            string type;
+            bool zeroInit;
+            if (m.Groups[2].Value == "+") { type = "float"; zeroInit = true; }
+            else if (StringInit.IsMatch(expr)) { type = "string"; zeroInit = false; }
+            else { type = "float"; zeroInit = false; }
+
+            decls.Add(type + " " + name + (zeroInit ? " = 0f;" : ";"));
+        }
+
+        if (decls.Count == 0) return bodyCode;
+        return string.Join("\n", decls) + "\n" + bodyCode;
+    }
+
     private static string EmitEventHandlers(string ns, string eventCode, List<FunctionDef> functions)
     {
         var sb = new StringBuilder();
@@ -631,7 +665,7 @@ Copy the built DLL from `bin/Release/` into
             sb.AppendLine("        {");
             if (!string.IsNullOrEmpty(fn.Body))
             {
-                var bodyCode = fn.Body.Replace("body.", "GetPlayer().");
+                var bodyCode = DeclareLocals(fn.Body.Replace("body.", "GetPlayer()."));
                 foreach (var bline in bodyCode.Split('\n'))
                 {
                     var btrim = bline.TrimEnd('\r');
@@ -682,6 +716,7 @@ Copy the built DLL from `bin/Release/` into
                         sb.AppendLine($"        private static void {handlerName}()");
                         sb.AppendLine("        {");
                         sb.AppendLine($"            Log.LogInfo($\"[CuBlocky] {handlerName} fired\");");
+                        bodyCode = DeclareLocals(bodyCode);
                         foreach (var bline in bodyCode.Split('\n'))
                         {
                             var btrim = bline.TrimEnd('\r');
@@ -699,6 +734,7 @@ Copy the built DLL from `bin/Release/` into
                         sb.AppendLine($"        private static void {handlerName}()");
                         sb.AppendLine("        {");
                         sb.AppendLine($"            Log.LogInfo($\"[CuBlocky] {handlerName} fired\");");
+                        bodyCode = DeclareLocals(bodyCode);
                         foreach (var bline in bodyCode.Split('\n'))
                         {
                             var btrim = bline.TrimEnd('\r');
@@ -733,6 +769,7 @@ Copy the built DLL from `bin/Release/` into
                             sb.AppendLine("            if (__instance != cam.body) return;");
                             sb.AppendLine("            _patchedBodies.Add(__instance.GetInstanceID());");
                             sb.AppendLine($"            Log.LogInfo($\"[CuBlocky] {patchName} body.pos={{__instance.transform.position}} cam.pos={{PlayerCamera.main?.transform.position}}\");");
+                            bodyCode = DeclareLocals(bodyCode);
                             sb.AppendLine("            try {");
                             foreach (var bline in bodyCode.Split('\n'))
                             {
@@ -782,6 +819,7 @@ Copy the built DLL from `bin/Release/` into
                             sb.AppendLine("        {");
                             sb.AppendLine("            if (__instance == null) return;");
                             sb.AppendLine("            if (__instance.talker == null) return;");
+                            bodyCode = DeclareLocals(bodyCode);
                             foreach (var bline in bodyCode.Split('\n'))
                             {
                                 var btrim = bline.TrimEnd('\r');

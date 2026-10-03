@@ -2930,7 +2930,7 @@ csharpGenerator.forBlock['cu_while'] = (block, gen) => {
   return `while (${c}) {\n${s}}\n`;
 };
 csharpGenerator.forBlock['cu_for_loop'] = (block, gen) => {
-  const v = block.getFieldValue('VAR') || 'i';
+  const v = safeVar(block.getFieldValue('VAR') || 'i');
   const from = gen.valueToCode(block, 'FROM', ORDER_ATOMIC) || '0';
   const to = gen.valueToCode(block, 'TO', ORDER_ATOMIC) || '10';
   const s = gen.statementToCode(block, 'SUBSTACK');
@@ -2946,14 +2946,23 @@ function bool(v: string): string {
   if (v === 'true' || v === 'false') return v;
   return v + ' == true';
 }
+// Escape a user-typed string for use inside a C# "..." literal
+function csStr(v: string): string {
+  return String(v).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+// Turn a user-typed variable name into a valid C# local variable name
+function safeVar(n: string): string {
+  const s = String(n || '').replace(/[^A-Za-z0-9_]/g, '_').replace(/^\d/, '_');
+  return '_' + (s || 'var');
+}
 
 // Value
 csharpGenerator.forBlock['cu_number'] = (block) => [`${block.getFieldValue('NUM')}`, ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_text'] = (block) => {
   const v = block.getFieldValue('TEXT');
-  return [`"${v}"`, ORDER_ATOMIC];
+  return [`"${csStr(v)}"`, ORDER_ATOMIC];
 };
-csharpGenerator.forBlock['cu_var_get'] = (block) => [`_{block.getFieldValue('NAME')}`, ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_var_get'] = (block) => [safeVar(block.getFieldValue('NAME')), ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_item_custom'] = (block) => [`"${block.getFieldValue('ID')}"`, ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_item_vanilla'] = (block) => [`"${block.getFieldValue('ID')}"`, ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_happiness'] = () => ['body.happiness', ORDER_ATOMIC];
@@ -3031,12 +3040,12 @@ csharpGenerator.forBlock['cu_not'] = (block, gen) => {
 csharpGenerator.forBlock['cu_var_set'] = (block, gen) => {
   const n = block.getFieldValue('NAME');
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `_${n} = ${v};\n`;
+  return `${safeVar(n)} = ${float(v)};\n`;
 };
 csharpGenerator.forBlock['cu_var_change'] = (block, gen) => {
   const n = block.getFieldValue('NAME');
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '1';
-  return `_${n} += ${v};\n`;
+  return `${safeVar(n)} += ${float(v)};\n`;
 };
 
 // Lists
@@ -3602,7 +3611,7 @@ csharpGenerator.forBlock['cu_return'] = (block, gen) => {
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
   return `return ${v};\n`;
 };
-csharpGenerator.forBlock['cu_get_param'] = (block) => [`_${block.getFieldValue('NAME')}`, ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_get_param'] = (block) => [safeVar(block.getFieldValue('NAME')), ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_call_function'] = (block, gen) => {
   const name = block.getFieldValue('NAME') || 'myFunc';
   const args: string[] = [];
