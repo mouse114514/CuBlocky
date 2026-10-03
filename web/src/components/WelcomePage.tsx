@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import type { Blueprint } from '../types';
-import { defaultBlueprint } from '../types';
+import { defaultBlueprint, isValidProjectName } from '../types';
 import { useI18n, LANG_LABELS, type Lang } from '../i18n';
 import GradientBg from './GradientBg';
 import { getConfig, updateConfig, type ServerConfig } from '../api';
@@ -130,12 +130,13 @@ export default function WelcomePage({ onOpenProject }: Props) {
   };
 
   const createProject = async () => {
-    if (!newName.trim() || !newGuid.trim()) return;
+    const name = newName.trim();
+    if (!isValidProjectName(name) || !newGuid.trim()) return;
     setLoading(true);
     try {
       const bp = defaultBlueprint();
-      bp.mod.name = newName.trim();
-      bp.mod.guid = newGuid.trim() || `com.user.${newName.toLowerCase().replace(/\s+/g, '')}`;
+      bp.mod.name = name;
+      bp.mod.guid = newGuid.trim();
       bp.mod.description = newDesc;
       const res = await fetch(`${API}/api/projects`, {
         method: 'POST',
@@ -149,6 +150,9 @@ export default function WelcomePage({ onOpenProject }: Props) {
       setLoading(false);
     }
   };
+
+  const nameTrimmed = newName.trim();
+  const nameBad = nameTrimmed.length > 0 && !isValidProjectName(nameTrimmed);
 
   return (
     <div className="wp-root">
@@ -194,8 +198,13 @@ export default function WelcomePage({ onOpenProject }: Props) {
                   onChange={e => setNewName(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && createProject()}
                   autoFocus
+                  style={{ fontFamily: 'monospace', textTransform: 'none' }}
                 />
               </label>
+              <div className="form-note">{t('mod.nameHint')}</div>
+              {nameBad && (
+                <div className="form-note" style={{ color: '#ff8080' }}>{t('mod.nameInvalid')}</div>
+              )}
               <label>
                 {t('mod.guid')}
                 <input
@@ -217,7 +226,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
             </div>
             <div className="modal-actions">
               <button onClick={() => setShowNew(false)}>{t('app.close')}</button>
-              <button onClick={createProject} disabled={loading || !newName.trim() || !newGuid.trim()}>{t('app.create')}</button>
+              <button onClick={createProject} disabled={loading || !isValidProjectName(nameTrimmed) || !newGuid.trim()}>{t('app.create')}</button>
             </div>
           </div>
         </div>

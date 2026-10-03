@@ -53,6 +53,7 @@ static string GetProjectAssetsDir(string projectName)
 // ── Project-scoped asset management ────────────────────────────────
 app.MapGet("/api/projects/{name}/assets", (string name) =>
 {
+    if (!ProjectEmitter.IsSafePathSegment(name)) return Results.BadRequest("invalid project name");
     var assetsDir = GetProjectAssetsDir(name);
     if (!Directory.Exists(assetsDir)) return Results.Json(Array.Empty<object>());
     var files = Directory.GetFiles(assetsDir)
@@ -69,6 +70,7 @@ app.MapGet("/api/projects/{name}/assets", (string name) =>
 
 app.MapPost("/api/projects/{name}/assets/upload", async (string name, HttpRequest req) =>
 {
+    if (!ProjectEmitter.IsSafePathSegment(name)) return Results.BadRequest("invalid project name");
     var assetsDir = GetProjectAssetsDir(name);
     if (!req.HasFormContentType) return Results.BadRequest("expected multipart form");
     var form = await req.ReadFormAsync();
@@ -90,6 +92,7 @@ app.MapPost("/api/projects/{name}/assets/upload", async (string name, HttpReques
 
 app.MapDelete("/api/projects/{name}/assets/{assetName}", (string name, string assetName) =>
 {
+    if (!ProjectEmitter.IsSafePathSegment(name)) return Results.BadRequest("invalid project name");
     var assetsDir = GetProjectAssetsDir(name);
     var safe = Path.GetFileName(assetName);
     var path = Path.Combine(assetsDir, safe);
@@ -100,6 +103,7 @@ app.MapDelete("/api/projects/{name}/assets/{assetName}", (string name, string as
 
 app.MapGet("/api/projects/{name}/assets/raw/{assetName}", (string name, string assetName) =>
 {
+    if (!ProjectEmitter.IsSafePathSegment(name)) return Results.BadRequest("invalid project name");
     var assetsDir = GetProjectAssetsDir(name);
     var safe = Path.GetFileName(assetName);
     var path = Path.Combine(assetsDir, safe);
@@ -155,13 +159,19 @@ app.MapPost("/api/build", async (HttpRequest req) =>
     var bp = await JsonSerializer.DeserializeAsync<Blueprint>(req.Body, jsonOpts);
     if (bp == null) return Results.BadRequest("invalid blueprint");
 
+    var rawName = !string.IsNullOrWhiteSpace(bp.ProjectName)
+        ? bp.ProjectName
+        : (bp.Mod?.Name ?? "");
+    var asmName = ProjectEmitter.SafeProjectName(rawName);
+
+    // C# namespace and assembly name both follow the project name.
+    bp.Mod.RootNamespace = asmName;
+
     var files = ProjectEmitter.EmitProject(bp, config.GamePath);
-    var asmName = Path.GetFileNameWithoutExtension(files.Keys.First(k => k.EndsWith(".csproj")));
     var buildDir = Path.Combine(Directory.GetCurrentDirectory(), "builds", asmName);
 
-    // Determine project name: use provided projectName, fall back to mod name
-    var reqProjectName = bp.ProjectName ?? "";
-    var projectName = !string.IsNullOrWhiteSpace(reqProjectName) ? reqProjectName : (bp.Mod?.Name?.Replace(' ', '_') ?? "");
+    // Project name is also the source for the assets folder.
+    var projectName = asmName;
 
     try
     {
@@ -373,6 +383,7 @@ app.MapGet("/api/projects", () =>
 
 app.MapGet("/api/projects/{name}", (string name) =>
 {
+    if (!ProjectEmitter.IsSafePathSegment(name)) return Results.BadRequest("invalid project name");
     var dir = Path.Combine(projectsDir, name);
     if (!Directory.Exists(dir)) return Results.NotFound("project not found");
     var cbpFiles = Directory.GetFiles(dir, "*.cbp");
@@ -387,7 +398,10 @@ app.MapPost("/api/projects", async (HttpRequest req) =>
     var bp = await JsonSerializer.DeserializeAsync<Blueprint>(req.Body, jsonOpts);
     if (bp == null || string.IsNullOrWhiteSpace(bp.Mod?.Name))
         return Results.BadRequest("invalid blueprint");
-    var safeName = bp.Mod.Name.Replace(' ', '_');
+    if (!ProjectEmitter.IsProjectNameOk(bp.Mod.Name))
+        return Results.BadRequest("invalid project name");
+    var safeName = ProjectEmitter.SafeProjectName(bp.Mod.Name);
+    bp.Mod.RootNamespace = safeName;
     var dir = Path.Combine(projectsDir, safeName);
     Directory.CreateDirectory(dir);
     var cbpPath = Path.Combine(dir, safeName + ".cbp");
@@ -398,6 +412,7 @@ app.MapPost("/api/projects", async (HttpRequest req) =>
 
 app.MapPut("/api/projects/{name}", async (string name, HttpRequest req) =>
 {
+    if (!ProjectEmitter.IsSafePathSegment(name)) return Results.BadRequest("invalid project name");
     var dir = Path.Combine(projectsDir, name);
     if (!Directory.Exists(dir)) return Results.NotFound("project not found");
     var bp = await JsonSerializer.DeserializeAsync<Blueprint>(req.Body, jsonOpts);
@@ -411,6 +426,7 @@ app.MapPut("/api/projects/{name}", async (string name, HttpRequest req) =>
 
 app.MapDelete("/api/projects/{name}", (string name) =>
 {
+    if (!ProjectEmitter.IsSafePathSegment(name)) return Results.BadRequest("invalid project name");
     var dir = Path.Combine(projectsDir, name);
     if (!Directory.Exists(dir)) return Results.NotFound("project not found");
     Directory.Delete(dir, true);

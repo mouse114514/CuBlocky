@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect, type ReactNode } from 'react';
 import type { Blueprint } from './types';
-import { defaultBlueprint } from './types';
+import { defaultBlueprint, sanitizeProjectName } from './types';
 import { useI18n } from './i18n';
 import { BlockEditor } from './components/BlockEditor';
 import { UIEditor } from './components/UIEditor';
@@ -123,8 +123,7 @@ export function App() {
   };
 
   const saveAs = () => {
-    const name = bp.mod.name.replace(/[^a-zA-Z0-9_-]/g, '_') + '.cbp';
-    download(name, JSON.stringify(bp, null, 2));
+    download(sanitizeProjectName(bp.mod.name) + '.cbp', JSON.stringify(bp, null, 2));
   };
 
   const openFile = () => {

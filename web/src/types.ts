@@ -144,12 +144,37 @@ export interface Blueprint {
   uiControls?: UIControl[];
 }
 
+// ── Project naming ──
+// Rule (shared with the server): letters, digits and underscore; must start
+// with a letter; max 60 chars. The name is reused verbatim for the project
+// folder, the C# namespace and the generated DLL name.
+export const PROJECT_NAME_RE = /^[A-Za-z][A-Za-z0-9_]{0,59}$/;
+const RESERVED_NAMES = [
+  'CON', 'PRN', 'AUX', 'NUL',
+  'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9',
+  'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9',
+];
+
+export function isValidProjectName(s: string): boolean {
+  if (!PROJECT_NAME_RE.test(s)) return false;
+  return !RESERVED_NAMES.includes(s.toUpperCase());
+}
+
+// Coerce any string (legacy or hand-edited project) into a valid project name.
+export function sanitizeProjectName(s: string): string {
+  let t = String(s || '').replace(/[^A-Za-z0-9_]/g, '_').replace(/_{2,}/g, '_').replace(/^_|_$/g, '');
+  if (!t) t = 'MyMod';
+  if (/^[0-9]/.test(t)) t = 'M' + t;
+  if (RESERVED_NAMES.includes(t.toUpperCase())) t = 'M' + t;
+  return t;
+}
+
 // ── Defaults ──
 export function defaultBlueprint(): Blueprint {
   return {
     mod: {
       guid: 'com.example.mymod',
-      name: '我的模组',
+      name: 'MyMod',
       version: '1.0.0',
       author: '',
       description: '',

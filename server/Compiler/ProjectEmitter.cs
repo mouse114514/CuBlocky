@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using CuBlocky.Server.Models;
 
 namespace CuBlocky.Server.Compiler;
@@ -10,11 +11,55 @@ namespace CuBlocky.Server.Compiler;
 public static class ProjectEmitter
 {
     private const string DefaultGamePath = @"C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo";
+    private const int MaxNameLen = 60;
+
+    private static readonly HashSet<string> ReservedNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "CON", "PRN", "AUX", "NUL",
+        "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+        "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+    };
+
+    private static bool IsNameChar(char c) =>
+        (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_';
+
+    // Project name rule: A-Za-z0-9_ only, must start with a letter, max 60 chars.
+    // The same string is used for the project folder, the C# namespace and the DLL name.
+    public static bool IsProjectNameOk(string? s)
+    {
+        if (string.IsNullOrWhiteSpace(s) || s.Length > MaxNameLen) return false;
+        if (!IsNameChar(s[0]) || char.IsDigit(s[0])) return false;
+        foreach (var c in s) if (!IsNameChar(c)) return false;
+        return !ReservedNames.Contains(s);
+    }
+
+    // Lenient guard for /api/projects/{name} routes: blocks path traversal but
+    // still accepts legacy project folders that predate the strict naming rule.
+    public static bool IsSafePathSegment(string? s)
+    {
+        if (string.IsNullOrWhiteSpace(s) || s.Length > 256) return false;
+        if (s == "." || s == "..") return false;
+        if (Path.GetFileName(s) != s) return false;
+        return s.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
+    }
+
+    // Coerce any string (e.g. a legacy or hand-edited project name) into a valid name.
+    public static string SafeProjectName(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return "MyMod";
+        var sb = new StringBuilder();
+        foreach (var c in raw)
+            sb.Append(IsNameChar(c) ? c : '_');
+        var s = Regex.Replace(sb.ToString(), @"_+", "_").Trim('_');
+        if (s.Length == 0 || char.IsDigit(s[0])) s = "M" + s;
+        if (s.Length > MaxNameLen) s = s.Substring(0, MaxNameLen).TrimEnd('_');
+        return ReservedNames.Contains(s) ? "M" + s : s;
+    }
 
     public static Dictionary<string, string> EmitProject(Blueprint bp, string? gamePath = null)
     {
-        var ns = SafeIdent(bp.Mod.RootNamespace);
-        var asmName = SafeIdent(bp.Mod.RootNamespace);
+        var asmName = SafeProjectName(bp.Mod.Name);
+        var ns = asmName;
         var guid = bp.Mod.Guid;
         var name = bp.Mod.Name.Replace("\"", "\\\"");
         var ver = bp.Mod.Version;

@@ -24,10 +24,8 @@ export function ModForm({ mod, onChange }: Props) {
       <label className="full">{t('mod.desc')}
         <textarea value={mod.description} onChange={e => set('description', e.target.value)} />
       </label>
-      <label className="full">{t('mod.namespace')}
-        <input value={mod.rootNamespace} onChange={e => set('rootNamespace', e.target.value)} />
-      </label>
       <div className="form-note">{t('mod.guidHint')}</div>
+      <div className="form-note">{t('mod.nameHint')}</div>
     </div>
   );
 }
