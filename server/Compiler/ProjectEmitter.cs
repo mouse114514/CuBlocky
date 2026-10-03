@@ -613,13 +613,51 @@ Copy the built DLL from `bin/Release/` into
     }
 
     // cu_var_set emits a bare assignment ("_x = v;"), which is not a declaration in C#.
-    // First assignment / increment of each variable gets an explicit declaration.
+    // Variables are shared between handlers (that is how Blockly variables behave),
+    // so every one of them is emitted once as a class-level static field instead of
+    // being declared inside whichever handler happens to assign it. Declaring them
+    // per handler used to break the moment a variable was assigned in one handler and
+    // read in another: CS0103 "name does not exist" in the reader, CS0219 "assigned
+    // but never used" in the writer.
     private static readonly System.Text.RegularExpressions.Regex LocalAssign =
-        new System.Text.RegularExpressions.Regex(@"^\s*(_[A-Za-z_]\w*)\s*([+]?)=(?!=)", System.Text.RegularExpressions.RegexOptions.Compiled);
+        new System.Text.RegularExpressions.Regex(@"^\s*(_[A-Za-z_]\w*)\s*([+]?)=(?!=)",
+            System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.Multiline);
     private static readonly System.Text.RegularExpressions.Regex StringInit =
         new System.Text.RegularExpressions.Regex("\"|fullName|\\.category|\\.Tags");
 
-    private static string DeclareLocals(string bodyCode)
+    private static (string type, bool zeroInit) InferVar(string line, System.Text.RegularExpressions.Match m)
+    {
+        var expr = line.Substring(line.IndexOf('=') + 1).TrimEnd(';').Trim();
+        if (m.Groups[2].Value == "+") return ("float", true);
+        return StringInit.IsMatch(expr) ? ("string", false) : ("float", false);
+    }
+
+    private static Dictionary<string, (string type, bool zeroInit)> CollectVars(string eventCode, List<FunctionDef> functions)
+    {
+        var vars = new Dictionary<string, (string, bool)>();
+        var sources = new List<string> { eventCode };
+        foreach (var fn in functions)
+            if (!string.IsNullOrEmpty(fn.Body)) sources.Add(fn.Body.Replace("body.", "GetPlayer()."));
+
+        foreach (var src in sources)
+        {
+            foreach (System.Text.RegularExpressions.Match m in LocalAssign.Matches(src))
+            {
+                if (vars.ContainsKey(m.Groups[1].Value)) continue;
+                // The match only spans "_x =" - the right-hand side is what the type
+                // depends on, so widen out to the whole line.
+                var lineStart = src.LastIndexOf('\n', m.Index > 0 ? m.Index - 1 : 0) + 1;
+                var lineEnd = src.IndexOf('\n', m.Index + m.Length);
+                if (lineEnd < 0) lineEnd = src.Length;
+                vars[m.Groups[1].Value] = InferVar(src.Substring(lineStart, lineEnd - lineStart).TrimEnd('\r'), m);
+            }
+        }
+        return vars;
+    }
+
+    // LocalAssign also catches these, but class-level fields are already declared
+    // by EmitEventHandlers, so do not redeclare them inside the method body.
+    private static string DeclareLocals(string bodyCode, HashSet<string> hoisted)
     {
         var seen = new HashSet<string>();
         var decls = new List<string>();
@@ -630,15 +668,9 @@ Copy the built DLL from `bin/Release/` into
             if (!m.Success) continue;
             var name = m.Groups[1].Value;
             if (!seen.Add(name)) continue;
+            if (hoisted != null && hoisted.Contains(name)) continue;
 
-            var expr = raw.Substring(raw.IndexOf('=') + 1).TrimEnd(';').Trim();
-
-            string type;
-            bool zeroInit;
-            if (m.Groups[2].Value == "+") { type = "float"; zeroInit = true; }
-            else if (StringInit.IsMatch(expr)) { type = "string"; zeroInit = false; }
-            else { type = "float"; zeroInit = false; }
-
+            var (type, zeroInit) = InferVar(raw, m);
             decls.Add(type + " " + name + (zeroInit ? " = 0f;" : ";"));
         }
 
@@ -714,6 +746,15 @@ Copy the built DLL from `bin/Release/` into
         sb.AppendLine("        private static Body GetPlayer() => PlayerCamera.main.body;");
         sb.AppendLine();
 
+        // Every variable the blocks assign to, once, at class level.
+        var userVars = CollectVars(eventCode, functions);
+        var hoisted = new HashSet<string>(userVars.Keys);
+        foreach (var kv in userVars)
+        {
+            sb.AppendLine($"        private static {kv.Value.type} {kv.Key}{(kv.Value.zeroInit ? " = 0f;" : ";")}");
+        }
+        if (userVars.Count > 0) sb.AppendLine();
+
         // Emit user-defined functions
         foreach (var fn in functions)
         {
@@ -724,7 +765,7 @@ Copy the built DLL from `bin/Release/` into
             sb.AppendLine("        {");
             if (!string.IsNullOrEmpty(fn.Body))
             {
-                var bodyCode = DeclareLocals(fn.Body.Replace("body.", "GetPlayer()."));
+                var bodyCode = DeclareLocals(fn.Body.Replace("body.", "GetPlayer()."), hoisted);
                 foreach (var bline in bodyCode.Split('\n'))
                 {
                     var btrim = bline.TrimEnd('\r');
@@ -775,7 +816,7 @@ Copy the built DLL from `bin/Release/` into
                         sb.AppendLine($"        private static void {handlerName}()");
                         sb.AppendLine("        {");
                         sb.AppendLine($"            Log.LogInfo($\"[CuBlocky] {handlerName} fired\");");
-                        bodyCode = DeclareLocals(bodyCode);
+                        bodyCode = DeclareLocals(bodyCode, hoisted);
                         foreach (var bline in bodyCode.Split('\n'))
                         {
                             var btrim = bline.TrimEnd('\r');
@@ -793,7 +834,7 @@ Copy the built DLL from `bin/Release/` into
                         sb.AppendLine($"        private static void {handlerName}()");
                         sb.AppendLine("        {");
                         sb.AppendLine($"            Log.LogInfo($\"[CuBlocky] {handlerName} fired\");");
-                        bodyCode = DeclareLocals(bodyCode);
+                        bodyCode = DeclareLocals(bodyCode, hoisted);
                         foreach (var bline in bodyCode.Split('\n'))
                         {
                             var btrim = bline.TrimEnd('\r');
@@ -828,7 +869,7 @@ Copy the built DLL from `bin/Release/` into
                             sb.AppendLine("            if (__instance != cam.body) return;");
                             sb.AppendLine("            _patchedBodies.Add(__instance.GetInstanceID());");
                             sb.AppendLine($"            Log.LogInfo($\"[CuBlocky] {patchName} body.pos={{__instance.transform.position}} cam.pos={{PlayerCamera.main?.transform.position}}\");");
-                            bodyCode = DeclareLocals(bodyCode);
+                            bodyCode = DeclareLocals(bodyCode, hoisted);
                             sb.AppendLine("            try {");
                             foreach (var bline in bodyCode.Split('\n'))
                             {
@@ -878,7 +919,7 @@ Copy the built DLL from `bin/Release/` into
                             sb.AppendLine("        {");
                             sb.AppendLine("            if (__instance == null) return;");
                             sb.AppendLine("            if (__instance.talker == null) return;");
-                            bodyCode = DeclareLocals(bodyCode);
+                            bodyCode = DeclareLocals(bodyCode, hoisted);
                             foreach (var bline in bodyCode.Split('\n'))
                             {
                                 var btrim = bline.TrimEnd('\r');
