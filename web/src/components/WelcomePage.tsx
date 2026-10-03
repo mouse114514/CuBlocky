@@ -4,6 +4,7 @@ import { defaultBlueprint, isValidProjectName } from '../types';
 import { useI18n, type Lang } from '../i18n';
 import GradientBg from './GradientBg';
 import { LangPicker } from './LangPicker';
+import Marketplace from './Marketplace';
 import { getConfig, updateConfig, type ServerConfig } from '../api';
 import SPLASH_TEXTS from '../splashTexts';
 
@@ -41,6 +42,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
   const [showLangHint, setShowLangHint] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
+  const [showMarket, setShowMarket] = useState(false);
   const importInputRef = useRef<HTMLInputElement | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [splashText, setSplashText] = useState(() => pickSplash(lang));
@@ -225,6 +227,8 @@ export default function WelcomePage({ onOpenProject }: Props) {
   const nameTrimmed = newName.trim();
   const nameBad = nameTrimmed.length > 0 && !isValidProjectName(nameTrimmed);
 
+  if (showMarket) return <Marketplace onBack={() => setShowMarket(false)} />;
+
   return (
     <div className="wp-root">
       <header className="toolbar">
@@ -263,6 +267,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
         <div className="wp-actions">
           <button onClick={() => setShowNew(true)}>{t('app.newProject')}</button>
           <button onClick={loadProjects}>{t('app.openProject')}</button>
+          <button onClick={() => setShowMarket(true)}>{t('market.title')}</button>
         </div>
       </div>
 

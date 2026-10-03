@@ -38,6 +38,7 @@ app.MapPut("/api/config", async (HttpRequest req) =>
     var body = await JsonSerializer.DeserializeAsync<ServerConfig>(req.Body, jsonOpts);
     if (body == null) return Results.BadRequest("invalid config");
     config.GamePath = body.GamePath;
+    if (body.PartSizeMb > 0) config.PartSizeMb = body.PartSizeMb;
     config.Save();
     return Results.Ok(config);
 });
@@ -388,6 +389,17 @@ app.MapGet("/api/projects/{name}", (string name) =>
     var content = File.ReadAllText(cbpFiles[0]);
     var bp = JsonSerializer.Deserialize<Blueprint>(content, jsonOpts);
     return Results.Json(bp, jsonOpts);
+});
+
+// Raw .cbp bytes, without the server model round-tripping the JSON.
+app.MapGet("/api/projects/{name}/cbp", (string name) =>
+{
+    if (!ProjectEmitter.IsSafePathSegment(name)) return Results.BadRequest("invalid project name");
+    var dir = Path.Combine(projectsDir, name);
+    if (!Directory.Exists(dir)) return Results.NotFound("project not found");
+    var cbpFiles = Directory.GetFiles(dir, "*.cbp");
+    if (cbpFiles.Length == 0) return Results.NotFound("no .cbp file");
+    return Results.File(cbpFiles[0], "application/json");
 });
 
 app.MapPost("/api/projects", async (HttpRequest req) =>

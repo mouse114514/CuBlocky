@@ -6,6 +6,8 @@ public class ServerConfig
 {
     public string GamePath { get; set; } = @"C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo";
 
+    public int PartSizeMb { get; set; } = 9;
+
     private static string ConfigPath => Path.Combine(AppContext.BaseDirectory, "config.json");
 
     private static ServerConfig? _instance;
