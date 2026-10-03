@@ -5,10 +5,30 @@ using CuBlocky.Server.Nodes;
 using CuBlocky.Server.Compiler;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddCors(o => o.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
 var app = builder.Build();
-app.UseCors();
+
+// Nothing in this API is authenticated, so CORS must stay closed. An open
+// policy let any web page the user happens to visit POST to /api/deploy and
+// have an arbitrary DLL copied into the game's plugins folder. Only the origin
+// that served the request gets CORS headers, whatever port it runs on.
+app.Use(async (ctx, next) =>
+{
+    var origin = ctx.Request.Headers.Origin.ToString();
+    if (origin == "http://" + ctx.Request.Host.Value)
+    {
+        ctx.Response.Headers["Access-Control-Allow-Origin"] = origin;
+        ctx.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
+        ctx.Response.Headers["Access-Control-Allow-Headers"] = "content-type, authorization";
+        ctx.Response.Headers["Vary"] = "Origin";
+        if (ctx.Request.Method == HttpMethods.Options)
+        {
+            await ctx.Response.CompleteAsync();
+            return;
+        }
+    }
+    await next();
+});
 app.UseStaticFiles(new Microsoft.AspNetCore.Builder.StaticFileOptions
 {
     OnPrepareResponse = ctx =>
@@ -320,6 +340,12 @@ app.MapPost("/api/deploy", async (HttpRequest req) =>
     var body = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(req.Body, jsonOpts);
     if (body == null || !body.TryGetValue("dllPath", out var dllPath) || !File.Exists(dllPath))
         return Results.BadRequest("dllPath missing or file not found");
+
+    // Only DLLs this server built may be deployed.
+    var root = Directory.GetCurrentDirectory();
+    var full = Path.GetFullPath(dllPath);
+    if (!full.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+        return Results.BadRequest("dllPath must be inside the CuBlocky server directory");
 
     var gamePath = config.GamePath;
     var pluginsDir = Path.Combine(gamePath, "BepInEx", "plugins");
