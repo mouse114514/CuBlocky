@@ -11,7 +11,6 @@ const REPO = 'mouse114514/cublocky-market';
 const BRANCH = 'main';
 const RAW = 'https://raw.githubusercontent.com/' + REPO + '/' + BRANCH;
 const API = 'https://api.github.com/repos/' + REPO;
-const SUB_DIR = 'submissions';
 const CACHE_KEY = 'cublocky-market-manifest';
 const CACHE_MS = 15 * 60 * 1000;
 const TOK_SESSION = 'cublocky-github-token';
@@ -26,6 +25,9 @@ export interface MarketEntry {
   license?: string;
   icon?: string;
   cbp?: string;
+  cbpSize?: number;
+  cbpSha256?: string;
+  parts?: { path: string; size: number; sha256: string }[];
   assetsPath?: string;
   assets?: string[];
   added?: string;
@@ -76,7 +78,16 @@ export async function rawBlob(path: string): Promise<Blob> {
   return res.blob();
 }
 
-export const cbpPath = (e: MarketEntry) => e.cbp || `projects/${e.slug}.cbp`;
+// Normally one file. If a submission exceeded partSizeMb the .cbp was
+// split into part001…partNNN, which are concatenated back in order.
+export async function cbpText(e: MarketEntry): Promise<string> {
+  if (e.cbp) return rawText(e.cbp);
+  const parts = e.parts || [];
+  if (parts.length === 0) throw new Error('invalid entry: no .cbp');
+  let out = '';
+  for (const p of parts) out += await rawText(p.path);
+  return out;
+}
 export const assetDir = (e: MarketEntry) => e.assetsPath || `projects/${e.slug}/assets`;
 export const iconUrl = (e: MarketEntry): string | undefined =>
   e.icon ? (e.icon.startsWith('http') ? e.icon : RAW + '/' + e.icon) : undefined;
@@ -183,7 +194,9 @@ export async function fetchBlueprint(name: string): Promise<any> {
 export async function projectCbpBytes(name: string): Promise<Uint8Array> {
   const res = await fetch('/api/projects/' + encodeURIComponent(name) + '/cbp');
   if (!res.ok) throw new Error('HTTP ' + res.status + ' reading ' + name + '.cbp');
-  return new Uint8Array(await res.arrayBuffer());
+  const buf = new Uint8Array(await res.arrayBuffer());
+  if (buf.length === 0) throw new Error('empty .cbp for ' + name);
+  return buf;
 }
 
 export async function assetBytes(name: string, assetName: string): Promise<Uint8Array> {
@@ -194,10 +207,29 @@ export async function assetBytes(name: string, assetName: string): Promise<Uint8
   return new Uint8Array(await res.arrayBuffer());
 }
 
-// Pushes a local project onto a fresh branch and opens a draft PR. The
-// .cbp becomes part001…partNNN; assets and the icon go alongside. The
-// manifest records each part's size and sha256 so the reviewer can
-// reassemble and verify.
+// PUT /contents rejects the request when the path already exists on main
+// and no sha is given, so look the blob sha up for every write.
+async function putFile(branch: string, path: string, data: Uint8Array, message: string): Promise<void> {
+  const sha = await mainShaOf(path);
+  await gh(API + '/contents/' + path, {
+    method: 'PUT',
+    body: JSON.stringify({ content: bytesToBase64(data), message, branch, ...(sha ? { sha } : {}) }),
+  });
+}
+
+// PUT /contents needs the current blob sha when the file already exists
+// on main, or it fails with a 409 conflict.
+async function mainShaOf(path: string): Promise<string | undefined> {
+  try {
+    return (await gh<{ sha: string }>(API + '/contents/' + path)).sha;
+  } catch {
+    return undefined; // not on main yet: a fresh create needs no sha
+  }
+}
+
+// The PR is already publishable: files go straight into projects/ and
+// projects/manifest.json is updated in the same commit. Merging it is
+// the whole job - there is no post-merge step.
 export async function submitProject(
   projectName: string,
   iconFile: File | null,
@@ -206,11 +238,9 @@ export async function submitProject(
 ): Promise<SubmitResult> {
   const size = Math.max(1, partSizeMb) * 1024 * 1024;
   const bytes = await projectCbpBytes(projectName);
-  const nonce = Date.now().toString(36);
   const slug = projectName.replace(/[^A-Za-z0-9._-]/g, '_') || 'submission';
-  const branch = 'sub/' + slug + '-' + nonce;
-  const base = SUB_DIR + '/' + slug + '/';
-  const encName = encodeURIComponent(projectName);
+  const p = encodeURIComponent(slug);
+  const branch = 'sub/' + slug + '-' + Date.now().toString(36);
 
   const mainSha = (await gh<{ object: { sha: string } }>(API + '/git/refs/heads/' + BRANCH)).object.sha;
   await gh(API + '/git/refs', {
@@ -218,58 +248,58 @@ export async function submitProject(
     body: JSON.stringify({ ref: 'refs/heads/' + branch, sha: mainSha }),
   });
 
-  const parts: { index: number; size: number; sha256: string }[] = [];
-  for (let off = 0, n = 1; off < bytes.length; off += size, n++) {
-    const part = bytes.subarray(off, Math.min(off + size, bytes.length));
-    parts.push({ index: n - 1, size: part.length, sha256: await sha256Hex(part) });
-    const pad = n.toString().padStart(3, '0');
-    await gh(API + '/contents/' + base + 'part' + pad + '.cbp', {
-      method: 'PUT',
-      body: JSON.stringify({ content: bytesToBase64(part), message: 'part ' + pad, branch }),
-    });
-  }
-
-  const names: string[] = [];
-  for (const a of await listAssets(projectName)) {
-    const b64 = bytesToBase64(await assetBytes(projectName, a.name));
-    await gh(API + '/contents/' + base + 'assets/' + encodeURIComponent(a.name), {
-      method: 'PUT',
-      body: JSON.stringify({ content: b64, message: 'asset ' + a.name, branch }),
-    });
-    names.push(a.name);
-  }
-
-  if (iconFile) {
-    const b64 = bytesToBase64(new Uint8Array(await iconFile.arrayBuffer()));
-    await gh(API + '/contents/' + base + 'icon.png', {
-      method: 'PUT',
-      body: JSON.stringify({ content: b64, message: 'icon', branch }),
-    });
-  }
-
-  const p = encodeURIComponent(slug);
-  const manifest = JSON.stringify({
+  const entry: MarketEntry = {
     slug,
     name: meta.name,
     author: meta.author,
     version: meta.version,
     description: meta.description,
     license: meta.license,
-    ...(iconFile ? { icon: 'projects/' + p + '.icon.png' } : {}),
-    cbp: 'projects/' + p + '.cbp',
-    assetsPath: 'projects/' + p + '/assets',
-    assets: names,
-    parts,
-  }, null, 2);
+  };
 
-  await gh(API + '/contents/' + base + 'MANIFEST.json', {
-    method: 'PUT',
-    body: JSON.stringify({
-      content: bytesToBase64(new TextEncoder().encode(manifest)),
-      message: 'manifest',
-      branch,
-    }),
-  });
+  // One file when it fits; split into part001…partNNN above partSizeMb.
+  if (bytes.length <= size) {
+    entry.cbp = 'projects/' + p + '.cbp';
+    entry.cbpSize = bytes.length;
+    entry.cbpSha256 = await sha256Hex(bytes);
+    await putFile(branch, entry.cbp, bytes, 'cbp');
+  } else {
+    entry.parts = [];
+    for (let off = 0, n = 1; off < bytes.length; off += size, n++) {
+      const part = bytes.subarray(off, Math.min(off + size, bytes.length));
+      const path = 'projects/' + p + '.cbp.part' + n.toString().padStart(3, '0');
+      await putFile(branch, path, part, 'cbp part ' + path);
+      entry.parts.push({ path, size: part.length, sha256: await sha256Hex(part) });
+    }
+  }
+
+  const names: string[] = [];
+  for (const a of await listAssets(projectName)) {
+    const path = 'projects/' + p + '/assets/' + encodeURIComponent(a.name);
+    await putFile(branch, path, await assetBytes(projectName, a.name), 'asset ' + a.name);
+    names.push(a.name);
+  }
+  entry.assets = names;
+  entry.assetsPath = 'projects/' + p + '/assets';
+
+  if (iconFile) {
+    const path = 'projects/' + p + '.icon.png';
+    await putFile(branch, path, new Uint8Array(await iconFile.arrayBuffer()), 'icon');
+    entry.icon = path;
+  }
+
+  // Append to main's manifest, replacing any older entry with the same
+  // slug, so the reviewer sees the list change in the PR diff.
+  const manifestPath = 'projects/manifest.json';
+  let list: MarketEntry[] = [];
+  try {
+    const parsed = JSON.parse(await rawText(manifestPath));
+    if (Array.isArray(parsed)) list = parsed;
+  } catch { /* manifest missing: start a fresh list */ }
+  list = list.filter(e => !e || !e.slug || e.slug !== slug);
+  list.push(entry);
+  const manifestText = new TextEncoder().encode(JSON.stringify(list, null, 2));
+  await putFile(branch, manifestPath, manifestText, 'manifest');
 
   const pr = await gh<{ html_url: string; number: number }>(API + '/pulls', {
     method: 'POST',
@@ -277,8 +307,8 @@ export async function submitProject(
       title: 'Submit: ' + meta.name,
       head: branch,
       base: BRANCH,
-      draft: true,
-      body: 'Submitted via CuBlocky.\n\n```json\n' + manifest + '\n```',
+      body: 'Submitted via CuBlocky. Merging publishes this project.\n\n```json\n'
+        + JSON.stringify(entry, null, 2) + '\n```',
     }),
   });
 
@@ -290,7 +320,7 @@ export async function submitProject(
 // Imports the .cbp then uploads each asset. Assets are separate files
 // on disk, so importing the .cbp alone would leave every sprite blank.
 export async function installEntry(entry: MarketEntry): Promise<{ name: string; assets: number }> {
-  const text = await rawText(cbpPath(entry));
+  const text = await cbpText(entry);
   let obj: unknown;
   try { obj = JSON.parse(text); } catch { throw new Error('invalid .cbp: not JSON'); }
   if (!obj || typeof obj !== 'object' || !(obj as any).mod || !(obj as any).mod.name) {
