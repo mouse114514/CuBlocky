@@ -382,11 +382,11 @@ const TOOLBOX = `
   </category>
   <category name="%{BKY_CAT_SOUND}" colour="#9c27b0">
     <block type="cu_play_sound">
-      <value name="SOUND"><shadow type="cu_sound_vanilla"><field name="ID">hit</field></shadow></value>
+      <value name="SOUND"><shadow type="cu_sound_vanilla"><field name="ID">beep</field></shadow></value>
       <value name="VOLUME"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
     </block>
     <block type="cu_play_sound_at">
-      <value name="SOUND"><shadow type="cu_sound_vanilla"><field name="ID">hit</field></shadow></value>
+      <value name="SOUND"><shadow type="cu_sound_vanilla"><field name="ID">beep</field></shadow></value>
       <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
       <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
       <value name="VOLUME"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>

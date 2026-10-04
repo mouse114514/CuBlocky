@@ -230,13 +230,33 @@ const VANILLA_ITEMS: DdOption[] = [
   ['等离子切割器', 'Plasma Cutter', 'Plasma Cutter', 'plasmacutter'],
 ];
 
+// Tokens verified against Assembly-CSharp Sound.Play() call sites. The game itself
+// prepends "Sounds/", so these are bare clip names, not paths.
 const VANILLA_SOUNDS: DdOption[] = [
-  ['使用物品', 'use item', 'использовать предмет', 'useItem'],
-  ['咀嚼(食物)', 'eat (crunch)', 'есть (хруст)', 'eatCrunch'],
-  ['咀嚼(血肉)', 'eat (flesh)', 'есть (мясо)', 'eatFlesh'],
-  ['饮水', 'drink', 'пить', 'drink'],
-  ['合成', 'combine', 'соединить', 'combine'],
-  ['打击', 'hit', 'удар', 'hit'],
+  ['键盘提示音', 'keypad beep', 'сигнал клавиатуры', 'beep'],
+  ['键盘提示音(2)', 'keypad beep (2)', 'сигнал клавиатуры (2)', 'beep0'],
+  ['背包打开', 'backpack open', 'открыть рюкзак', 'backpack'],
+  ['换手/换槽位', 'switch hands/slot', 'смена рук/слота', 'switch'],
+  ['合成/组合', 'combine', 'соединить', 'combine'],
+  ['进食(脆)', 'eat (crunch)', 'есть (хруст)', 'eatCrunch'],
+  ['进食(血肉)', 'eat (flesh)', 'есть (мясо)', 'eatFlesh'],
+  ['喝(滤管)', 'drink (filter straw)', 'пить (фильтр)', 'filterstraw'],
+  ['倒水', 'pour water', 'налить воду', 'waterpour'],
+  ['注射', 'syringe', 'шприц', 'syringe'],
+  ['吃药', 'pills', 'таблетки', 'pills'],
+  ['解锁', 'unlock', 'разблокировать', 'unlock'],
+  ['电击', 'electric shock', 'разряд', 'zap'],
+  ['玻璃碎裂', 'glass break', 'стекло', 'glass'],
+  ['血肉冲击', 'gore impact', 'кровь', 'gore'],
+  ['喘息', 'exertion', 'натуживание', 'exert'],
+  ['丢弃物品', 'drop item', 'выбросить', 'drop'],
+  ['攻击命中', 'attack hit', 'удар по цели', 'attackdamage'],
+  ['击中地面', 'hit ground', 'удар по земле', 'BlockGround'],
+  ['击中生物', 'hit animal', 'удар по животному', 'AnimalHit'],
+  ['生物死亡', 'animal death', 'смерть животного', 'AnimalDeath'],
+  ['枪声', 'rifle shot', 'выстрел', 'rifleshot'],
+  ['激光', 'laser', 'лазер', 'laser'],
+  ['咆哮', 'growl', 'рык', 'growl'],
 ];
 
 // Generic player property setter options: every public field on Body
@@ -3667,13 +3687,13 @@ function isCustomSound(block: any): boolean {
   return block.getInputTargetBlock ? block.getInputTargetBlock('SOUND')?.type === 'cu_sound_custom' : false;
 }
 function soundCall(block: any, gen: any, x: string, y: string, vol: string): string {
-  const s = soundInput(block, gen) || '"useItem"';
+  const s = soundInput(block, gen) || '"beep"';
   if (isCustomSound(block)) {
-    if (x) return `CUCoreUtils.PlaySoundAt(AssetLoader.LoadEmbeddedAudio(${s}), null, null, new Vector3(${x}, ${y}, 0f), null);\n`;
-    return `CUCoreUtils.PlaySoundAt(AssetLoader.LoadEmbeddedAudio(${s}), volume: ${vol});\n`;
+    if (x) return `CUCoreUtils.PlaySoundAt(RegisterContent.LoadAudio(${s}), null, null, new Vector2(${x}, ${y}), null);\n`;
+    return `CUCoreUtils.PlaySoundAt(RegisterContent.LoadAudio(${s}), volume: ${vol});\n`;
   }
-  if (x) return `Sound.Play(${s}, new Vector3(${x}, ${y}, 0f), false, false, null, ${vol});\n`;
-  return `Sound.Play(${s}, body.transform.position);\n`;
+  const pos = x ? `new Vector2(${x}, ${y})` : 'body.transform.position';
+  return `Sound.Play(${s}, ${pos}, false, false, null, ${vol});\n`;
 }
 
 csharpGenerator.forBlock['cu_play_sound'] = (block, gen) =>

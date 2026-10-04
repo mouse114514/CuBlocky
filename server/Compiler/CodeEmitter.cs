@@ -54,12 +54,12 @@ public static class CodeEmitter
         sb.AppendLine("            var names = asm.GetManifestResourceNames();");
         sb.AppendLine("            bool found = names.Any(n => n.EndsWith(name) || n.Contains(name));");
         sb.AppendLine("            _spriteLog.AppendLine(\"Audio '\" + name + \"' -> embedded=\" + found + \" resources=[\" + string.Join(\",\", names) + \"]\");");
-        sb.AppendLine("            var clip = AssetLoader.LoadEmbeddedAudio(name);");
+        sb.AppendLine("            var clip = AssetLoader.LoadEmbeddedAudio(name);\n            if (clip == null) Plugin.Logger.LogWarning(\"[CuBlocky] embedded audio '\" + name + \"' not found (embedded=\" + found + \")\");");
         sb.AppendLine("            _spriteLog.AppendLine(\"  -> result=\" + (clip != null ? \"OK\" : \"NULL\"));");
         sb.AppendLine("            return clip;");
         sb.AppendLine("        }");
         sb.AppendLine("        private static Sprite LoadSprite(string name) => _loadSprite(name);");
-        sb.AppendLine("        private static AudioClip LoadAudio(string name) => _loadAudio(name);");
+        sb.AppendLine("        public static AudioClip LoadAudio(string name) => _loadAudio(name);");
         sb.AppendLine("        private static void DumpSpriteLog()");
         sb.AppendLine("        {");
         sb.AppendLine("            Plugin.Logger.LogInfo(\"[CuBlocky] Sprite/Audio debug log:\\n\" + _spriteLog);");
