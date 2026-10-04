@@ -11,6 +11,40 @@ import { download, buildProject, saveProject, getConfig, updateConfig, deployDll
 import * as Blockly from 'blockly/core';
 import { csharpGenerator, pickSprite, setSpritePickCallback, createSpriteBlock, extractFunctions } from './blocklySetup';
 
+// Everything a modder should paste when reporting a build failure: the compiler
+// output, the exact generated lines it points at, the resolved game path, and
+// which of the required game assemblies the server could not find.
+function debugPayload(r: BuildResult): string {
+  const lines: string[] = [];
+  lines.push('[CuBlocky build report]');
+  lines.push('gamePath: ' + (r.gamePath ?? '(not set)'));
+  lines.push('buildDir: ' + (r.buildDir ?? ''));
+  lines.push('dllPath:  ' + (r.dllPath ?? ''));
+  lines.push('');
+  if (r.generatedFiles?.length) {
+    lines.push('generated files:');
+    for (const f of r.generatedFiles) lines.push(`  ${f.path}  (${f.lines} lines, ${f.bytes} bytes)`);
+    lines.push('');
+  }
+  if (r.diagnostics?.length) {
+    lines.push('compiler diagnostics:');
+    for (const d of r.diagnostics) {
+      lines.push(`  ${d.severity} ${d.code} ${d.file}(${d.line},${d.column}): ${d.text}`);
+      lines.push('    source:');
+      for (const s of d.snippet) lines.push('      ' + s);
+    }
+    lines.push('');
+  }
+  if (r.referenceChecks?.length) {
+    lines.push('reference checks:');
+    for (const c of r.referenceChecks) lines.push(`  ${c.exists ? 'OK      ' : 'MISSING '} ${c.path}`);
+    lines.push('');
+  }
+  lines.push('raw compiler output:');
+  lines.push(r.message);
+  return lines.join('\n');
+}
+
 function CopyIcon() {
   return (
     <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -293,13 +327,46 @@ export function App() {
             ) : (
               <div className="modal-path-wrap">
                 <button className={`copy-btn${errCopied ? ' copied' : ''}`} onClick={async () => {
-                  try { await navigator.clipboard.writeText(buildResult.message || ''); } catch { return; }
+                  try { await navigator.clipboard.writeText(debugPayload(buildResult)); } catch { return; }
                   setErrCopied(true); setTimeout(() => setErrCopied(false), 1200);
                 }} title="Copy">
                   {errCopied ? <CheckIcon /> : <CopyIcon />}
                 </button>
                 <pre className="modal-err">{buildResult.message}</pre>
+                <p className="modal-hint">{t('app.copyForHelp')}</p>
               </div>
+            )}
+
+            {(buildResult.diagnostics?.length ?? 0) > 0 && (
+              <div className="build-diagnostics">
+                <p className="modal-label">{t('app.diagnostics')}</p>
+                {buildResult.diagnostics!.map((d, i) => (
+                  <div key={i} className={`diag-item ${d.severity}`}>
+                    <div className="diag-head">
+                      <span className="diag-code">{d.code}</span>
+                      <span>{d.file}:{d.line}:{d.column}</span>
+                      <span>{d.text}</span>
+                    </div>
+                    <pre className="diag-snippet">{d.snippet.join('\n')}</pre>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {buildResult.referenceChecks?.filter(r => !r.exists).length ? (
+              <div className="build-refs">
+                <p className="modal-label">{t('app.missingRefs')}</p>
+                {buildResult.referenceChecks!.filter(r => !r.exists).map((r, i) => (
+                  <pre key={i} className="modal-err">{r.path}</pre>
+                ))}
+              </div>
+            ) : null}
+
+            {buildResult.gamePath && (
+              <>
+                <p className="modal-label">{t('app.gamePath')}</p>
+                <pre className="modal-err">{buildResult.gamePath}</pre>
+              </>
             )}
             {deployResult && (
               <p className={`deploy-result ${deployResult.success ? 'ok' : 'err'}`}>

@@ -325,9 +325,95 @@ app.MapPost("/api/build", async (HttpRequest req) =>
 
         var dllPath = Path.Combine(buildDir, "bin", "Release", asmName + ".dll");
         var success = proc.ExitCode == 0 && File.Exists(dllPath);
-        var msg = success ? $"Build succeeded!" : $"Build failed (exit {proc.ExitCode}):\n{stdout}\n{stderr}";
 
-        return Results.Json(new { success, message = msg, dllPath, buildDir }, jsonOpts);
+        // A bare "CS1002 : ; expected" at EventHandlers.cs(37,15) tells the user
+        // nothing. Pull every diagnostic out of the compiler output and attach the
+        // generated source around it so the real issue is visible and reportable.
+        var rawOutput = (stdout + "\n" + stderr).Trim();
+        var diagnostics = new List<object>();
+        var seenDiag = new HashSet<string>();
+        var srcCache = new Dictionary<string, string[]>();
+        var diagRe = new System.Text.RegularExpressions.Regex(
+            @"(?<file>[\w.-]+\.cs)\((?<line>\d+),(?<col>\d+)\):\s*(?<sev>error|warning)\s+(?<code>\w+):\s*(?<text>.*)",
+            System.Text.RegularExpressions.RegexOptions.Multiline);
+        foreach (System.Text.RegularExpressions.Match m in diagRe.Matches(rawOutput))
+        {
+            var rel = m.Groups["file"].Value;
+            if (!srcCache.TryGetValue(rel, out var lines))
+            {
+                var p = Path.Combine(buildDir, rel);
+                lines = File.Exists(p) ? File.ReadAllLines(p) : Array.Empty<string>();
+                srcCache[rel] = lines;
+            }
+            var ln = int.Parse(m.Groups["line"].Value);
+            var snippet = new List<string>();
+            for (var k = Math.Max(0, ln - 3); k < Math.Min(lines.Length, ln + 2); k++)
+                snippet.Add((k + 1) + (k + 1 == ln ? " > " : "   ") + lines[k]);
+            var key = $"{rel}:{ln}:{m.Groups["col"].Value}:{m.Groups["code"].Value}";
+            if (!seenDiag.Add(key)) continue;
+            diagnostics.Add(new
+            {
+                file = rel,
+                line = ln,
+                column = int.Parse(m.Groups["col"].Value),
+                severity = m.Groups["sev"].Value,
+                code = m.Groups["code"].Value,
+                text = m.Groups["text"].Value.Trim(),
+                snippet,
+            });
+        }
+        // dotnet echoes each diagnostic to both stdout and stderr; keep one copy.
+
+        // The generated project references the game by absolute path. If any of
+        // these assemblies is missing, the DLL either fails to compile or compiles
+        // against nothing and silently does nothing in-game. Report it explicitly
+        // instead of letting the user guess.
+        var refs = new (string Name, string Rel, bool Dir)[]
+        {
+            ("game root", "", true),
+            ("BepInEx", "BepInEx", true),
+            ("BepInEx/core", "BepInEx\\core", true),
+            ("BepInEx/core/BepInEx.dll", "BepInEx\\core\\BepInEx.dll", false),
+            ("BepInEx/core/0Harmony.dll", "BepInEx\\core\\0Harmony.dll", false),
+            ("BepInEx/plugins/CUCoreLib.dll", "BepInEx\\plugins\\CUCoreLib.dll", false),
+            ("CasualtiesUnknown_Data/Managed/Assembly-CSharp.dll", "CasualtiesUnknown_Data\\Managed\\Assembly-CSharp.dll", false),
+            ("CasualtiesUnknown_Data/Managed/UnityEngine.dll", "CasualtiesUnknown_Data\\Managed\\UnityEngine.dll", false),
+            ("BepInEx/plugins (deploy target)", "BepInEx\\plugins", true),
+        };
+        var referenceChecks = new List<object>();
+        foreach (var r in refs)
+        {
+            var p = r.Rel == "" ? config.GamePath : Path.Combine(config.GamePath, r.Rel);
+            referenceChecks.Add(new
+            {
+                check = r.Name,
+                path = p,
+                exists = r.Dir ? Directory.Exists(p) : File.Exists(p),
+            });
+        }
+
+        var generatedFiles = files.Keys.Select(k => new
+        {
+            path = k,
+            lines = files[k].Split('\n').Length,
+            bytes = files[k].Length,
+        }).ToList();
+
+        var msg = success
+            ? "Build succeeded!"
+            : "Build failed (exit " + proc.ExitCode + "):\n" + rawOutput;
+
+        return Results.Json(new
+        {
+            success,
+            message = msg,
+            dllPath,
+            buildDir,
+            diagnostics,
+            generatedFiles,
+            referenceChecks,
+            gamePath = config.GamePath,
+        }, jsonOpts);
     }
     catch (Exception ex)
     {

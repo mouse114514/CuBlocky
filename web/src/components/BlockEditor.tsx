@@ -84,7 +84,7 @@ const TOOLBOX = `
       <value name="ID"><shadow type="cu_status_ref"><field name="ID">myStatus</field></shadow></value>
     </block>
     <block type="cu_register_recipe">
-      <value name="INPUTS"><shadow type="lists_create_with"></shadow></value>
+      <value name="INPUTS"><shadow type="cu_list_create"></shadow></value>
       <value name="OUTPUT"><shadow type="cu_item_vanilla"><field name="ID">bandage</field></shadow></value>
       <value name="AMOUNT"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
       <value name="RESULT_CONDITION"><shadow type="cu_number"><field name="NUM">-1</field></shadow></value>
@@ -563,7 +563,7 @@ const TOOLBOX = `
     <sep></sep>
     <block type="cu_string_op"></block>
     <sep></sep>
-    <block type="lists_create_with"></block>
+    <block type="cu_list_create"></block>
     <block type="cu_list_get">
       <value name="INDEX"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
@@ -914,7 +914,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
 
       const forceHorizontal = () => {
         ws.getAllBlocks().forEach((b: any) => {
-          if ((b.type === 'lists_create_with' || b.type === 'cu_define_function' || b.type === 'cu_call_function' || b.type === 'cu_call_function_value') && !b.inputsInline) {
+          if ((b.type === 'cu_list_create' || b.type === 'cu_define_function' || b.type === 'cu_call_function' || b.type === 'cu_call_function_value') && !b.inputsInline) {
             b.inputsInline = true;
             b.render();
           }

@@ -22,11 +22,37 @@ export async function compileProject(bp: Blueprint): Promise<Record<string, stri
   return data.files as Record<string, string>;
 }
 
+export interface BuildDiagnostic {
+  file: string;
+  line: number;
+  column: number;
+  severity: string;
+  code: string;
+  text: string;
+  snippet: string[];
+}
+
+export interface ReferenceCheck {
+  check: string;
+  path: string;
+  exists: boolean;
+}
+
+export interface GeneratedFile {
+  path: string;
+  lines: number;
+  bytes: number;
+}
+
 export interface BuildResult {
   success: boolean;
   message: string;
   dllPath?: string;
   buildDir?: string;
+  diagnostics?: BuildDiagnostic[];
+  generatedFiles?: GeneratedFile[];
+  referenceChecks?: ReferenceCheck[];
+  gamePath?: string;
 }
 
 export async function buildProject(bp: Blueprint, projectName: string): Promise<BuildResult> {
