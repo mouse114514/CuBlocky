@@ -2,87 +2,7 @@ import * as Blockly from 'blockly/core';
 import { fieldRegistry } from 'blockly/core';
 import type { FunctionDef, ParamDef } from './types';
 
-// ── Global sprite picker callback (React ↔ Blockly bridge) ──────
-export type SpritePickCallback = (assetName: string) => void;
-let _spritePickCb: SpritePickCallback | null = null;
 let _propTypeCheckRegistered = false;
-export function setSpritePickCallback(cb: SpritePickCallback | null) { _spritePickCb = cb; }
-export function pickSprite(assetName: string) { _spritePickCb?.(assetName); _spritePickCb = null; }
-
-// ── Custom asset picker fields (sprite image / audio clip) ──────────
-function makeAssetPickerField(kind: 'image' | 'audio', buttonLabel: string, buttonTitle: string) {
-  // @ts-ignore — Blockly v12 FieldConfig incompatible with custom field constructor
-  class FieldAssetPicker extends Blockly.Field {
-    private assetId_ = '';
-    private buttonEl_: HTMLButtonElement | null = null;
-    private previewEl_: HTMLSpanElement | null = null;
-
-    constructor(value?: string) {
-      super(value || '');
-      this.value_ = value || '';
-      this.assetId_ = value || '';
-      this.getValue = this.getValue.bind(this);
-      this.setValue = this.setValue.bind(this);
-    }
-
-    static fromJson<T extends Blockly.Field>(this: new (...args: any[]) => T, options: { sprite?: string; audio?: string }): T {
-      return new FieldAssetPicker(options.sprite || options.audio) as unknown as T;
-    }
-
-    protected initView_(): void {
-      if (!this.fieldGroup_) return;
-      this.previewEl_ = document.createElement('span');
-      this.previewEl_.style.cssText = 'display:inline-block;max-width:130px;padding:2px 6px;margin-right:4px;border:1px solid #666;border-radius:3px;background:#222;color:#fff;font-size:11px;line-height:16px;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-      this.previewEl_.textContent = this.assetLabel_();
-      this.fieldGroup_.appendChild(this.previewEl_);
-      this.buttonEl_ = document.createElement('button');
-      this.buttonEl_.textContent = buttonLabel;
-      this.buttonEl_.title = buttonTitle;
-      this.buttonEl_.style.cssText = 'border:1px solid #555;border-radius:3px;background:#444;color:#fff;cursor:pointer;padding:2px 6px;font-size:13px;vertical-align:middle;';
-      this.buttonEl_.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.openPicker_();
-      });
-      this.fieldGroup_.appendChild(this.buttonEl_);
-    }
-
-    private assetLabel_(): string {
-      return this.assetId_ || ((Blockly.Msg as Record<string, string>)['CU_ASSET_NONE'] || '—');
-    }
-
-    private openPicker_(): void {
-      const self = this;
-      _spritePickCb = (assetName: string) => {
-        self.assetId_ = assetName;
-        self.setValue(assetName);
-        if (self.previewEl_) self.previewEl_.textContent = self.assetLabel_();
-        _spritePickCb = null;
-      };
-      window.dispatchEvent(new CustomEvent('cublocky:open-asset-picker', { detail: { kind } }));
-    }
-
-    getValue(): string {
-      return this.assetId_;
-    }
-
-    protected doValueUpdate_(newValue: any): void {
-      this.assetId_ = newValue || '';
-      if (this.previewEl_) this.previewEl_.textContent = this.assetLabel_();
-    }
-
-    protected doValueInvalid_(newValue: any): void {}
-    protected render_(): void {}
-    protected updateEditable_(): void {}
-    getEditorShowArrow_: () => false = () => false as false;
-  }
-  return FieldAssetPicker;
-}
-
-const FieldSpritePicker = makeAssetPickerField('image', '🖼', '选择精灵图 / Pick sprite');
-const FieldAudioPicker = makeAssetPickerField('audio', '🎵', '选择音效 / Pick audio');
-
-fieldRegistry.register('field_sprite_picker', FieldSpritePicker as any);
-fieldRegistry.register('field_audio_picker', FieldAudioPicker as any);
 
 // ── Searchable dropdown field ──────────────────────────────────────
 type SearchableOption = [string, string, string, string]; // [zhLabel, enLabel, ruLabel, value]
@@ -782,7 +702,7 @@ const BLOCK_JSON: any[] = [
     type: 'cu_play_sound_file',
     message0: '%{BKY_CU_PLAY_SOUND_FILE}',
     args0: [
-      { type: 'field_audio_picker', name: 'FILE' },
+      { type: 'field_input', name: 'FILE', text: 'sound.wav' },
       { type: 'input_value', name: 'VOLUME', check: 'Number', align: 'RIGHT' },
     ],
     colour: C.SOUND, previousStatement: null, nextStatement: null, inputsInline: true,
@@ -791,7 +711,7 @@ const BLOCK_JSON: any[] = [
     type: 'cu_play_sound_file_at',
     message0: '%{BKY_CU_PLAY_SOUND_FILE_AT}',
     args0: [
-      { type: 'field_audio_picker', name: 'FILE' },
+      { type: 'field_input', name: 'FILE', text: 'sound.wav' },
       { type: 'input_value', name: 'X', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'Y', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'VOLUME', check: 'Number', align: 'RIGHT' },
@@ -1985,7 +1905,7 @@ const BLOCK_JSON: any[] = [
     type: 'cu_make_sprite',
     message0: '%{BKY_CU_MAKE_SPRITE}',
     args0: [
-      { type: 'field_sprite_picker', name: 'SHEET' },
+      { type: 'field_input', name: 'SHEET', text: 'sheet.png' },
       { type: 'input_value', name: 'COLS', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'ROWS', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'INDEX', check: 'Number', align: 'RIGHT' },
@@ -2055,7 +1975,7 @@ const BLOCK_JSON: any[] = [
     message0: '%{BKY_CU_FRAME_ANIMATION_SHEET}',
     args0: [
       { type: 'field_input', name: 'ID', text: 'myAnim' },
-      { type: 'field_sprite_picker', name: 'SHEET' },
+      { type: 'field_input', name: 'SHEET', text: 'sheet.png' },
       { type: 'input_value', name: 'COLS', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'ROWS', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'FPS', check: 'Number', align: 'RIGHT' },
@@ -2680,7 +2600,6 @@ const MSG_ZH: Record<string, string> = {
   CU_STOP_BODY_ANIMATION: '在 %1 上停止动画',
   CU_REGISTER_CONSOLE_COMMAND: '控制台命令 %1（%2）参数 %3 -> %4',
   CU_CONSOLE_ARG: '命令参数 %1',
-  CU_ASSET_NONE: '（未选择）',
   CU_PLAY_SOUND_FILE: '播放音效 %1 音量 %2',
   CU_PLAY_SOUND_FILE_AT: '播放音效 %1 在 (%2,%3) 音量 %4',
   CU_SET_VELOCITY: '设置速度(%1,%2)',
@@ -2935,7 +2854,6 @@ const MSG_EN: Record<string, string> = {
   CU_STOP_BODY_ANIMATION: 'stop animation on %1',
   CU_REGISTER_CONSOLE_COMMAND: 'console command %1 (%2) args %3 -> %4',
   CU_CONSOLE_ARG: 'command arg %1',
-  CU_ASSET_NONE: '(none)',
   CU_PLAY_SOUND_FILE: 'play sound %1 volume %2',
   CU_PLAY_SOUND_FILE_AT: 'play sound %1 at (%2,%3) volume %4',
   CU_SET_VELOCITY: 'set velocity (%1,%2)',
@@ -3181,7 +3099,6 @@ const MSG_RU: Record<string, string> = {
   CU_STOP_BODY_ANIMATION: 'остановить анимацию на %1',
   CU_REGISTER_CONSOLE_COMMAND: 'консольная команда %1 (%2), аргументы %3 -> %4',
   CU_CONSOLE_ARG: 'аргумент команды %1',
-  CU_ASSET_NONE: '(не выбрано)',
   CU_PLAY_SOUND_FILE: 'воспроизвести звук %1 громкость %2',
   CU_PLAY_SOUND_FILE_AT: 'воспроизвести звук %1 в (%2,%3) громкость %4',
   CU_SET_VELOCITY: 'установить скорость (%1,%2)',
