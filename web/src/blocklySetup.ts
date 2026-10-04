@@ -9,75 +9,82 @@ let _propTypeCheckRegistered = false;
 export function setSpritePickCallback(cb: SpritePickCallback | null) { _spritePickCb = cb; }
 export function pickSprite(assetName: string) { _spritePickCb?.(assetName); _spritePickCb = null; }
 
-// ── Custom sprite picker field ──────────────────────────────────────
-// @ts-ignore — Blockly v12 FieldConfig incompatible with custom field constructor
-class FieldSpritePicker extends Blockly.Field {
-  private spriteId_ = '';
-  private buttonEl_: HTMLButtonElement | null = null;
-  private previewEl_: HTMLSpanElement | null = null;
+// ── Custom asset picker fields (sprite image / audio clip) ──────────
+function makeAssetPickerField(kind: 'image' | 'audio', buttonLabel: string, buttonTitle: string) {
+  // @ts-ignore — Blockly v12 FieldConfig incompatible with custom field constructor
+  class FieldAssetPicker extends Blockly.Field {
+    private assetId_ = '';
+    private buttonEl_: HTMLButtonElement | null = null;
+    private previewEl_: HTMLSpanElement | null = null;
 
-  constructor(value?: string) {
-    super(value || '');
-    this.value_ = value || '';
-    this.spriteId_ = value || '';
-    this.getValue = this.getValue.bind(this);
-    this.setValue = this.setValue.bind(this);
-  }
-
-  static fromJson<T extends Blockly.Field>(this: new (...args: any[]) => T, options: { sprite?: string }): T {
-    return new FieldSpritePicker(options.sprite) as unknown as T;
-  }
-
-  protected initView_(): void {
-    if (!this.fieldGroup_) return;
-    this.previewEl_ = document.createElement('span');
-    this.previewEl_.style.cssText = 'display:inline-block;width:24px;height:24px;border:1px solid #666;border-radius:3px;vertical-align:middle;margin-right:4px;background:#222;text-align:center;line-height:22px;font-size:10px;color:#999;';
-    this.previewEl_.textContent = this.spriteId_ ? '✓' : '?';
-    this.fieldGroup_.appendChild(this.previewEl_);
-    this.buttonEl_ = document.createElement('button');
-    this.buttonEl_.textContent = '🖼';
-    this.buttonEl_.title = '选择精灵图 / Pick sprite';
-    this.buttonEl_.style.cssText = 'border:1px solid #555;border-radius:3px;background:#444;color:#fff;cursor:pointer;padding:2px 6px;font-size:13px;vertical-align:middle;';
-    this.buttonEl_.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.openPicker_();
-    });
-    this.fieldGroup_.appendChild(this.buttonEl_);
-  }
-
-  private openPicker_(): void {
-    const self = this;
-    _spritePickCb = (assetName: string) => {
-      self.spriteId_ = assetName;
-      self.setValue(assetName);
-      if (self.previewEl_) {
-        self.previewEl_.textContent = '✓';
-        self.previewEl_.title = assetName;
-      }
-      _spritePickCb = null;
-    };
-    // Dispatch event for React to open AssetManager
-    window.dispatchEvent(new CustomEvent('cublocky:open-sprite-picker'));
-  }
-
-  getValue(): string {
-    return this.spriteId_;
-  }
-
-  protected doValueUpdate_(newValue: any): void {
-    this.spriteId_ = newValue || '';
-    if (this.previewEl_) {
-      this.previewEl_.textContent = this.spriteId_ ? '✓' : '?';
+    constructor(value?: string) {
+      super(value || '');
+      this.value_ = value || '';
+      this.assetId_ = value || '';
+      this.getValue = this.getValue.bind(this);
+      this.setValue = this.setValue.bind(this);
     }
-  }
 
-  protected doValueInvalid_(newValue: any): void {}
-  protected render_(): void {}
-  protected updateEditable_(): void {}
-  getEditorShowArrow_: () => false = () => false as false;
+    static fromJson<T extends Blockly.Field>(this: new (...args: any[]) => T, options: { sprite?: string; audio?: string }): T {
+      return new FieldAssetPicker(options.sprite || options.audio) as unknown as T;
+    }
+
+    protected initView_(): void {
+      if (!this.fieldGroup_) return;
+      this.previewEl_ = document.createElement('span');
+      this.previewEl_.style.cssText = 'display:inline-block;width:24px;height:24px;border:1px solid #666;border-radius:3px;vertical-align:middle;margin-right:4px;background:#222;text-align:center;line-height:22px;font-size:10px;color:#999;';
+      this.previewEl_.textContent = this.assetId_ ? '✓' : '?';
+      this.fieldGroup_.appendChild(this.previewEl_);
+      this.buttonEl_ = document.createElement('button');
+      this.buttonEl_.textContent = buttonLabel;
+      this.buttonEl_.title = buttonTitle;
+      this.buttonEl_.style.cssText = 'border:1px solid #555;border-radius:3px;background:#444;color:#fff;cursor:pointer;padding:2px 6px;font-size:13px;vertical-align:middle;';
+      this.buttonEl_.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.openPicker_();
+      });
+      this.fieldGroup_.appendChild(this.buttonEl_);
+    }
+
+    private openPicker_(): void {
+      const self = this;
+      _spritePickCb = (assetName: string) => {
+        self.assetId_ = assetName;
+        self.setValue(assetName);
+        if (self.previewEl_) {
+          self.previewEl_.textContent = '✓';
+          self.previewEl_.title = assetName;
+        }
+        _spritePickCb = null;
+      };
+      // Dispatch event for React to open AssetManager, filtered by asset kind
+      window.dispatchEvent(new CustomEvent('cublocky:open-asset-picker', { detail: { kind } }));
+    }
+
+    getValue(): string {
+      return this.assetId_;
+    }
+
+    protected doValueUpdate_(newValue: any): void {
+      this.assetId_ = newValue || '';
+      if (this.previewEl_) {
+        this.previewEl_.textContent = this.assetId_ ? '✓' : '?';
+      }
+    }
+
+    protected doValueInvalid_(newValue: any): void {}
+    protected render_(): void {}
+    protected updateEditable_(): void {}
+    getEditorShowArrow_: () => false = () => false as false;
+  }
+  return FieldAssetPicker;
 }
 
+const FieldSpritePicker = makeAssetPickerField('image', '🖼', '选择精灵图 / Pick sprite');
+const FieldAudioPicker = makeAssetPickerField('audio', '🎵', '选择音效 / Pick audio');
+
 fieldRegistry.register('field_sprite_picker', FieldSpritePicker as any);
+fieldRegistry.register('field_audio_picker', FieldAudioPicker as any);
 
 // ── Searchable dropdown field ──────────────────────────────────────
 type SearchableOption = [string, string, string, string]; // [zhLabel, enLabel, ruLabel, value]
@@ -773,6 +780,26 @@ const BLOCK_JSON: any[] = [
     ],
     colour: C.SOUND, previousStatement: null, nextStatement: null, inputsInline: true,
   },
+  {
+    type: 'cu_play_sound_file',
+    message0: '%{BKY_CU_PLAY_SOUND_FILE}',
+    args0: [
+      { type: 'field_audio_picker', name: 'FILE' },
+      { type: 'input_value', name: 'VOLUME', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.SOUND, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_play_sound_file_at',
+    message0: '%{BKY_CU_PLAY_SOUND_FILE_AT}',
+    args0: [
+      { type: 'field_audio_picker', name: 'FILE' },
+      { type: 'input_value', name: 'X', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'Y', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'VOLUME', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.SOUND, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
 
   // ═══ Flow (deep orange) ══════════════════════════════════════
   {
@@ -1337,6 +1364,22 @@ const BLOCK_JSON: any[] = [
   { type: 'cu_jump', message0: '%{BKY_CU_JUMP}', colour: C.BODY, previousStatement: null, nextStatement: null },
   { type: 'cu_switch_hands', message0: '%{BKY_CU_SWITCH_HANDS}', colour: C.BODY, previousStatement: null, nextStatement: null },
   { type: 'cu_throw_item', message0: '%{BKY_CU_THROW_ITEM}', colour: C.BODY, previousStatement: null, nextStatement: null },
+  {
+    type: 'cu_set_velocity', message0: '%{BKY_CU_SET_VELOCITY}',
+    args0: [
+      { type: 'input_value', name: 'X', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'Y', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_add_velocity', message0: '%{BKY_CU_ADD_VELOCITY}',
+    args0: [
+      { type: 'input_value', name: 'X', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'Y', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
 
   // ═══ Limb getters (teal) ════════════════════════════════════
   {
@@ -1941,6 +1984,20 @@ const BLOCK_JSON: any[] = [
     colour: C.ASSET,
   },
   {
+    type: 'cu_make_sprite',
+    message0: '%{BKY_CU_MAKE_SPRITE}',
+    args0: [
+      { type: 'field_sprite_picker', name: 'SHEET' },
+      { type: 'input_value', name: 'COLS', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'ROWS', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'INDEX', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'PPU', check: 'Number', align: 'RIGHT' },
+    ],
+    output: null,
+    colour: C.ASSET,
+    inputsInline: true,
+  },
+  {
     type: 'cu_cache_sprite',
     message0: '%{BKY_CU_CACHE_SPRITE}',
     args0: [
@@ -1994,6 +2051,23 @@ const BLOCK_JSON: any[] = [
     previousStatement: null,
     nextStatement: null,
     colour: C.ASSET,
+  },
+  {
+    type: 'cu_frame_animation_sheet',
+    message0: '%{BKY_CU_FRAME_ANIMATION_SHEET}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myAnim' },
+      { type: 'field_sprite_picker', name: 'SHEET' },
+      { type: 'input_value', name: 'COLS', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'ROWS', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'FPS', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'PPU', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'LOOP', check: 'Boolean' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.ASSET,
+    inputsInline: true,
   },
   {
     type: 'cu_load_texture_file',
@@ -2608,6 +2682,12 @@ const MSG_ZH: Record<string, string> = {
   CU_STOP_BODY_ANIMATION: '在 %1 上停止动画',
   CU_REGISTER_CONSOLE_COMMAND: '控制台命令 %1（%2）参数 %3 -> %4',
   CU_CONSOLE_ARG: '命令参数 %1',
+  CU_PLAY_SOUND_FILE: '播放音效文件 %1 音量%2',
+  CU_PLAY_SOUND_FILE_AT: '播放音效文件 %1 在(%2,%3) 音量%4',
+  CU_SET_VELOCITY: '设置速度(%1,%2)',
+  CU_ADD_VELOCITY: '增加速度(%1,%2)',
+  CU_MAKE_SPRITE: '切分 %1（%2×%3 网格）第 %4 帧 PPU %5',
+  CU_FRAME_ANIMATION_SHEET: '帧动画 %1 来自 %2（%3×%4 网格，%5 FPS，PPU %6，循环 %7）',
 };
 
 const MSG_EN: Record<string, string> = {
@@ -2856,6 +2936,12 @@ const MSG_EN: Record<string, string> = {
   CU_STOP_BODY_ANIMATION: 'stop animation on %1',
   CU_REGISTER_CONSOLE_COMMAND: 'console command %1 (%2) args %3 -> %4',
   CU_CONSOLE_ARG: 'command arg %1',
+  CU_PLAY_SOUND_FILE: 'play sound file %1 volume %2',
+  CU_PLAY_SOUND_FILE_AT: 'play sound file %1 at (%2,%3) volume %4',
+  CU_SET_VELOCITY: 'set velocity (%1,%2)',
+  CU_ADD_VELOCITY: 'add velocity (%1,%2)',
+  CU_MAKE_SPRITE: 'slice %1 (%2x%3 grid) frame %4 ppu %5',
+  CU_FRAME_ANIMATION_SHEET: 'frame animation %1 from sheet %2 (%3x%4 grid, %5 fps, ppu %6, loop %7)',
 };
 
 const MSG_RU: Record<string, string> = {
@@ -3095,6 +3181,12 @@ const MSG_RU: Record<string, string> = {
   CU_STOP_BODY_ANIMATION: 'остановить анимацию на %1',
   CU_REGISTER_CONSOLE_COMMAND: 'консольная команда %1 (%2), аргументы %3 -> %4',
   CU_CONSOLE_ARG: 'аргумент команды %1',
+  CU_PLAY_SOUND_FILE: 'воспроизвести звук %1 громкость %2',
+  CU_PLAY_SOUND_FILE_AT: 'воспроизвести звук %1 в (%2,%3) громкость %4',
+  CU_SET_VELOCITY: 'установить скорость (%1,%2)',
+  CU_ADD_VELOCITY: 'добавить скорость (%1,%2)',
+  CU_MAKE_SPRITE: 'разрезать %1 (%2x%3) кадр %4 PPU %5',
+  CU_FRAME_ANIMATION_SHEET: 'анимация %1 из листа %2 (%3x%4, %5 FPS, PPU %6, цикл %7)',
 };
 
 export function setMessages(lang: string) {
@@ -3354,15 +3446,23 @@ export function defineBlocks(lang: string = 'zh') {
 
 // ── Create sprite block in workspace ──────────────────────────────
 export function createSpriteBlock(assetName: string, ws: Blockly.WorkspaceSvg) {
+  createBlockAtCenter('cu_sprite_ref', { ASSET: assetName }, ws);
+}
+
+export function createSoundBlock(assetName: string, ws: Blockly.WorkspaceSvg) {
+  createBlockAtCenter('cu_play_sound_file', { FILE: assetName }, ws);
+}
+
+function createBlockAtCenter(type: string, fields: Record<string, string>, ws: Blockly.WorkspaceSvg) {
   try {
-    const block = ws.newBlock('cu_sprite_ref') as any;
-    block.setFieldValue(assetName, 'ASSET');
+    const block = ws.newBlock(type) as any;
+    for (const [name, value] of Object.entries(fields)) block.setFieldValue(value, name);
     block.initSvg();
     block.render();
     const metrics = ws.getMetrics();
-    block.moveBy(metrics.viewLeft + metrics.viewWidth / 2 - 60, metrics.viewTop + metrics.viewHeight / 2 - 20);
+    block.moveBy(metrics.viewLeft + metrics.viewWidth / 2 - 80, metrics.viewTop + metrics.viewHeight / 2 - 20);
   } catch (e) {
-    console.error('Failed to create sprite block:', e);
+    console.error(`Failed to create ${type} block:`, e);
   }
 }
 
@@ -3649,6 +3749,18 @@ csharpGenerator.forBlock['cu_play_sound_at'] = (block, gen) => {
   const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
   const vol = gen.valueToCode(block, 'VOLUME', ORDER_ATOMIC) || '1';
   return `Sound.Play("${s}", new Vector3(${floatSuffix(x)}, ${floatSuffix(y)}, 0f), twoDimensional: false, pitchShift: false, null, ${floatSuffix(float(vol))});\n`;
+};
+csharpGenerator.forBlock['cu_play_sound_file'] = (block, gen) => {
+  const f = q(block.getFieldValue('FILE') || '');
+  const vol = gen.valueToCode(block, 'VOLUME', ORDER_ATOMIC) || '1';
+  return `CUCoreUtils.PlaySoundAt(AssetLoader.LoadEmbeddedAudio("${f}"), volume: ${floatSuffix(float(vol))});\n`;
+};
+csharpGenerator.forBlock['cu_play_sound_file_at'] = (block, gen) => {
+  const f = q(block.getFieldValue('FILE') || '');
+  const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
+  const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
+  const vol = gen.valueToCode(block, 'VOLUME', ORDER_ATOMIC) || '1';
+  return `CUCoreUtils.PlaySoundAt(AssetLoader.LoadEmbeddedAudio("${f}"), volume: ${floatSuffix(float(vol))}, position: new Vector2(${floatSuffix(x)}, ${floatSuffix(y)}));\n`;
 };
 
 // Flow
@@ -4059,6 +4171,16 @@ csharpGenerator.forBlock['cu_ragdoll'] = () => 'body.Ragdoll();\n';
 csharpGenerator.forBlock['cu_jump'] = () => 'body.Jump();\n';
 csharpGenerator.forBlock['cu_switch_hands'] = () => 'body.SwitchHands();\n';
 csharpGenerator.forBlock['cu_throw_item'] = () => 'body.ThrowItem();\n';
+csharpGenerator.forBlock['cu_set_velocity'] = (block, gen) => {
+  const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
+  const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
+  return `body.SetVelocity(new Vector2(${floatSuffix(x)}, ${floatSuffix(y)}));\n`;
+};
+csharpGenerator.forBlock['cu_add_velocity'] = (block, gen) => {
+  const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
+  const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
+  return `body.SetVelocity(body.lastTimeStepVelocity + new Vector2(${floatSuffix(x)}, ${floatSuffix(y)}));\n`;
+};
 
 // ═══ Limb getters ═══════════════════════════════════════════
 csharpGenerator.forBlock['cu_limb_index'] = (block) => {
@@ -4482,6 +4604,14 @@ csharpGenerator.forBlock['cu_split_sprite_sheet'] = (block, gen) => {
   const idx = gen.valueToCode(block, 'INDEX', ORDER_ATOMIC) || '0';
   return [`CUCoreUtils.SplitSpriteSheet(${sheet}, ${toInt(cols)}, ${toInt(rows)})[${toInt(idx)}]`, ORDER_ATOMIC];
 };
+csharpGenerator.forBlock['cu_make_sprite'] = (block, gen) => {
+  const sheet = q(block.getFieldValue('SHEET') || '');
+  const cols = toInt(gen.valueToCode(block, 'COLS', ORDER_ATOMIC) || '1');
+  const rows = toInt(gen.valueToCode(block, 'ROWS', ORDER_ATOMIC) || '1');
+  const idx = toInt(gen.valueToCode(block, 'INDEX', ORDER_ATOMIC) || '0');
+  const ppu = floatSuffix(gen.valueToCode(block, 'PPU', ORDER_ATOMIC) || '8');
+  return [`CUCoreUtils.SplitSpriteSheet(CUCoreUtils.LoadEmbeddedSprite("${sheet}", ${ppu}), ${cols}, ${rows})[${idx}]`, ORDER_ATOMIC];
+};
 csharpGenerator.forBlock['cu_cache_sprite'] = (block, gen) => {
   const id = q(block.getFieldValue('ID') || 'mySprite');
   const sprite = gen.valueToCode(block, 'SPRITE', ORDER_ATOMIC) || 'null';
@@ -4509,6 +4639,16 @@ csharpGenerator.forBlock['cu_frame_animation'] = (block) => {
   const loop = (block.getFieldValue('LOOP') || 'FALSE') === 'FALSE' ? 'true' : 'false';
   const frames = listPaths(block.getFieldValue('FRAMES') || '').map(p => `"${q(p)}"`).join(', ');
   return `AssetLoader.LoadFrameAnimationFromFiles("${id}", new[] { ${frames} }, ${ppu}, ${fps}, ${loop});\n`;
+};
+csharpGenerator.forBlock['cu_frame_animation_sheet'] = (block, gen) => {
+  const id = q(block.getFieldValue('ID') || 'myAnim');
+  const sheet = q(block.getFieldValue('SHEET') || '');
+  const cols = toInt(gen.valueToCode(block, 'COLS', ORDER_ATOMIC) || '1');
+  const rows = toInt(gen.valueToCode(block, 'ROWS', ORDER_ATOMIC) || '1');
+  const fps = floatSuffix(gen.valueToCode(block, 'FPS', ORDER_ATOMIC) || '12');
+  const ppu = floatSuffix(gen.valueToCode(block, 'PPU', ORDER_ATOMIC) || '8');
+  const loop = (gen.valueToCode(block, 'LOOP', ORDER_ATOMIC) || 'true') === 'true' ? 'true' : 'false';
+  return `AssetLoader.RegisterFrameAnimation("${id}", CUCoreUtils.SplitSpriteSheet(CUCoreUtils.LoadEmbeddedSprite("${sheet}", ${ppu}), ${cols}, ${rows}), ${fps}, ${loop});\n`;
 };
 csharpGenerator.forBlock['cu_load_texture_file'] = (block) => {
   const path = q(block.getFieldValue('PATH') || 'Assets/texture.png');

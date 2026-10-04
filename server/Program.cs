@@ -100,8 +100,9 @@ app.MapPost("/api/projects/{name}/assets/upload", async (string name, HttpReques
     if (file == null || file.Length == 0) return Results.BadRequest("no file");
 
     var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-    if (ext is not (".png" or ".jpg" or ".jpeg" or ".bmp"))
-        return Results.BadRequest("only PNG/JPG/BMP images are accepted");
+    if (ext is not (".png" or ".jpg" or ".jpeg" or ".bmp" or
+                     ".wav" or ".mp3" or ".mp1" or ".mp2" or ".aif" or ".aiff" or ".cue"))
+        return Results.BadRequest("only PNG/JPG/BMP images or WAV/MP3/AIFF audio are accepted");
 
     var safeName = Path.GetFileName(file.FileName).Replace(' ', '_');
     var savedPath = Path.Combine(assetsDir, safeName);
@@ -136,6 +137,9 @@ app.MapGet("/api/projects/{name}/assets/raw/{assetName}", (string name, string a
         ".png" => "image/png",
         ".jpg" or ".jpeg" => "image/jpeg",
         ".bmp" => "image/bmp",
+        ".wav" => "audio/wav",
+        ".mp3" or ".mp1" or ".mp2" => "audio/mpeg",
+        ".aif" or ".aiff" => "audio/x-aiff",
         _ => "application/octet-stream"
     };
     return Results.File(path, ct);

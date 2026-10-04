@@ -9,7 +9,7 @@ import { ToolbarGuide } from './components/ToolbarGuide';
 import AssetManager from './components/AssetManager';
 import { download, buildProject, saveProject, getConfig, updateConfig, deployDll, type BuildResult, type ServerConfig } from './api';
 import * as Blockly from 'blockly/core';
-import { csharpGenerator, pickSprite, setSpritePickCallback, createSpriteBlock, extractFunctions } from './blocklySetup';
+import { csharpGenerator, pickSprite, setSpritePickCallback, createSpriteBlock, createSoundBlock, extractFunctions } from './blocklySetup';
 
 // Everything a modder should paste when reporting a build failure: the compiler
 // output, the exact generated lines it points at, the resolved game path, and
@@ -92,6 +92,7 @@ export function App() {
   const [deployResult, setDeployResult] = useState<{ success: boolean; message: string } | null>(null);
   const [errCopied, setErrCopied] = useState(false);
   const [showSpritePicker, setShowSpritePicker] = useState(false);
+  const [pickKind, setPickKind] = useState<'image' | 'audio'>('image');
   const [showAssetManager, setShowAssetManager] = useState(false);
   const [showGuide, setShowGuide] = useState(() => localStorage.getItem('cublocky-toolbar-guide') !== '1');
   const [blockSearch, setBlockSearch] = useState('');
@@ -134,11 +135,14 @@ export function App() {
     return () => window.removeEventListener('keydown', handler);
   }, [inEditor]);
 
-  // Listen for sprite picker events from Blockly fields
+  // Listen for asset picker events from Blockly fields (sprite image or audio clip)
   useEffect(() => {
-    const handler = () => setShowSpritePicker(true);
-    window.addEventListener('cublocky:open-sprite-picker', handler);
-    return () => window.removeEventListener('cublocky:open-sprite-picker', handler);
+    const handler = (e: Event) => {
+      setPickKind((e as CustomEvent).detail?.kind === 'audio' ? 'audio' : 'image');
+      setShowSpritePicker(true);
+    };
+    window.addEventListener('cublocky:open-asset-picker', handler);
+    return () => window.removeEventListener('cublocky:open-asset-picker', handler);
   }, []);
 
   // Load server config on mount
@@ -387,6 +391,7 @@ export function App() {
         <AssetManager
           projectName={currentProjectName}
           mode="pick"
+          accept={pickKind}
           onSelect={(name) => pickSprite(name)}
           onClose={() => { setSpritePickCallback(null); setShowSpritePicker(false); }}
         />
@@ -398,7 +403,9 @@ export function App() {
           mode="manage"
           onGenerate={(name) => {
             const ws = wsRef.current;
-            if (ws) createSpriteBlock(name, ws);
+            if (!ws) return;
+            if (/\.wav|\.mp3|\.mp1|\.mp2|\.aif|\.aiff|\.cue$/i.test(name)) createSoundBlock(name, ws);
+            else createSpriteBlock(name, ws);
           }}
           onClose={() => setShowAssetManager(false)}
         />

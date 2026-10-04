@@ -399,6 +399,13 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 }
 .asset-card:hover .asset-del{opacity:1}
 .asset-del:hover{background:rgba(200,0,0,.8)}
+.asset-thumb-audio{position:relative}
+.asset-play{
+  position:absolute;bottom:0;right:0;width:18px;height:18px;border-radius:50%;
+  border:none;background:rgba(26,138,26,.92);color:#fff;font-size:9px;line-height:18px;
+  text-align:center;cursor:pointer;padding:0;z-index:1;
+}
+.asset-play:hover{background:#146e14}
 .asset-badge{
   position:absolute;top:2px;left:2px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;
   background:#1a8a1a;color:#fff;font-size:11px;line-height:18px;text-align:center;font-weight:700;z-index:1;
@@ -412,6 +419,17 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 .asset-merge-bar input[type=text]{width:130px;padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;background:#fff}
 .asset-merge-bar input:focus{outline:none;border-color:#1a8a1a}
 .asset-merge-hint{font-size:11px;color:#777;width:100%}
+.asset-preview-wrap{
+  padding:10px;margin-bottom:8px;display:flex;justify-content:center;align-items:center;
+  background:#f7f7f7;border:1px dashed #ccc;border-radius:6px;
+}
+.asset-preview{
+  max-width:220px;max-height:220px;border:1px solid #ddd;border-radius:4px;background:
+  linear-gradient(45deg,#e8e8e8 25%,transparent 25%,transparent 75%,#e8e8e8 75%),
+  linear-gradient(45deg,#e8e8e8 25%,#fff 25%,#fff 75%,#e8e8e8 75%);
+  background-size:12px 12px;background-position:0 0,6px 6px;
+  image-rendering:pixelated;
+}
 
 /* ── UI Editor ───────────────────────────────────────────────── */
 .ui-editor{display:flex;flex-direction:column;height:100vh}

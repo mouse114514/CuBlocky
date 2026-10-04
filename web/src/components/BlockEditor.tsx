@@ -211,6 +211,14 @@ const TOOLBOX = `
     <block type="cu_jump"></block>
     <block type="cu_switch_hands"></block>
     <block type="cu_throw_item"></block>
+    <block type="cu_set_velocity">
+      <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+      <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_add_velocity">
+      <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+      <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
     <sep></sep>
     <block type="cu_set_player_property">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
@@ -375,6 +383,14 @@ const TOOLBOX = `
   <category name="%{BKY_CAT_SOUND}" colour="#9c27b0">
     <block type="cu_play_sound"></block>
     <block type="cu_play_sound_at">
+      <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+      <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+      <value name="VOLUME"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+    </block>
+    <block type="cu_play_sound_file">
+      <value name="VOLUME"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+    </block>
+    <block type="cu_play_sound_file_at">
       <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
       <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
       <value name="VOLUME"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
@@ -700,12 +716,25 @@ const TOOLBOX = `
       <value name="PPU"><shadow type="cu_number"><field name="NUM">8</field></shadow></value>
     </block>
     <block type="cu_split_sprite_sheet"></block>
+    <block type="cu_make_sprite">
+      <value name="COLS"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="ROWS"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="INDEX"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+      <value name="PPU"><shadow type="cu_number"><field name="NUM">8</field></shadow></value>
+    </block>
     <block type="cu_cache_sprite"></block>
     <block type="cu_get_cached_sprite"></block>
     <sep></sep>
     <block type="cu_register_bundle"></block>
     <block type="cu_bundle_asset"></block>
     <block type="cu_frame_animation">
+      <value name="LOOP"><shadow type="cu_true"></shadow></value>
+    </block>
+    <block type="cu_frame_animation_sheet">
+      <value name="COLS"><shadow type="cu_number"><field name="NUM">4</field></shadow></value>
+      <value name="ROWS"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="FPS"><shadow type="cu_number"><field name="NUM">12</field></shadow></value>
+      <value name="PPU"><shadow type="cu_number"><field name="NUM">8</field></shadow></value>
       <value name="LOOP"><shadow type="cu_true"></shadow></value>
     </block>
     <sep></sep>

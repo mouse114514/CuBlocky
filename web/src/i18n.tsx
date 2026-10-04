@@ -165,9 +165,12 @@ const dict = {
   'asset.merging':     { zh: '合并中...', en: 'Merging...', ru: 'Склейка...' },
   'asset.mergeFailed': { zh: '合并失败', en: 'Merge failed', ru: 'Ошибка склейки' },
   'asset.mergeName':   { zh: '文件名', en: 'File name', ru: 'Имя файла' },
-  'asset.mergeHint':   { zh: '点击顺序即为帧顺序（左→右）', en: 'Click order = frame order (left → right)', ru: 'Порядок кликов = порядок кадров (слева направо)' },
+  'asset.mergeHint':   { zh: '点击顺序即为帧顺序（先左后右，先上后下）', en: 'Click order = frame order (left → right, top → bottom)', ru: 'Порядок кликов = порядок кадров (слева направо, сверху вниз)' },
   'asset.frameW':      { zh: '帧宽', en: 'Frame W', ru: 'Ширина кадра' },
   'asset.frameH':      { zh: '帧高', en: 'Frame H', ru: 'Высота кадра' },
+  'asset.cols':        { zh: '列数', en: 'Columns', ru: 'Колонки' },
+  'asset.rows':        { zh: '行数', en: 'Rows', ru: 'Строки' },
+  'asset.preview':     { zh: '排版预览', en: 'Layout preview', ru: 'Предпросмотр раскладки' },
 
   // ── Language modal ──
   'lang.title':        { zh: '选择语言', en: 'Select Language', ru: 'Выбрать язык' },
