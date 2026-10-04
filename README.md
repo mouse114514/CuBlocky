@@ -140,12 +140,12 @@ In the CuBlocky editor, design your mod using blocks, then click the **Build** b
 
 ## Item Use Behavior
 
-The `cu_define_item_use` and `cu_define_item_limb_use` blocks are event-style hat blocks that define what happens when an item is used. Drag body action blocks (`cu_eat`, `cu_drink`, `cu_set_happiness`, etc.) inside to create the use effect.
+The `cu_define_item_use` and `cu_define_item_limb_use` blocks are event-style hat blocks that define what happens when an item is used. Drag body action blocks (`cu_eat`, `cu_drink`, `cu_set_player_property`, etc.) inside to create the use effect.
 
 ```
 cu_define_item_use [myItem]
   ├── cu_eat (12, 0.5)
-  ├── cu_set_happiness (10)
+  ├── cu_set_player_property [happiness] = 10
   └── cu_talk ("Thanks!")
 ```
 

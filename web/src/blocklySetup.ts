@@ -659,18 +659,6 @@ const BLOCK_JSON: any[] = [
     colour: C.BODY, previousStatement: null, nextStatement: null,
   },
   {
-    type: 'cu_set_happiness',
-    message0: '%{BKY_CU_SET_HAPPINESS}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
-  {
-    type: 'cu_set_temperature',
-    message0: '%{BKY_CU_SET_TEMPERATURE}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
-  {
     type: 'cu_talk',
     message0: '%{BKY_CU_TALK}',
     args0: [{ type: 'input_value', name: 'TEXT', check: 'String', align: 'RIGHT' }],
@@ -680,36 +668,6 @@ const BLOCK_JSON: any[] = [
     type: 'cu_run_command',
     message0: '%{BKY_CU_RUN_COMMAND}',
     args0: [{ type: 'input_value', name: 'COMMAND', check: 'String', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
-  {
-    type: 'cu_set_pain',
-    message0: '%{BKY_CU_SET_PAIN}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
-  {
-    type: 'cu_set_stress',
-    message0: '%{BKY_CU_SET_STRESS}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
-  {
-    type: 'cu_set_heart_rate',
-    message0: '%{BKY_CU_SET_HEART_RATE}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
-  {
-    type: 'cu_set_blood_pressure',
-    message0: '%{BKY_CU_SET_BLOOD_PRESSURE}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
-  {
-    type: 'cu_set_immunity',
-    message0: '%{BKY_CU_SET_IMMUNITY}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
     colour: C.BODY, previousStatement: null, nextStatement: null,
   },
   {
@@ -1313,41 +1271,6 @@ const BLOCK_JSON: any[] = [
   { type: 'cu_player_crouching', message0: '%{BKY_CU_PLAYER_CROUCHING}', output: 'Boolean', colour: C.BOOL },
 
   // ═══ Extended Body setters (green) ═══════════════════════════
-  {
-    type: 'cu_set_energy', message0: '%{BKY_CU_SET_ENERGY}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
-  {
-    type: 'cu_set_brain_health', message0: '%{BKY_CU_SET_BRAIN_HEALTH}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
-  {
-    type: 'cu_set_shock', message0: '%{BKY_CU_SET_SHOCK}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
-  {
-    type: 'cu_set_blood_volume', message0: '%{BKY_CU_SET_BLOOD_VOLUME}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
-  {
-    type: 'cu_set_sickness', message0: '%{BKY_CU_SET_SICKNESS}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
-  {
-    type: 'cu_set_wetness', message0: '%{BKY_CU_SET_WETNESS}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
-  {
-    type: 'cu_set_radiation', message0: '%{BKY_CU_SET_RADIATION}',
-    args0: [{ type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' }],
-    colour: C.BODY, previousStatement: null, nextStatement: null,
-  },
 
   // ═══ Generic player property setters (green) ═══════════════════
   {
@@ -1451,38 +1374,6 @@ const BLOCK_JSON: any[] = [
   },
 
   // ═══ Limb setters (teal) ════════════════════════════════════
-  {
-    type: 'cu_set_limb_skin_health', message0: '%{BKY_CU_SET_LIMB_SKIN_HEALTH} %1 %2',
-    args0: [
-      { type: 'input_value', name: 'LIMB', check: 'Number' },
-      { type: 'input_value', name: 'VALUE', check: 'Number' },
-    ],
-    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
-  },
-  {
-    type: 'cu_set_limb_muscle_health', message0: '%{BKY_CU_SET_LIMB_MUSCLE_HEALTH} %1 %2',
-    args0: [
-      { type: 'input_value', name: 'LIMB', check: 'Number' },
-      { type: 'input_value', name: 'VALUE', check: 'Number' },
-    ],
-    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
-  },
-  {
-    type: 'cu_set_limb_pain', message0: '%{BKY_CU_SET_LIMB_PAIN} %1 %2',
-    args0: [
-      { type: 'input_value', name: 'LIMB', check: 'Number' },
-      { type: 'input_value', name: 'VALUE', check: 'Number' },
-    ],
-    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
-  },
-  {
-    type: 'cu_set_limb_bleed', message0: '%{BKY_CU_SET_LIMB_BLEED} %1 %2',
-    args0: [
-      { type: 'input_value', name: 'LIMB', check: 'Number' },
-      { type: 'input_value', name: 'VALUE', check: 'Number' },
-    ],
-    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
-  },
   // Generic limb property setter: a dropdown for which field to set + limb + value
   {
     type: 'cu_set_limb_property', message0: '%{BKY_CU_SET_LIMB_PROPERTY}',
@@ -2477,15 +2368,8 @@ const MSG_ZH: Record<string, string> = {
   CU_REGISTER_RECIPE: '配方 %1 → %2 ×%3 耐久%4 材料耐久%5 修理%6 智力%7',
   CU_EAT: '吃 饥饿 %1 体重增益 %2',
   CU_DRINK: '喝水 量 %1',
-  CU_SET_HAPPINESS: '设置情绪值 %1',
-  CU_SET_TEMPERATURE: '设置核心体温 %1',
   CU_TALK: '说话 %1',
   CU_RUN_COMMAND: '执行命令 %1',
-  CU_SET_PAIN: '设置头部疼痛 %1',
-  CU_SET_STRESS: '设置总疼痛度 %1',
-  CU_SET_HEART_RATE: '设置心率 %1',
-  CU_SET_BLOOD_PRESSURE: '设置血压 %1',
-  CU_SET_IMMUNITY: '设置免疫值 %1',
   CU_SLEEP: '睡觉',
   CU_WAKE: '醒来',
   CU_ITEM_USE: '物品 %1 %2',
@@ -2592,13 +2476,6 @@ const MSG_ZH: Record<string, string> = {
   CU_PLAYER_BREATHING: '是否呼吸中',
   CU_PLAYER_CROUCHING: '是否蹲下',
   // Extended Body setters
-  CU_SET_ENERGY: '设置精力 %1',
-  CU_SET_BRAIN_HEALTH: '设置脑组织完整度 %1',
-  CU_SET_SHOCK: '设置休克 %1',
-  CU_SET_BLOOD_VOLUME: '设置血容量 %1',
-  CU_SET_SICKNESS: '设置反胃程度 %1',
-  CU_SET_WETNESS: '设置潮湿度 %1',
-  CU_SET_RADIATION: '设置辐射值 %1',
   CU_SET_PLAYER_PROPERTY: '设置玩家属性 %1 为 %2',
   CU_SET_PLAYER_FLAG: '设置玩家状态 %1 为 %2',
   CU_SET_SKILL: '设置技能 %1 为 %2',
@@ -2620,10 +2497,6 @@ const MSG_ZH: Record<string, string> = {
   CU_LIMB_DISLOCATED: '是否脱臼',
   CU_LIMB_INFECTED: '是否感染',
   CU_LIMB_DISMEMBERED: '是否离断',
-  CU_SET_LIMB_SKIN_HEALTH: '设置皮肤健康值',
-  CU_SET_LIMB_MUSCLE_HEALTH: '设置肌肉健康值',
-  CU_SET_LIMB_PAIN: '设置肢体疼痛值',
-  CU_SET_LIMB_BLEED: '设置肢体失血速度',
   CU_LIMB_BREAK: '使肢体骨折',
   CU_LIMB_MEND: '接骨',
   CU_LIMB_DISLOCATE: '使肢体脱臼',
@@ -2743,15 +2616,8 @@ const MSG_EN: Record<string, string> = {
   CU_REGISTER_RECIPE: 'recipe %1 → %2 ×%3 cond%4 ing cond%5 repair%6 int%7',
   CU_EAT: 'eat hunger %1 weight gain %2',
   CU_DRINK: 'drink amount %1',
-  CU_SET_HAPPINESS: 'set mood %1',
-  CU_SET_TEMPERATURE: 'set core temperature %1',
   CU_TALK: 'talk %1',
   CU_RUN_COMMAND: 'run command %1',
-  CU_SET_PAIN: 'set head pain %1',
-  CU_SET_STRESS: 'set total pain %1',
-  CU_SET_HEART_RATE: 'set heart rate %1',
-  CU_SET_BLOOD_PRESSURE: 'set blood pressure %1',
-  CU_SET_IMMUNITY: 'set immunity %1',
   CU_SLEEP: 'sleep',
   CU_WAKE: 'wake',
   CU_ITEM_USE: 'item %1 %2',
@@ -2858,13 +2724,6 @@ const MSG_EN: Record<string, string> = {
   CU_PLAYER_BREATHING: 'is breathing',
   CU_PLAYER_CROUCHING: 'is crouching',
   // Extended Body setters
-  CU_SET_ENERGY: 'set energy %1',
-  CU_SET_BRAIN_HEALTH: 'set brain integrity %1',
-  CU_SET_SHOCK: 'set shock %1',
-  CU_SET_BLOOD_VOLUME: 'set blood volume %1',
-  CU_SET_SICKNESS: 'set sickness %1',
-  CU_SET_WETNESS: 'set wetness %1',
-  CU_SET_RADIATION: 'set radiation sickness %1',
   CU_SET_PLAYER_PROPERTY: 'set player %1 to %2',
   CU_SET_PLAYER_FLAG: 'set player %1 to %2',
   CU_SET_SKILL: 'set skill %1 to %2',
@@ -2886,10 +2745,6 @@ const MSG_EN: Record<string, string> = {
   CU_LIMB_DISLOCATED: 'is dislocated',
   CU_LIMB_INFECTED: 'is infected',
   CU_LIMB_DISMEMBERED: 'is dismembered',
-  CU_SET_LIMB_SKIN_HEALTH: 'set skin health',
-  CU_SET_LIMB_MUSCLE_HEALTH: 'set muscle health',
-  CU_SET_LIMB_PAIN: 'set limb pain',
-  CU_SET_LIMB_BLEED: 'set limb bleeding',
   CU_LIMB_BREAK: 'break limb',
   CU_LIMB_MEND: 'mend limb',
   CU_LIMB_DISLOCATE: 'dislocate limb',
@@ -3009,15 +2864,8 @@ const MSG_RU: Record<string, string> = {
   CU_REGISTER_RECIPE: 'рецепт %1 → %2 ×%3 прочн%4 прочн materials%5 ремонт%6 инт%7',
   CU_EAT: 'есть голод %1 прибавка веса %2',
   CU_DRINK: 'пить количество %1',
-  CU_SET_HAPPINESS: 'установить настроение %1',
-  CU_SET_TEMPERATURE: 'установить температуру тела %1',
   CU_TALK: 'сказать %1',
   CU_RUN_COMMAND: 'выполнить команду %1',
-  CU_SET_PAIN: 'установить боль головы %1',
-  CU_SET_STRESS: 'установить общую боль %1',
-  CU_SET_HEART_RATE: 'установить пульс %1',
-  CU_SET_BLOOD_PRESSURE: 'установить давление %1',
-  CU_SET_IMMUNITY: 'установить иммунитет %1',
   CU_SLEEP: 'спать',
   CU_WAKE: 'проснуться',
   CU_ITEM_USE: 'предмет %1 %2',
@@ -3121,13 +2969,6 @@ const MSG_RU: Record<string, string> = {
   CU_PLAYER_IN_WATER: 'в воде',
   CU_PLAYER_BREATHING: 'дышит',
   CU_PLAYER_CROUCHING: 'присел',
-  CU_SET_ENERGY: 'установить энергию %1',
-  CU_SET_BRAIN_HEALTH: 'установить целостность мозга %1',
-  CU_SET_SHOCK: 'установить шок %1',
-  CU_SET_BLOOD_VOLUME: 'установить объём крови %1',
-  CU_SET_SICKNESS: 'установить тошноту %1',
-  CU_SET_WETNESS: 'установить влажность %1',
-  CU_SET_RADIATION: 'установить радиацию %1',
   CU_SET_PLAYER_PROPERTY: 'у игрока %1 = %2',
   CU_SET_PLAYER_FLAG: 'у игрока %1 = %2',
   CU_SET_SKILL: 'навык %1 = %2',
@@ -3147,10 +2988,6 @@ const MSG_RU: Record<string, string> = {
   CU_LIMB_DISLOCATED: 'конечность вывихнута',
   CU_LIMB_INFECTED: 'конечность инфицирована',
   CU_LIMB_DISMEMBERED: 'конечность ампутирована',
-  CU_SET_LIMB_SKIN_HEALTH: 'установить здоровье кожи',
-  CU_SET_LIMB_MUSCLE_HEALTH: 'установить здоровье мышц',
-  CU_SET_LIMB_PAIN: 'установить боль конечности',
-  CU_SET_LIMB_BLEED: 'установить кровотечение конечности',
   CU_LIMB_BREAK: 'сломать конечность',
   CU_LIMB_MEND: 'вылечить конечность',
   CU_LIMB_DISLOCATE: 'вывихнуть конечность',
@@ -3721,14 +3558,6 @@ csharpGenerator.forBlock['cu_drink'] = (block, gen) => {
   const a = gen.valueToCode(block, 'AMOUNT', ORDER_ATOMIC) || '4';
   return `body.Drink(${floatSuffix(a)});\n`;
 };
-csharpGenerator.forBlock['cu_set_happiness'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '1';
-  return `body.happiness = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_temperature'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.temperature = ${float(v)};\n`;
-};
 csharpGenerator.forBlock['cu_talk'] = (block, gen) => {
   const t = gen.valueToCode(block, 'TEXT', ORDER_ATOMIC) || '"Hello"';
   return `body.talker.Talk(${t});\n`;
@@ -3736,26 +3565,6 @@ csharpGenerator.forBlock['cu_talk'] = (block, gen) => {
 csharpGenerator.forBlock['cu_run_command'] = (block, gen) => {
   const cmd = gen.valueToCode(block, 'COMMAND', ORDER_ATOMIC) || '"help"';
   return `ConsoleScript.instance.ExecuteCommand(${cmd});\n`;
-};
-csharpGenerator.forBlock['cu_set_pain'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.limbs[0].pain = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_stress'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.averagePain = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_heart_rate'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.heartRate = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_blood_pressure'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.bloodPressure = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_immunity'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.immunity = ${float(v)};\n`;
 };
 csharpGenerator.forBlock['cu_sleep'] = () => 'body.sleeping = true;\n';
 csharpGenerator.forBlock['cu_wake'] = () => 'body.WakeUp();\n';
@@ -4193,34 +4002,6 @@ csharpGenerator.forBlock['cu_player_breathing'] = () => ['body.breathing', ORDER
 csharpGenerator.forBlock['cu_player_crouching'] = () => ['body.crouching', ORDER_ATOMIC];
 
 // ═══ Extended Body setters ═══════════════════════════════════
-csharpGenerator.forBlock['cu_set_energy'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.energy = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_brain_health'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.brainHealth = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_shock'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.shock = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_blood_volume'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.bloodVolume = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_sickness'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.sicknessAmount = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_wetness'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.wetness = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_radiation'] = (block, gen) => {
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `body.radiationSickness = ${float(v)};\n`;
-};
 
 // ═══ Generic player property setters ═══════════════════════════
 const PLAYER_INT_FIELDS = new Set(['handSlot']);
@@ -4303,26 +4084,6 @@ csharpGenerator.forBlock['cu_limb_dismembered'] = (block, gen) => {
 };
 
 // ═══ Limb setters ═══════════════════════════════════════════
-csharpGenerator.forBlock['cu_set_limb_skin_health'] = (block, gen) => {
-  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `${limb}.skinHealth = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_limb_muscle_health'] = (block, gen) => {
-  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `${limb}.muscleHealth = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_limb_pain'] = (block, gen) => {
-  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `${limb}.pain = ${float(v)};\n`;
-};
-csharpGenerator.forBlock['cu_set_limb_bleed'] = (block, gen) => {
-  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `${limb}.bleedAmount = ${float(v)};\n`;
-};
 csharpGenerator.forBlock['cu_set_limb_property'] = (block, gen) => {
   const f = block.getFieldValue('PROP');
   const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
