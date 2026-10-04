@@ -1362,9 +1362,7 @@ const BLOCK_JSON: any[] = [
     type: 'cu_set_player_flag', message0: '%{BKY_CU_SET_PLAYER_FLAG}',
     args0: [
       { type: 'field_searchable_dropdown', name: 'PROP', options: PLAYER_BOOL_OPTIONS, lang: 'zh' },
-      { type: 'field_dropdown', name: 'VALUE', options: [
-        ['真(true)', 'true'], ['假(false)', 'false'],
-      ]},
+      { type: 'input_value', name: 'VALUE', check: 'Boolean', align: 'RIGHT' },
     ],
     colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
   },
@@ -1500,9 +1498,7 @@ const BLOCK_JSON: any[] = [
     args0: [
       { type: 'field_searchable_dropdown', name: 'PROP', options: LIMB_BOOL_OPTIONS, lang: 'zh' },
       { type: 'input_value', name: 'LIMB', check: 'Number' },
-      { type: 'field_dropdown', name: 'VALUE', options: [
-        ['真(true)', 'true'], ['假(false)', 'false'],
-      ]},
+      { type: 'input_value', name: 'VALUE', check: 'Boolean', align: 'RIGHT' },
     ],
     colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
   },
@@ -2082,7 +2078,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'FRAMES', text: 'a.png, b.png, c.png' },
       { type: 'field_input', name: 'PPU', text: '8' },
       { type: 'field_input', name: 'FPS', text: '12' },
-      { type: 'input_value', name: 'LOOP' },
+      { type: 'input_value', name: 'LOOP', check: 'Boolean' },
     ],
     previousStatement: null,
     nextStatement: null,
@@ -2130,7 +2126,7 @@ const BLOCK_JSON: any[] = [
     message0: '%{BKY_CU_ALERT}',
     args0: [
       { type: 'input_value', name: 'TEXT' },
-      { type: 'input_value', name: 'IMPORTANT' },
+      { type: 'input_value', name: 'IMPORTANT', check: 'Boolean' },
     ],
     previousStatement: null,
     nextStatement: null,
@@ -2151,7 +2147,7 @@ const BLOCK_JSON: any[] = [
     type: 'cu_call_when',
     message0: '%{BKY_CU_CALL_WHEN}',
     args0: [
-      { type: 'input_value', name: 'COND' },
+      { type: 'input_value', name: 'COND', check: 'Boolean' },
       { type: 'input_statement', name: 'BODY' },
     ],
     previousStatement: null,
@@ -2192,14 +2188,14 @@ const BLOCK_JSON: any[] = [
     type: 'cu_moodle',
     message0: '%{BKY_CU_MOODLE}',
     args0: [
-      { type: 'input_value', name: 'INTENSITY' },
+      { type: 'input_value', name: 'INTENSITY', check: 'Number' },
       { type: 'input_value', name: 'ICON' },
-      { type: 'input_value', name: 'NAME' },
-      { type: 'input_value', name: 'DESC' },
-      { type: 'input_value', name: 'CRITICAL' },
-      { type: 'input_value', name: 'IMPORTANT' },
+      { type: 'input_value', name: 'NAME', check: 'String' },
+      { type: 'input_value', name: 'DESC', check: 'String' },
+      { type: 'input_value', name: 'CRITICAL', check: 'Boolean' },
+      { type: 'input_value', name: 'IMPORTANT', check: 'Boolean' },
       { type: 'field_input', name: 'KEY', text: '' },
-      { type: 'input_value', name: 'HOLD' },
+      { type: 'input_value', name: 'HOLD', check: 'Number' },
     ],
     previousStatement: null,
     nextStatement: null,
@@ -2209,14 +2205,14 @@ const BLOCK_JSON: any[] = [
     type: 'cu_moodle_animated',
     message0: '%{BKY_CU_MOODLE_ANIMATED}',
     args0: [
-      { type: 'input_value', name: 'INTENSITY' },
+      { type: 'input_value', name: 'INTENSITY', check: 'Number' },
       { type: 'input_value', name: 'ANIM_ID' },
-      { type: 'input_value', name: 'NAME' },
-      { type: 'input_value', name: 'DESC' },
-      { type: 'input_value', name: 'CRITICAL' },
-      { type: 'input_value', name: 'IMPORTANT' },
+      { type: 'input_value', name: 'NAME', check: 'String' },
+      { type: 'input_value', name: 'DESC', check: 'String' },
+      { type: 'input_value', name: 'CRITICAL', check: 'Boolean' },
+      { type: 'input_value', name: 'IMPORTANT', check: 'Boolean' },
       { type: 'field_input', name: 'KEY', text: '' },
-      { type: 'input_value', name: 'HOLD' },
+      { type: 'input_value', name: 'HOLD', check: 'Number' },
     ],
     previousStatement: null,
     nextStatement: null,
@@ -2335,8 +2331,8 @@ const BLOCK_JSON: any[] = [
       { type: 'field_dropdown', name: 'VISUAL_MODE', options: [
         ['液体加染色','Existing liquid + tint','Жидкость + тонировка','ExistingLiquidPlusTint'],
       ]},
-      { type: 'input_value', name: 'CONSUME_DRINK' },
-      { type: 'input_value', name: 'CONSUME_FILL' },
+      { type: 'input_value', name: 'CONSUME_DRINK', check: 'Boolean' },
+      { type: 'input_value', name: 'CONSUME_FILL', check: 'Boolean' },
       { type: 'field_input', name: 'FILL_LIQUID', text: 'water' },
     ],
     previousStatement: null,
@@ -2411,8 +2407,8 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'BODY' },
       { type: 'field_input', name: 'BUNDLE', text: 'myBundle' },
       { type: 'field_input', name: 'ANIM', text: 'walk' },
-      { type: 'input_value', name: 'LOOP' },
-      { type: 'input_value', name: 'SPEED' },
+      { type: 'input_value', name: 'LOOP', check: 'Boolean' },
+      { type: 'input_value', name: 'SPEED', check: 'Number' },
     ],
     previousStatement: null,
     nextStatement: null,
@@ -4239,7 +4235,8 @@ csharpGenerator.forBlock['cu_set_player_property'] = (block, gen) => {
 };
 csharpGenerator.forBlock['cu_set_player_flag'] = (block, gen) => {
   const f = block.getFieldValue('PROP');
-  return `body.${f} = ${block.getFieldValue('VALUE') === 'true' ? 'true' : 'false'};\n`;
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || 'false';
+  return `body.${f} = ${v};\n`;
 };
 
 // ═══ Skill setters ═══════════════════════════════════════════
@@ -4336,7 +4333,8 @@ csharpGenerator.forBlock['cu_set_limb_property'] = (block, gen) => {
 csharpGenerator.forBlock['cu_set_limb_flag'] = (block, gen) => {
   const f = block.getFieldValue('PROP');
   const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
-  return `${limb}.${f} = ${block.getFieldValue('VALUE') === 'true' ? 'true' : 'false'};\n`;
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || 'false';
+  return `${limb}.${f} = ${v};\n`;
 };
 
 // ═══ Limb actions ═══════════════════════════════════════════
@@ -4751,7 +4749,7 @@ csharpGenerator.forBlock['cu_liquid_tile_material'] = (block) => {
 csharpGenerator.forBlock['cu_alert'] = (block, gen) => {
   const text = gen.valueToCode(block, 'TEXT', ORDER_ATOMIC) || '""';
   const imp = gen.valueToCode(block, 'IMPORTANT', ORDER_ATOMIC) || 'false';
-  return `CUCoreUtils.ShowAlert(${text}, ${bool(imp)});\n`;
+  return `CUCoreUtils.ShowAlert(${text}, ${imp});\n`;
 };
 csharpGenerator.forBlock['cu_delay'] = (block, gen) => {
   const secs = gen.valueToCode(block, 'SECONDS', ORDER_ATOMIC) || '1';
@@ -4761,7 +4759,7 @@ csharpGenerator.forBlock['cu_delay'] = (block, gen) => {
 csharpGenerator.forBlock['cu_call_when'] = (block, gen) => {
   const cond = gen.valueToCode(block, 'COND', ORDER_ATOMIC) || 'true';
   const body = gen.statementToCode(block, 'BODY') || '{ }';
-  return `CUCoreUtils.CallWhen(() => ${bool(cond)}, () => { ${body} });\n`;
+  return `CUCoreUtils.CallWhen(() => ${cond}, () => { ${body} });\n`;
 };
 csharpGenerator.forBlock['cu_console_log'] = (block, gen) => {
   const text = gen.valueToCode(block, 'TEXT', ORDER_ATOMIC) || '""';
@@ -4779,8 +4777,8 @@ function moodleCommon(block: any, gen: any) {
     intensity: toInt(gen.valueToCode(block, 'INTENSITY', ORDER_ATOMIC) || '3'),
     name: q(gen.valueToCode(block, 'NAME', ORDER_ATOMIC).replace(/^"|"$/g, '') || ''),
     desc: q(gen.valueToCode(block, 'DESC', ORDER_ATOMIC).replace(/^"|"$/g, '') || ''),
-    critical: bool(gen.valueToCode(block, 'CRITICAL', ORDER_ATOMIC) || 'false'),
-    important: bool(gen.valueToCode(block, 'IMPORTANT', ORDER_ATOMIC) || 'true'),
+    critical: gen.valueToCode(block, 'CRITICAL', ORDER_ATOMIC) || 'false',
+    important: gen.valueToCode(block, 'IMPORTANT', ORDER_ATOMIC) || 'true',
     key: q(block.getFieldValue('KEY') || ''),
     hold: float(gen.valueToCode(block, 'HOLD', ORDER_ATOMIC) || '0.75'),
   };
@@ -4846,8 +4844,8 @@ csharpGenerator.forBlock['cu_register_liquid_tile'] = (block, gen) => {
     `  MaxFloodFill = ${toInt(g('MAX_FILL', '128'))},\n` +
     `  Tint = new Color(${float(g('R', '1'))}, ${float(g('G', '1'))}, ${float(g('B', '1'))}),\n` +
     `  VisualMode = LiquidTileVisualMode.${vm},\n` +
-    `  ConsumeOnDrink = ${bool(g('CONSUME_DRINK', 'true'))},\n` +
-    `  ConsumeOnFill = ${bool(g('CONSUME_FILL', 'true'))},\n` +
+    `  ConsumeOnDrink = ${g('CONSUME_DRINK', 'true')},\n` +
+    `  ConsumeOnFill = ${g('CONSUME_FILL', 'true')},\n` +
     `  FillLiquidId = "${q(block.getFieldValue('FILL_LIQUID') || 'water')}"\n` +
     `});\n`;
 };
@@ -4886,7 +4884,7 @@ csharpGenerator.forBlock['cu_play_body_animation'] = (block, gen) => {
   const body = gen.valueToCode(block, 'BODY', ORDER_ATOMIC) || 'body';
   const bundle = q(block.getFieldValue('BUNDLE') || 'myBundle');
   const anim = q(block.getFieldValue('ANIM') || 'walk');
-  const loop = bool(gen.valueToCode(block, 'LOOP', ORDER_ATOMIC) || 'true');
+  const loop = gen.valueToCode(block, 'LOOP', ORDER_ATOMIC) || 'true';
   const speed = float(gen.valueToCode(block, 'SPEED', ORDER_ATOMIC) || '1');
   return `BodyAnimationPlayer.PlayBundled(${body}, "${bundle}", "${anim}", ${loop}, ${speed});\n`;
 };
@@ -5132,9 +5130,9 @@ const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_set_item_base_stats: { DECAY_ENABLED: DECAY_BOOL_OPTIONS },
   cu_number_compare: { OP: NUMBER_CMP_OPTIONS },
   cu_set_player_property: { PROP: PLAYER_PROP_OPTIONS },
-  cu_set_player_flag: { PROP: PLAYER_BOOL_OPTIONS, VALUE: TRUE_FALSE_OPTIONS },
+  cu_set_player_flag: { PROP: PLAYER_BOOL_OPTIONS },
   cu_set_limb_property: { PROP: LIMB_PROP_OPTIONS },
-  cu_set_limb_flag: { PROP: LIMB_BOOL_OPTIONS, VALUE: TRUE_FALSE_OPTIONS },
+  cu_set_limb_flag: { PROP: LIMB_BOOL_OPTIONS },
   cu_set_skill: { STAT: SKILL_OPTIONS },
   cu_set_skill_range: { STAT: SKILL_OPTIONS },
   cu_register_mod_option: { KIND: MOD_OPTION_KIND_OPTIONS },

@@ -258,7 +258,7 @@ const TOOLBOX = `
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
     <block type="cu_set_player_flag">
-      <field name="VALUE">true</field>
+      <value name="VALUE"><shadow type="cu_true"></shadow></value>
     </block>
     <block type="cu_set_skill">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
@@ -295,7 +295,7 @@ const TOOLBOX = `
     </block>
     <block type="cu_set_limb_flag">
       <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
-      <field name="VALUE">false</field>
+      <value name="VALUE"><shadow type="cu_false"></shadow></value>
     </block>
     <block type="cu_limb_break">
       <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
@@ -420,9 +420,15 @@ const TOOLBOX = `
     <block type="cu_item_id"></block>
     <block type="cu_item_category"></block>
     <sep></sep>
-    <block type="cu_set_worn_sprite"></block>
-    <block type="cu_set_multi_worn_sprite"></block>
-    <block type="cu_edit_vanilla_item"></block>
+    <block type="cu_set_worn_sprite">
+      <value name="ITEM"><shadow type="cu_item_vanilla"><field name="ID">bandage</field></shadow></value>
+    </block>
+    <block type="cu_set_multi_worn_sprite">
+      <value name="ITEM"><shadow type="cu_item_vanilla"><field name="ID">bandage</field></shadow></value>
+    </block>
+    <block type="cu_edit_vanilla_item">
+      <value name="ITEM"><shadow type="cu_item_vanilla"><field name="ID">ironBar</field></shadow></value>
+    </block>
   </category>
   <category name="%{BKY_CAT_SOUND}" colour="#9c27b0">
     <block type="cu_play_sound"></block>
@@ -470,7 +476,10 @@ const TOOLBOX = `
     </block>
     <block type="cu_world_depth"></block>
     <sep></sep>
-    <block type="cu_register_liquid_tile"></block>
+    <block type="cu_register_liquid_tile">
+      <value name="CONSUME_DRINK"><shadow type="cu_true"></shadow></value>
+      <value name="CONSUME_FILL"><shadow type="cu_true"></shadow></value>
+    </block>
     <block type="cu_place_liquid_tile">
       <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
       <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
@@ -506,12 +515,29 @@ const TOOLBOX = `
     <block type="cu_call_when"></block>
     <block type="cu_alert">
       <value name="TEXT"><shadow type="cu_text"><field name="TEXT">Alert</field></shadow></value>
+      <value name="IMPORTANT"><shadow type="cu_true"></shadow></value>
     </block>
     <block type="cu_talk_electronic">
       <value name="TEXT"><shadow type="cu_text"><field name="TEXT">Beep</field></shadow></value>
     </block>
-    <block type="cu_moodle"></block>
-    <block type="cu_moodle_animated"></block>
+    <block type="cu_moodle">
+      <value name="INTENSITY"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="ICON"><shadow type="cu_text"><field name="TEXT">icon</field></shadow></value>
+      <value name="NAME"><shadow type="cu_text"><field name="TEXT">My moodle</field></shadow></value>
+      <value name="DESC"><shadow type="cu_text"><field name="TEXT">Description</field></shadow></value>
+      <value name="CRITICAL"><shadow type="cu_false"></shadow></value>
+      <value name="IMPORTANT"><shadow type="cu_true"></shadow></value>
+      <value name="HOLD"><shadow type="cu_number"><field name="NUM">0.75</field></shadow></value>
+    </block>
+    <block type="cu_moodle_animated">
+      <value name="INTENSITY"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="ANIM_ID"><shadow type="cu_text"><field name="TEXT">myAnim</field></shadow></value>
+      <value name="NAME"><shadow type="cu_text"><field name="TEXT">My moodle</field></shadow></value>
+      <value name="DESC"><shadow type="cu_text"><field name="TEXT">Description</field></shadow></value>
+      <value name="CRITICAL"><shadow type="cu_false"></shadow></value>
+      <value name="IMPORTANT"><shadow type="cu_true"></shadow></value>
+      <value name="HOLD"><shadow type="cu_number"><field name="NUM">0.75</field></shadow></value>
+    </block>
     <block type="cu_end_minigame"></block>
   </category>
   <category name="%{BKY_CAT_VALUE}" colour="#59c059" icon="🔢">
@@ -606,7 +632,9 @@ const TOOLBOX = `
     <block type="cu_get_held_item"></block>
     <block type="cu_get_hovered_item"></block>
     <sep></sep>
-    <block type="cu_load_embedded_sprite"></block>
+    <block type="cu_load_embedded_sprite">
+      <value name="PPU"><shadow type="cu_number"><field name="NUM">8</field></shadow></value>
+    </block>
     <block type="cu_get_cached_sprite"></block>
     <block type="cu_bundle_asset"></block>
     <block type="cu_load_texture_file"></block>
@@ -714,28 +742,39 @@ const TOOLBOX = `
     <block type="cu_friendly_key_name"></block>
     <block type="cu_keybind_code"></block>
     <sep></sep>
-    <block type="cu_cfg_get"></block>
-    <block type="cu_cfg_set"></block>
+    <block type="cu_cfg_get">
+      <value name="DEFAULT"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_cfg_set">
+      <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
     <sep></sep>
     <block type="cu_register_console_command"></block>
     <block type="cu_console_arg"></block>
     <block type="cu_console_log"></block>
   </category>
   <category name="%{BKY_CAT_ASSET}" colour="#607d8b">
-    <block type="cu_load_embedded_sprite"></block>
+    <block type="cu_load_embedded_sprite">
+      <value name="PPU"><shadow type="cu_number"><field name="NUM">8</field></shadow></value>
+    </block>
     <block type="cu_split_sprite_sheet"></block>
     <block type="cu_cache_sprite"></block>
     <block type="cu_get_cached_sprite"></block>
     <sep></sep>
     <block type="cu_register_bundle"></block>
     <block type="cu_bundle_asset"></block>
-    <block type="cu_frame_animation"></block>
+    <block type="cu_frame_animation">
+      <value name="LOOP"><shadow type="cu_true"></shadow></value>
+    </block>
     <sep></sep>
     <block type="cu_load_texture_file"></block>
     <block type="cu_liquid_material"></block>
     <block type="cu_liquid_tile_material"></block>
     <sep></sep>
-    <block type="cu_play_body_animation"></block>
+    <block type="cu_play_body_animation">
+      <value name="LOOP"><shadow type="cu_true"></shadow></value>
+      <value name="SPEED"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+    </block>
     <block type="cu_stop_body_animation"></block>
   </category>
   <category name="%{BKY_CAT_UI}" colour="#00acc1">
