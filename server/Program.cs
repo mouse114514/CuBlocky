@@ -64,6 +64,13 @@ app.MapPut("/api/config", async (HttpRequest req) =>
     return Results.Ok(config);
 });
 
+// Extensions the asset manager accepts: images plus the audio codecs CUCoreLib can decode.
+HashSet<string> AssetExtensions = new(StringComparer.OrdinalIgnoreCase)
+{
+    ".png", ".jpg", ".jpeg", ".bmp",
+    ".wav", ".mp3", ".mp1", ".mp2", ".aif", ".aiff", ".cue"
+};
+
 // Helper: get project asset directory
 static string GetProjectAssetsDir(string projectName)
 {
@@ -79,7 +86,7 @@ app.MapGet("/api/projects/{name}/assets", (string name) =>
     var assetsDir = GetProjectAssetsDir(name);
     if (!Directory.Exists(assetsDir)) return Results.Json(Array.Empty<object>());
     var files = Directory.GetFiles(assetsDir)
-        .Where(f => Path.GetExtension(f).ToLowerInvariant() is ".png" or ".jpg" or ".jpeg" or ".bmp")
+        .Where(f => AssetExtensions.Contains(Path.GetExtension(f)))
         .Select(f =>
         {
             var info = new FileInfo(f);
@@ -100,8 +107,7 @@ app.MapPost("/api/projects/{name}/assets/upload", async (string name, HttpReques
     if (file == null || file.Length == 0) return Results.BadRequest("no file");
 
     var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-    if (ext is not (".png" or ".jpg" or ".jpeg" or ".bmp" or
-                     ".wav" or ".mp3" or ".mp1" or ".mp2" or ".aif" or ".aiff" or ".cue"))
+    if (!AssetExtensions.Contains(ext))
         return Results.BadRequest("only PNG/JPG/BMP images or WAV/MP3/AIFF audio are accepted");
 
     var safeName = Path.GetFileName(file.FileName).Replace(' ', '_');
