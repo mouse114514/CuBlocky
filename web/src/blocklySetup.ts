@@ -32,8 +32,8 @@ function makeAssetPickerField(kind: 'image' | 'audio', buttonLabel: string, butt
     protected initView_(): void {
       if (!this.fieldGroup_) return;
       this.previewEl_ = document.createElement('span');
-      this.previewEl_.style.cssText = 'display:inline-block;width:24px;height:24px;border:1px solid #666;border-radius:3px;vertical-align:middle;margin-right:4px;background:#222;text-align:center;line-height:22px;font-size:10px;color:#999;';
-      this.previewEl_.textContent = this.assetId_ ? '✓' : '?';
+      this.previewEl_.style.cssText = 'display:inline-block;max-width:130px;padding:2px 6px;margin-right:4px;border:1px solid #666;border-radius:3px;background:#222;color:#fff;font-size:11px;line-height:16px;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+      this.previewEl_.textContent = this.assetLabel_();
       this.fieldGroup_.appendChild(this.previewEl_);
       this.buttonEl_ = document.createElement('button');
       this.buttonEl_.textContent = buttonLabel;
@@ -46,18 +46,18 @@ function makeAssetPickerField(kind: 'image' | 'audio', buttonLabel: string, butt
       this.fieldGroup_.appendChild(this.buttonEl_);
     }
 
+    private assetLabel_(): string {
+      return this.assetId_ || ((Blockly.Msg as Record<string, string>)['CU_ASSET_NONE'] || '—');
+    }
+
     private openPicker_(): void {
       const self = this;
       _spritePickCb = (assetName: string) => {
         self.assetId_ = assetName;
         self.setValue(assetName);
-        if (self.previewEl_) {
-          self.previewEl_.textContent = '✓';
-          self.previewEl_.title = assetName;
-        }
+        if (self.previewEl_) self.previewEl_.textContent = self.assetLabel_();
         _spritePickCb = null;
       };
-      // Dispatch event for React to open AssetManager, filtered by asset kind
       window.dispatchEvent(new CustomEvent('cublocky:open-asset-picker', { detail: { kind } }));
     }
 
@@ -67,9 +67,7 @@ function makeAssetPickerField(kind: 'image' | 'audio', buttonLabel: string, butt
 
     protected doValueUpdate_(newValue: any): void {
       this.assetId_ = newValue || '';
-      if (this.previewEl_) {
-        this.previewEl_.textContent = this.assetId_ ? '✓' : '?';
-      }
+      if (this.previewEl_) this.previewEl_.textContent = this.assetLabel_();
     }
 
     protected doValueInvalid_(newValue: any): void {}
@@ -2322,7 +2320,7 @@ const BLOCK_JSON: any[] = [
     ],
     previousStatement: null,
     nextStatement: null,
-    colour: C.WORLD,
+    colour: C.REGISTER,
   },
   {
     type: 'cu_place_liquid_tile',
@@ -2358,7 +2356,7 @@ const BLOCK_JSON: any[] = [
     ],
     previousStatement: null,
     nextStatement: null,
-    colour: C.WORLD,
+    colour: C.REGISTER,
   },
   {
     type: 'cu_place_structure',
@@ -2672,7 +2670,7 @@ const MSG_ZH: Record<string, string> = {
   CU_SET_WORN_SPRITE: '设置 %1 的佩戴精灵 = %2',
   CU_SET_MULTI_WORN_SPRITE: '设置 %1 部位 %2 的佩戴精灵 = %3',
   CU_EDIT_VANILLA_ITEM: '修改原生物品 %1：%2',
-  CU_REGISTER_LIQUID_TILE: '液体方块 %1 液体 %2 浮力 %3 阻力 %4 潮湿 %5 温度 %6 反胃 %7 打滑 %8 生成量 %9 填充上限 %10 颜色 %11/%12/%13 视觉 %14 饮用 %15 填充 %16 填充液体 %17',
+  CU_REGISTER_LIQUID_TILE: '注册液体方块 %1 液体 %2 浮力 %3 阻力 %4 潮湿 %5 温度 %6 反胃 %7 打滑 %8 生成量 %9 填充上限 %10 颜色 %11/%12/%13 视觉 %14 饮用 %15 填充 %16 填充液体 %17',
   CU_PLACE_LIQUID_TILE: '放置液体方块 %1 到 (%2, %3)',
   CU_FLOOD_LIQUID_TILE: '扩散液体方块 %1 到 (%2, %3) 上限 %4',
   CU_REGISTER_STRUCTURE_FILE: '注册结构 %1：%2',
@@ -2682,8 +2680,9 @@ const MSG_ZH: Record<string, string> = {
   CU_STOP_BODY_ANIMATION: '在 %1 上停止动画',
   CU_REGISTER_CONSOLE_COMMAND: '控制台命令 %1（%2）参数 %3 -> %4',
   CU_CONSOLE_ARG: '命令参数 %1',
-  CU_PLAY_SOUND_FILE: '播放音效文件 %1 音量%2',
-  CU_PLAY_SOUND_FILE_AT: '播放音效文件 %1 在(%2,%3) 音量%4',
+  CU_ASSET_NONE: '（未选择）',
+  CU_PLAY_SOUND_FILE: '播放音效 %1 音量 %2',
+  CU_PLAY_SOUND_FILE_AT: '播放音效 %1 在 (%2,%3) 音量 %4',
   CU_SET_VELOCITY: '设置速度(%1,%2)',
   CU_ADD_VELOCITY: '增加速度(%1,%2)',
   CU_MAKE_SPRITE: '切分 %1（%2×%3 网格）第 %4 帧 PPU %5',
@@ -2926,7 +2925,7 @@ const MSG_EN: Record<string, string> = {
   CU_SET_WORN_SPRITE: 'worn sprite of %1 = %2',
   CU_SET_MULTI_WORN_SPRITE: 'worn sprite of %1 limb %2 = %3',
   CU_EDIT_VANILLA_ITEM: 'edit vanilla item %1: %2',
-  CU_REGISTER_LIQUID_TILE: 'liquid tile %1 liquid %2 buoyancy %3 drag %4 wetness %5 temp %6 sickness %7 slip %8 spawn %9 maxfill %10 colour %11/%12/%13 visual %14 drink %15 fill %16 fillliquid %17',
+  CU_REGISTER_LIQUID_TILE: 'register liquid tile %1 liquid %2 buoyancy %3 drag %4 wetness %5 temp %6 sickness %7 slip %8 spawn %9 maxfill %10 colour %11/%12/%13 visual %14 drink %15 fill %16 fillliquid %17',
   CU_PLACE_LIQUID_TILE: 'place liquid tile %1 at (%2, %3)',
   CU_FLOOD_LIQUID_TILE: 'flood fill liquid tile %1 at (%2, %3) max %4',
   CU_REGISTER_STRUCTURE_FILE: 'register structure %1: %2',
@@ -2936,8 +2935,9 @@ const MSG_EN: Record<string, string> = {
   CU_STOP_BODY_ANIMATION: 'stop animation on %1',
   CU_REGISTER_CONSOLE_COMMAND: 'console command %1 (%2) args %3 -> %4',
   CU_CONSOLE_ARG: 'command arg %1',
-  CU_PLAY_SOUND_FILE: 'play sound file %1 volume %2',
-  CU_PLAY_SOUND_FILE_AT: 'play sound file %1 at (%2,%3) volume %4',
+  CU_ASSET_NONE: '(none)',
+  CU_PLAY_SOUND_FILE: 'play sound %1 volume %2',
+  CU_PLAY_SOUND_FILE_AT: 'play sound %1 at (%2,%3) volume %4',
   CU_SET_VELOCITY: 'set velocity (%1,%2)',
   CU_ADD_VELOCITY: 'add velocity (%1,%2)',
   CU_MAKE_SPRITE: 'slice %1 (%2x%3 grid) frame %4 ppu %5',
@@ -3171,7 +3171,7 @@ const MSG_RU: Record<string, string> = {
   CU_SET_WORN_SPRITE: 'снаряжённый спрайт %1 = %2',
   CU_SET_MULTI_WORN_SPRITE: 'снаряжённый спрайт %1 конечность %2 = %3',
   CU_EDIT_VANILLA_ITEM: 'изменить стандартный предмет %1: %2',
-  CU_REGISTER_LIQUID_TILE: 'жидкий тайл %1 жидкость %2 плавучесть %3 сопротивление %4 влажность %5 темп. %6 тошнота %7 скольжение %8 спавн %9 макс.заполн. %10 цвет %11/%12/%13 вид %14 питьё %15 заполн. %16 заполн.жидк. %17',
+  CU_REGISTER_LIQUID_TILE: 'зарегистрировать жидкий тайл %1 жидкость %2 плавучесть %3 сопротивление %4 влажность %5 темп. %6 тошнота %7 скольжение %8 спавн %9 макс.заполн. %10 цвет %11/%12/%13 вид %14 питьё %15 заполн. %16 заполн.жидк. %17',
   CU_PLACE_LIQUID_TILE: 'поставить жидкий тайл %1 в (%2, %3)',
   CU_FLOOD_LIQUID_TILE: 'заливка жидкого тайла %1 в (%2, %3) макс %4',
   CU_REGISTER_STRUCTURE_FILE: 'зарегистрировать структуру %1: %2',
@@ -3181,6 +3181,7 @@ const MSG_RU: Record<string, string> = {
   CU_STOP_BODY_ANIMATION: 'остановить анимацию на %1',
   CU_REGISTER_CONSOLE_COMMAND: 'консольная команда %1 (%2), аргументы %3 -> %4',
   CU_CONSOLE_ARG: 'аргумент команды %1',
+  CU_ASSET_NONE: '(не выбрано)',
   CU_PLAY_SOUND_FILE: 'воспроизвести звук %1 громкость %2',
   CU_PLAY_SOUND_FILE_AT: 'воспроизвести звук %1 в (%2,%3) громкость %4',
   CU_SET_VELOCITY: 'установить скорость (%1,%2)',
