@@ -25,6 +25,7 @@ export default function AssetManager({ projectName, mode, accept = 'image', onSe
   const [mergeName, setMergeName] = useState('sheet.png');
   const [merging, setMerging] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [uploadErr, setUploadErr] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLCanvasElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -118,10 +119,11 @@ export default function AssetManager({ projectName, mode, accept = 'image', onSe
     const file = fileRef.current?.files?.[0];
     if (!file) return;
     setUploading(true);
+    setUploadErr(null);
     try {
       await uploadAsset(projectName, file);
       await load();
-    } catch (e) { console.warn('upload failed', e); }
+    } catch (e) { setUploadErr((e as Error).message || 'upload failed'); }
     if (fileRef.current) fileRef.current.value = '';
     setUploading(false);
   };
@@ -212,6 +214,7 @@ export default function AssetManager({ projectName, mode, accept = 'image', onSe
             {visible.length} {t('asset.files')}{mode === 'manage' && selected.length > 0 ? ` · ${selected.length} ${t('asset.selected')}` : ''}
           </span>
         </div>
+        {uploadErr && <div className="asset-error">{uploadErr}</div>}
         {mode === 'manage' && selected.length > 0 && (
           <div className="asset-action-bar">
             <span className="asset-action-name">

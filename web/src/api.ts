@@ -101,7 +101,10 @@ export async function uploadAsset(projectName: string, file: File): Promise<{ as
   const form = new FormData();
   form.append('file', file);
   const res = await fetch(`/api/projects/${encodeURIComponent(projectName)}/assets/upload`, { method: 'POST', body: form });
-  if (!res.ok) throw new Error('upload failed');
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(body.trim() || `upload failed (HTTP ${res.status})`);
+  }
   return await res.json();
 }
 
