@@ -236,18 +236,6 @@ export default function Marketplace({ onBack }: { onBack: () => void }) {
             ))}
           </div>
         )}
-
-        <section className="mt-sec">
-          <h3 className="mt-sec-title">{t('sec.local')}</h3>
-          <ul className="mt-sec-list">
-            <li>{t('sec.loopback')}</li>
-            <li>{t('sec.cors')}</li>
-            <li>{t('sec.token')}</li>
-            <li>{t('sec.browse')}</li>
-            <li>{t('sec.deploy')}</li>
-            <li>{t('sec.review')}</li>
-          </ul>
-        </section>
       </div>
 
       {showSubmit && (
@@ -261,7 +249,13 @@ export default function Marketplace({ onBack }: { onBack: () => void }) {
               <p className="mt-section-desc">{t('market.submitDesc')}</p>
 
               <div className="mt-section">
-                <div className="mt-section-title">{t('market.token')}</div>
+                <div className="mt-section-title">
+                  {t('market.token')}
+                  <span className="i-btn" tabIndex={0}>
+                    i
+                    <span className="i-tip">{t('market.tokenTip')}</span>
+                  </span>
+                </div>
                 {tokSaved ? (
                   <div className="mt-token-row">
                     <span className="mt-token-info">{maskToken(tokSaved)}</span>
@@ -276,8 +270,7 @@ export default function Marketplace({ onBack }: { onBack: () => void }) {
                     <a className="mt-btn mt-btn-ghost mt-btn-sm mt-token-link" href={TOKEN_URL} target="_blank" rel="noreferrer">
                       {t('market.tokenLink')} →
                     </a>
-                    <div className="mt-hint">{t('market.tokenScope')}</div>
-                    <div className="mt-hint">{t('market.tokenHint')}</div>
+                    <div className="mt-hint">{t('market.tokenSafe')}</div>
                     {tokErr && <div className="modal-err">{tokErr}</div>}
                   </>
                 )}
