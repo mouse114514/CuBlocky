@@ -837,6 +837,7 @@ Copy the built DLL from `bin/Release/` into
                         sb.AppendLine($"        private static void {handlerName}()");
                         sb.AppendLine("        {");
                         sb.AppendLine($"            Log.LogInfo($\"[CuBlocky] {handlerName} fired\");");
+                        sb.AppendLine("            var body = PlayerCamera.main.body;");
                         bodyCode = DeclareLocals(bodyCode, hoisted);
                         foreach (var bline in bodyCode.Split('\n'))
                         {
