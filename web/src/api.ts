@@ -92,6 +92,7 @@ export function assetRawUrl(projectName: string, assetName: string): string {
 export interface ServerConfig {
   gamePath: string;
   partSizeMb?: number;
+  githubToken?: string;
 }
 
 export async function getConfig(): Promise<ServerConfig> {

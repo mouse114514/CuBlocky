@@ -5,7 +5,7 @@ import {
   TOKEN_URL,
   fetchManifest, submitProject, installEntry,
   listProjects, listAssets, fetchBlueprint, projectCbpBytes,
-  getToken, setToken, clearToken, maskToken, iconUrl,
+  getToken, setToken, clearToken, maskToken, iconUrl, setStoredToken,
   type MarketEntry, type ServerProject, type ServerAsset,
 } from '../market';
 
@@ -64,6 +64,10 @@ export default function Marketplace({ onBack }: { onBack: () => void }) {
           fetchManifest(),
         ]);
         if (cfg && cfg.partSizeMb) setPartSize(cfg.partSizeMb);
+        if (cfg) {
+          setStoredToken(cfg.githubToken || '');
+          if (!tokSaved) setTokSaved(getToken());
+        }
         setEntries(m.entries);
         if (m.fromCache) setErr(t('market.staleCache'));
       } catch (e: any) {

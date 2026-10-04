@@ -5,6 +5,7 @@ import { useI18n, type Lang } from '../i18n';
 import GradientBg from './GradientBg';
 import { LangPicker } from './LangPicker';
 import Marketplace from './Marketplace';
+import { TOKEN_URL, setStoredToken } from '../market';
 import { getConfig, updateConfig, type ServerConfig } from '../api';
 import SPLASH_TEXTS from '../splashTexts';
 
@@ -37,6 +38,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
   const [newDesc, setNewDesc] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const [gamePath, setGamePath] = useState('');
+  const [tokText, setTokText] = useState('');
   const [showLang, setShowLang] = useState(false);
   const [firstLang, setFirstLang] = useState(() => localStorage.getItem('cublocky-lang-chosen') !== '1');
   const [showLangHint, setShowLangHint] = useState(false);
@@ -77,13 +79,17 @@ export default function WelcomePage({ onOpenProject }: Props) {
   };
 
   const openSettings = () => {
-    getConfig().then(cfg => setGamePath(cfg.gamePath)).catch(() => {});
+    getConfig()
+      .then(cfg => { setGamePath(cfg.gamePath); setTokText(cfg.githubToken || ''); })
+      .catch(() => {});
     setShowSettings(true);
   };
 
   const saveSettings = async () => {
     try {
-      await updateConfig({ gamePath });
+      const tok = tokText.trim();
+      setStoredToken(tok);
+      await updateConfig({ gamePath, githubToken: tok });
       setShowSettings(false);
     } catch { /* ignore */ }
   };
@@ -420,6 +426,17 @@ export default function WelcomePage({ onOpenProject }: Props) {
               onChange={(e) => setGamePath(e.target.value)}
               placeholder="C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo"
             />
+            <div className="wp-setting-row">
+              <div className="wp-toggle-label">
+                <span>{t('market.token')}</span>
+                <span className="modal-hint">{t('app.tokenHint')}</span>
+              </div>
+              <a className="wp-btn-ghost" href={TOKEN_URL} target="_blank" rel="noreferrer">{t('market.tokenLink')}</a>
+            </div>
+            <div className="wp-token-row">
+              <input className="modal-input" value={tokText} onChange={e => setTokText(e.target.value)} placeholder={t('market.tokenPlaceholder')} />
+              {tokText && <button className="wp-btn-ghost" onClick={() => setTokText('')}>{t('app.tokenClear')}</button>}
+            </div>
             <div className="wp-setting-row">
               <label className="wp-toggle-label">
                 <span>{t('app.splash')}</span>

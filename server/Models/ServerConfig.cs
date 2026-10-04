@@ -8,6 +8,10 @@ public class ServerConfig
 
     public int PartSizeMb { get; set; } = 9;
 
+    // Stored in config.json next to the executable, so it survives browser
+    // clears and reinstalls. Read back by GET /api/config.
+    public string GitHubToken { get; set; } = "";
+
     private static string ConfigPath => Path.Combine(AppContext.BaseDirectory, "config.json");
 
     private static ServerConfig? _instance;

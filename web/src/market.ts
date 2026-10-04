@@ -7,6 +7,8 @@
 // /issues/{n}/comments/{cid}/attachments both return 404), so files
 // are pushed with PUT /contents onto a per-submission branch instead.
 
+import { getConfig } from './api';
+
 const REPO = 'mouse114514/cublocky-market';
 const BRANCH = 'main';
 const RAW = 'https://raw.githubusercontent.com/' + REPO + '/' + BRANCH;
@@ -106,8 +108,24 @@ export const iconUrl = (e: MarketEntry): string | undefined =>
 
 // ── Token ──
 
+// Precedence: the temporary token typed into the submit dialog, then a
+// remembered browser token, then the one the server keeps in config.json.
+let storedToken = '';
+
+export function setStoredToken(t: string) {
+  storedToken = (t || '').trim();
+}
+
+export async function loadStoredToken() {
+  try {
+    setStoredToken((await getConfig()).githubToken || '');
+  } catch {
+    // Server unreachable; browsing still works and getToken() yields ''.
+  }
+}
+
 export function getToken(): string {
-  return sessionStorage.getItem(TOK_SESSION) || localStorage.getItem(TOK_LOCAL) || '';
+  return sessionStorage.getItem(TOK_SESSION) || localStorage.getItem(TOK_LOCAL) || storedToken;
 }
 
 export function setToken(token: string, remember: boolean) {

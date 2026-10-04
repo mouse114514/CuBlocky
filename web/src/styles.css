@@ -656,3 +656,9 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 .mt-section-title .i-btn:focus-visible .i-tip{transform:translate(0,0)}
 .mt-section-title .i-tip::before{top:auto;bottom:100%;left:8px;transform:none;border-top-color:transparent;border-bottom-color:#e2e2e2}
 .mt-section-title .i-tip::after{top:auto;bottom:calc(100% - 2px);left:8px;transform:none;border-top-color:transparent;border-bottom-color:#fff}
+
+/* GitHub token row in the settings modal */
+.wp-token-row{display:flex;gap:8px;align-items:center}
+.wp-token-row .modal-input{flex:1;min-width:0}
+.wp-btn-ghost{display:inline-flex;align-items:center;justify-content:center;padding:6px 14px;border:1px solid #d0d0d0;background:#fff;color:#555;border-radius:14px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap;flex:none;transition:border-color .15s,color .15s}
+.wp-btn-ghost:hover{border-color:#1a8a1a;color:#1a8a1a}

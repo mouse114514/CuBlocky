@@ -275,7 +275,9 @@ const dict = {
   'market.loading':      { zh: '加载中…', en: 'Loading…', ru: 'Загрузка…' },
   'market.error':        { zh: '出错了：{msg}', en: 'Error: {msg}', ru: 'Ошибка: {msg}' },
   'market.back':         { zh: '返回', en: 'Back', ru: 'Назад' },
-  // ── Submit: GitHub token ──
+  // ── Submit / settings: GitHub token ──
+  'app.tokenHint':   { zh: '提交市场项目时使用。本地工具，完全安全。', en: 'Used when submitting to the marketplace. A local tool; completely safe.', ru: 'Используется при отправке в рынок. Локальный инструмент; полностью безопасно.' },
+  'app.tokenClear':  { zh: '清空', en: 'Clear', ru: 'Очистить' },
   'market.tokenSafe': { zh: '本地工具，token 完全安全。', en: 'A local tool; the token is safe.', ru: 'Локальный инструмент; токен безопасен.' },
   'market.tokenTip': { zh: '链接已预填 repo 权限，仅需具备向 mouse114514/cublocky-market 提交 PR 的权限。未提供 token 时仅可浏览与下载；token 只发往 api.github.com，不经过本服务，也不消耗任何配额。', en: 'The link pre-fills the repo scope; only permission to open pull requests against mouse114514/cublocky-market is needed. Without a token, browsing and downloading remain available. The token goes to api.github.com only, never through this service, and uses no quota.', ru: 'Ссылка задаёт область repo; достаточно прав для создания pull request в mouse114514/cublocky-market. Без токена доступны просмотр и загрузка. Токен передаётся только в api.github.com и не расходует квоту.' },
 } as const;

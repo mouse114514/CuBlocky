@@ -59,6 +59,7 @@ app.MapPut("/api/config", async (HttpRequest req) =>
     if (body == null) return Results.BadRequest("invalid config");
     config.GamePath = body.GamePath;
     if (body.PartSizeMb > 0) config.PartSizeMb = body.PartSizeMb;
+    config.GitHubToken = body.GitHubToken ?? "";
     config.Save();
     return Results.Ok(config);
 });
