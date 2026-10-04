@@ -646,3 +646,13 @@ h3{font-size:13px;color:var(--fg2);margin:8px 0 4px;font-weight:600}
 .wp-form textarea{background:#ebebeb;border:1px solid #d0d0d0;border-radius:6px;padding:8px 12px;font-family:inherit;font-size:13px}
 .wp-form textarea:focus{outline:none;border-color:#1a8a1a}
 .wp-form textarea::placeholder{color:#999}
+
+/* ── Marketplace security notice ─────────────────────────────── */
+.mt-sec{width:100%;max-width:1000px;border:1px solid #e0e0e0;border-radius:8px;padding:14px 18px;background:#f5f5f5;margin-top:6px}
+.mt-sec-title{font-size:13px;font-weight:600;color:#333;margin:0 0 8px;line-height:1.5}
+.mt-sec-list{margin:0;padding-left:16px;font-size:12px;color:#666;line-height:1.8}
+.mt-sec-list li{margin:0}
+.mt-sec-list li+li{margin-top:3px}
+
+/* ── Welcome footer ─────────────────────────────────────────── */
+.wp-local{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:12px;color:#999;margin:0;z-index:1}

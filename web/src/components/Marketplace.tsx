@@ -236,6 +236,18 @@ export default function Marketplace({ onBack }: { onBack: () => void }) {
             ))}
           </div>
         )}
+
+        <section className="mt-sec">
+          <h3 className="mt-sec-title">{t('sec.local')}</h3>
+          <ul className="mt-sec-list">
+            <li>{t('sec.loopback')}</li>
+            <li>{t('sec.cors')}</li>
+            <li>{t('sec.token')}</li>
+            <li>{t('sec.browse')}</li>
+            <li>{t('sec.deploy')}</li>
+            <li>{t('sec.review')}</li>
+          </ul>
+        </section>
       </div>
 
       {showSubmit && (

@@ -275,6 +275,15 @@ const dict = {
   'market.loading':      { zh: '加载中…', en: 'Loading…', ru: 'Загрузка…' },
   'market.error':        { zh: '出错了：{msg}', en: 'Error: {msg}', ru: 'Ошибка: {msg}' },
   'market.back':         { zh: '返回', en: 'Back', ru: 'Назад' },
+  // ── Security / local-only notice ──
+  'sec.local':     { zh: '本地运行。工程、资源、设置与编译产物全部保存在本机，无云服务。', en: 'Runs locally. Projects, assets, settings and build output all stay on your machine. No cloud service.', ru: 'Работает локально. Проекты, ресурсы, настройки и результаты сборки хранятся на вашем компьютере. Облачных сервисов нет.' },
+  'sec.loopback':  { zh: '服务默认只监听 localhost；需要共享时请显式修改端口。', en: 'The service listens on localhost by default; change the port explicitly to share it.', ru: 'Сервис по умолчанию слушает только localhost; для совместного использования явно измените порт.' },
+  'sec.cors':      { zh: '仅接受与来源一致的跨域请求，其他站点的页面无法访问本服务。', en: 'Only same-origin requests are accepted; pages from other sites cannot reach this service.', ru: 'Принимаются только запросы с тем же источником; страницы других сайтов не могут обращаться к сервису.' },
+  'sec.token':     { zh: 'GitHub token 只发往 api.github.com，不经过本服务，仅保存在你的浏览器。', en: 'Your GitHub token is sent only to api.github.com, never through this service, and is stored only in your browser.', ru: 'Токен GitHub передаётся только в api.github.com, не проходит через сервис и хранится только в вашем браузере.' },
+  'sec.browse':    { zh: '浏览与下载市场内容不需要 token，不消耗任何配额。', en: 'Browsing and downloading from the marketplace needs no token and uses no quota.', ru: 'Просмотр и загрузка из рынка не требуют токена и не расходуют квоту.' },
+  'sec.deploy':    { zh: '部署范围限定在服务器目录内已编译的 DLL。', en: 'Deploy is limited to DLLs compiled under the server directory.', ru: 'Развёртывание ограничено DLL, собранными в каталоге сервиса.' },
+  'sec.review':    { zh: '市场条目由维护者人工审核后发布。', en: 'Marketplace entries are published after manual review by a maintainer.', ru: 'Записи рынка публикуются после ручной проверки модератором.' },
+  'app.localNote': { zh: '本地工具：无云服务，工程与设置仅保存在本机，服务默认只监听 localhost。', en: 'Local tool: no cloud service, projects and settings stay on this machine, the service binds to localhost by default.', ru: 'Локальный инструмент: облачных сервисов нет, проекты и настройки хранятся на этом компьютере, сервис слушает localhost по умолчанию.' },
 } as const;
 
 type DictKey = keyof typeof dict;

@@ -463,6 +463,8 @@ export default function WelcomePage({ onOpenProject }: Props) {
           {t('lang.firstHint')}
         </div>
       )}
+
+      <p className="wp-local">{t('app.localNote')}</p>
     </div>
   );
 }
