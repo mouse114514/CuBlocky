@@ -5,13 +5,12 @@ import { useI18n } from '../i18n';
 interface Props {
   projectName: string;
   mode: 'manage' | 'pick';
-  accept?: 'image' | 'audio';
   onSelect?: (name: string) => void;
   onGenerate?: (name: string) => void;
   onClose: () => void;
 }
 
-export default function AssetManager({ projectName, mode, accept = 'image', onSelect, onGenerate, onClose }: Props) {
+export default function AssetManager({ projectName, mode, onSelect, onGenerate, onClose }: Props) {
   const { t } = useI18n();
   const [assets, setAssets] = useState<AssetInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,10 +42,9 @@ export default function AssetManager({ projectName, mode, accept = 'image', onSe
   useEffect(() => () => { audioRef.current?.pause(); }, []);
 
   const isAudio = (name: string) => /\.(wav|mp3|mp1|mp2|aif|aiff|cue)$/i.test(name);
-  const matchesAccept = (name: string) => accept === 'audio' ? isAudio(name) : !isAudio(name);
   const imageSel = selected.filter(n => !isAudio(n));
-  // In pick mode only show the kind being picked (sprite vs. audio clip).
-  const visible = mode === 'pick' ? assets.filter(a => matchesAccept(a.name)) : assets;
+  // In pick mode only audio clips are listed.
+  const visible = mode === 'pick' ? assets.filter(a => isAudio(a.name)) : assets;
 
   const load = async () => {
     setLoading(true);
