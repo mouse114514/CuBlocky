@@ -185,6 +185,8 @@ const C = {
   LOCALE:   '#5c6bc0',
   UI:       '#00acc1',
   CREATURE: '#ff6f00',
+  CONFIG:   '#3f51b5',
+  ASSET:    '#607d8b',
 };
 
 type DdOption = [string, string, string, string]; // [zhLabel, enLabel, ruLabel, value]
@@ -404,6 +406,60 @@ const SKILL_OPTIONS: DdOption[] = [
 const TRUE_FALSE_OPTIONS: DdOption[] = [
   ['真(true)', 'True (true)', 'Истина (true)', 'true'],
   ['假(false)', 'False (false)', 'Ложь (false)', 'false'],
+];
+
+const CFG_TYPE_OPTIONS: DdOption[] = [
+  ['数值(float)', 'Float (float)', 'Число (float)', 'float'],
+  ['布尔(bool)', 'Boolean (bool)', 'Булево (bool)', 'bool'],
+  ['文本(string)', 'String (string)', 'Текст (string)', 'string'],
+];
+
+const MOD_OPTION_KIND_OPTIONS: DdOption[] = [
+  ['滑块(float)', 'Slider (float)', 'Ползунок (float)', 'float'],
+  ['整数(int)', 'Integer (int)', 'Целое (int)', 'int'],
+  ['开关(bool)', 'Toggle (bool)', 'Переключатель (bool)', 'bool'],
+  ['下拉(dropdown)', 'Dropdown (dropdown)', 'Выпадающий (dropdown)', 'dropdown'],
+  ['按键(keybind)', 'Keybind (keybind)', 'Клавиша (keybind)', 'keybind'],
+];
+
+const KEYCODE_OPTIONS: DdOption[] = [
+  ['空格(Space)', 'Space', 'Пробел', 'Space'], ['W', 'W', 'W', 'W'], ['A', 'A', 'A', 'A'], ['S', 'S', 'S', 'S'], ['D', 'D', 'D', 'D'],
+  ['Q', 'Q', 'Q', 'Q'], ['E', 'E', 'E', 'E'], ['R', 'R', 'R', 'R'], ['F', 'F', 'F', 'F'], ['G', 'G', 'G', 'G'],
+  ['T', 'T', 'T', 'T'], ['Y', 'Y', 'Y', 'Y'], ['U', 'U', 'U', 'U'], ['I', 'I', 'I', 'I'], ['O', 'O', 'O', 'O'],
+  ['P', 'P', 'P', 'P'], ['1', '1', '1', 'Alpha1'], ['2', '2', '2', 'Alpha2'], ['3', '3', '3', 'Alpha3'], ['4', '4', '4', 'Alpha4'],
+  ['5', '5', '5', 'Alpha5'], ['6', '6', '6', 'Alpha6'], ['7', '7', '7', 'Alpha7'], ['8', '8', '8', 'Alpha8'], ['9', '9', '9', 'Alpha9'],
+  ['0', '0', '0', 'Alpha0'], ['左Shift(LeftShift)', 'Left Shift', 'Левый Shift', 'LeftShift'], ['右Shift(RightShift)', 'Right Shift', 'Правый Shift', 'RightShift'],
+  ['左Ctrl(LeftControl)', 'Left Control', 'Левый Ctrl', 'LeftControl'], ['右Ctrl(RightControl)', 'Right Control', 'Правый Ctrl', 'RightControl'],
+  ['左Alt(LeftAlt)', 'Left Alt', 'Левый Alt', 'LeftAlt'], ['右Alt(RightAlt)', 'Right Alt', 'Правый Alt', 'RightAlt'],
+  ['回车(Return)', 'Return', 'Enter', 'Return'], ['Tab', 'Tab', 'Tab', 'Tab'], ['退格(Backspace)', 'Backspace', 'Backspace', 'Backspace'],
+  ['删除(Delete)', 'Delete', 'Delete', 'Delete'], ['鼠标1(Mouse0)', 'Mouse 1', 'Мышь 1', 'Mouse0'], ['鼠标2(Mouse1)', 'Mouse 2', 'Мышь 2', 'Mouse1'],
+  ['鼠标3(Mouse2)', 'Mouse 3', 'Мышь 3', 'Mouse2'], ['左箭头(UpArrow)', 'Up Arrow', 'Стрелка вверх', 'UpArrow'], ['右箭头(RightArrow)', 'Right Arrow', 'Стрелка вправо', 'RightArrow'],
+  ['下箭头(DownArrow)', 'Down Arrow', 'Стрелка вниз', 'DownArrow'], ['左箭头(LeftArrow)', 'Left Arrow', 'Стрелка влево', 'LeftArrow'],
+  ['H', 'H', 'H', 'H'], ['J', 'J', 'J', 'J'], ['K', 'K', 'K', 'K'], ['L', 'L', 'L', 'L'], ['Z', 'Z', 'Z', 'Z'], ['X', 'X', 'X', 'X'],
+  ['C', 'C', 'C', 'C'], ['V', 'V', 'V', 'V'], ['B', 'B', 'B', 'B'], ['N', 'N', 'N', 'N'], ['M', 'M', 'M', 'M'],
+  ['无(None)', 'None', 'Нет', 'None'],
+];
+
+const FILTER_MODE_OPTIONS: DdOption[] = [
+  ['点阵(Point)', 'Point', 'Точечная', 'Point'],
+  ['双线性(Bilinear)', 'Bilinear', 'Билинейная', 'Bilinear'],
+  ['三线性(Trilinear)', 'Trilinear', 'Трилинейная', 'Trilinear'],
+];
+
+const TEXTURE_WRAP_OPTIONS: DdOption[] = [
+  ['重复(Repeat)', 'Repeat', 'Повтор', 'Repeat'],
+  ['镜像(Mirror)', 'Mirror', 'Зеркало', 'Mirror'],
+  ['钳制(Clamp)', 'Clamp', 'Ограничение', 'Clamp'],
+  ['边界(Border)', 'Border', 'Граница', 'Border'],
+  ['不可寻址(MirroredRepeat)', 'Mirrored Repeat', 'Зеркальное повтор', 'MirroredRepeat'],
+];
+
+const LIQUID_VISUAL_MODE_OPTIONS: DdOption[] = [
+  ['液体加染色(ExistingLiquidPlusTint)', 'Existing liquid + tint', 'Жидкость + тонировка', 'ExistingLiquidPlusTint'],
+  ['纯色(SolidColor)', 'Solid color', 'Твёрдый цвет', 'SolidColor'],
+  ['材质(Material)', 'Material', 'Материал', 'Material'],
+  ['精灵(Sprite)', 'Sprite', 'Спрайт', 'Sprite'],
+  ['高分辨率图片(HighResImage)', 'High-res image', 'Высокое разрешение', 'HighResImage'],
 ];
 
 const BLOCK_JSON: any[] = [
@@ -1856,6 +1912,546 @@ const BLOCK_JSON: any[] = [
     output: 'Boolean',
     colour: C.UI,
   },
+
+  // ═══ Settings / options (CUCoreLib settings menu + persistent config) ═══
+  {
+    type: 'cu_register_mod_option',
+    message0: '%{BKY_CU_REGISTER_MOD_OPTION}',
+    args0: [
+      { type: 'field_dropdown', name: 'KIND', options: [
+        ['滑块(float)','Slider (float)','Ползунок (float)','float'],
+      ]},
+      { type: 'field_input', name: 'ID', text: 'myOption' },
+      { type: 'field_input', name: 'LABEL', text: 'My option' },
+      { type: 'field_input', name: 'DESC', text: 'What this does' },
+      { type: 'field_input', name: 'CATEGORY', text: 'MyMod' },
+      { type: 'field_input', name: 'DEFAULT', text: '1' },
+      { type: 'field_input', name: 'MIN', text: '0' },
+      { type: 'field_input', name: 'MAX', text: '10' },
+      { type: 'field_input', name: 'KEYCODE', text: 'Space' },
+      { type: 'field_input', name: 'CHOICES', text: 'fast|Fast,slow|Slow' },
+      { type: 'input_statement', name: 'ACTION' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.CONFIG,
+  },
+  {
+    type: 'cu_cfg_get',
+    message0: '%{BKY_CU_CFG_GET}',
+    args0: [
+      { type: 'field_dropdown', name: 'TYPE', options: [
+        ['数值(float)','Float (float)','Число (float)','float'],
+      ]},
+      { type: 'field_input', name: 'KEY', text: 'myKey' },
+      { type: 'input_value', name: 'DEFAULT' },
+    ],
+    colour: C.CONFIG,
+  },
+  {
+    type: 'cu_cfg_set',
+    message0: '%{BKY_CU_CFG_SET}',
+    args0: [
+      { type: 'field_dropdown', name: 'TYPE', options: [
+        ['数值(float)','Float (float)','Число (float)','float'],
+      ]},
+      { type: 'field_input', name: 'KEY', text: 'myKey' },
+      { type: 'input_value', name: 'VALUE' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.CONFIG,
+  },
+  {
+    type: 'cu_register_keybind',
+    message0: '%{BKY_CU_REGISTER_KEYBIND}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myAction' },
+      { type: 'field_input', name: 'DESC', text: 'Triggers my action' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.CONFIG,
+  },
+  {
+    type: 'cu_key_code',
+    message0: '%{BKY_CU_KEY_CODE}',
+    args0: [
+      { type: 'field_searchable_dropdown', name: 'KEY', options: KEYCODE_OPTIONS, lang: 'zh' },
+    ],
+    output: null,
+    colour: C.CONFIG,
+  },
+  {
+    type: 'cu_key_sprite',
+    message0: '%{BKY_CU_KEY_SPRITE}',
+    args0: [
+      { type: 'field_searchable_dropdown', name: 'KEY', options: KEYCODE_OPTIONS, lang: 'zh' },
+    ],
+    output: null,
+    colour: C.CONFIG,
+  },
+  {
+    type: 'cu_friendly_key_name',
+    message0: '%{BKY_CU_FRIENDLY_KEY_NAME}',
+    args0: [
+      { type: 'field_searchable_dropdown', name: 'KEY', options: KEYCODE_OPTIONS, lang: 'zh' },
+    ],
+    output: 'String',
+    colour: C.CONFIG,
+  },
+  {
+    type: 'cu_keybind_code',
+    message0: '%{BKY_CU_KEYBIND_CODE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myAction' },
+    ],
+    output: null,
+    colour: C.CONFIG,
+  },
+
+  // ═══ Assets (sprites, bundles, textures, materials) ═══
+  {
+    type: 'cu_load_embedded_sprite',
+    message0: '%{BKY_CU_LOAD_EMBEDDED_SPRITE}',
+    args0: [
+      { type: 'field_input', name: 'PATH', text: 'Assets/icon.png' },
+      { type: 'input_value', name: 'PPU' },
+    ],
+    output: null,
+    colour: C.ASSET,
+  },
+  {
+    type: 'cu_split_sprite_sheet',
+    message0: '%{BKY_CU_SPLIT_SPRITE_SHEET}',
+    args0: [
+      { type: 'input_value', name: 'SHEET' },
+      { type: 'input_value', name: 'COLS' },
+      { type: 'input_value', name: 'ROWS' },
+      { type: 'input_value', name: 'INDEX' },
+    ],
+    output: null,
+    colour: C.ASSET,
+  },
+  {
+    type: 'cu_cache_sprite',
+    message0: '%{BKY_CU_CACHE_SPRITE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'mySprite' },
+      { type: 'input_value', name: 'SPRITE' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.ASSET,
+  },
+  {
+    type: 'cu_get_cached_sprite',
+    message0: '%{BKY_CU_GET_CACHED_SPRITE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'mySprite' },
+    ],
+    output: null,
+    colour: C.ASSET,
+  },
+  {
+    type: 'cu_register_bundle',
+    message0: '%{BKY_CU_REGISTER_BUNDLE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myBundle' },
+      { type: 'field_input', name: 'PATH', text: 'Assets/bundle.bundle' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.ASSET,
+  },
+  {
+    type: 'cu_bundle_asset',
+    message0: '%{BKY_CU_BUNDLE_ASSET}',
+    args0: [
+      { type: 'field_input', name: 'BUNDLE', text: 'myBundle' },
+      { type: 'field_input', name: 'NAME', text: 'asset' },
+    ],
+    output: null,
+    colour: C.ASSET,
+  },
+  {
+    type: 'cu_frame_animation',
+    message0: '%{BKY_CU_FRAME_ANIMATION}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myAnim' },
+      { type: 'field_input', name: 'FRAMES', text: 'a.png, b.png, c.png' },
+      { type: 'field_input', name: 'PPU', text: '8' },
+      { type: 'field_input', name: 'FPS', text: '12' },
+      { type: 'input_value', name: 'LOOP' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.ASSET,
+  },
+  {
+    type: 'cu_load_texture_file',
+    message0: '%{BKY_CU_LOAD_TEXTURE_FILE}',
+    args0: [
+      { type: 'field_input', name: 'PATH', text: 'Assets/texture.png' },
+      { type: 'field_dropdown', name: 'FILTER', options: [
+        ['点阵(Point)','Point','Точечная','Point'],
+      ]},
+      { type: 'field_dropdown', name: 'WRAP', options: [
+        ['重复(Repeat)','Repeat','Повтор','Repeat'],
+      ]},
+    ],
+    output: null,
+    colour: C.ASSET,
+  },
+  {
+    type: 'cu_liquid_material',
+    message0: '%{BKY_CU_LIQUID_MATERIAL}',
+    args0: [
+      { type: 'input_value', name: 'TEXTURE' },
+      { type: 'field_input', name: 'SHADER', text: '' },
+    ],
+    output: null,
+    colour: C.ASSET,
+  },
+  {
+    type: 'cu_liquid_tile_material',
+    message0: '%{BKY_CU_LIQUID_TILE_MATERIAL}',
+    args0: [
+      { type: 'field_input', name: 'PATH', text: 'Assets/water.png' },
+      { type: 'field_input', name: 'SHADER', text: '' },
+    ],
+    output: null,
+    colour: C.ASSET,
+  },
+
+  // ═══ Scheduling / feedback ═══
+  {
+    type: 'cu_alert',
+    message0: '%{BKY_CU_ALERT}',
+    args0: [
+      { type: 'input_value', name: 'TEXT' },
+      { type: 'input_value', name: 'IMPORTANT' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.FLOW,
+  },
+  {
+    type: 'cu_delay',
+    message0: '%{BKY_CU_DELAY}',
+    args0: [
+      { type: 'input_value', name: 'SECONDS' },
+      { type: 'input_statement', name: 'BODY' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.FLOW,
+  },
+  {
+    type: 'cu_call_when',
+    message0: '%{BKY_CU_CALL_WHEN}',
+    args0: [
+      { type: 'input_value', name: 'COND' },
+      { type: 'input_statement', name: 'BODY' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.FLOW,
+  },
+  {
+    type: 'cu_console_log',
+    message0: '%{BKY_CU_CONSOLE_LOG}',
+    args0: [
+      { type: 'input_value', name: 'TEXT' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.FLOW,
+  },
+  {
+    type: 'cu_talk_electronic',
+    message0: '%{BKY_CU_TALK_ELECTRONIC}',
+    args0: [
+      { type: 'input_value', name: 'TEXT' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.FLOW,
+  },
+  {
+    type: 'cu_end_minigame',
+    message0: '%{BKY_CU_END_MINIGAME}',
+    args0: [],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.FLOW,
+  },
+
+  // ═══ Status effects: moodle icons ═══
+  {
+    type: 'cu_moodle',
+    message0: '%{BKY_CU_MOODLE}',
+    args0: [
+      { type: 'input_value', name: 'INTENSITY' },
+      { type: 'input_value', name: 'ICON' },
+      { type: 'input_value', name: 'NAME' },
+      { type: 'input_value', name: 'DESC' },
+      { type: 'input_value', name: 'CRITICAL' },
+      { type: 'input_value', name: 'IMPORTANT' },
+      { type: 'field_input', name: 'KEY', text: '' },
+      { type: 'input_value', name: 'HOLD' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.BODY,
+  },
+  {
+    type: 'cu_moodle_animated',
+    message0: '%{BKY_CU_MOODLE_ANIMATED}',
+    args0: [
+      { type: 'input_value', name: 'INTENSITY' },
+      { type: 'input_value', name: 'ANIM_ID' },
+      { type: 'input_value', name: 'NAME' },
+      { type: 'input_value', name: 'DESC' },
+      { type: 'input_value', name: 'CRITICAL' },
+      { type: 'input_value', name: 'IMPORTANT' },
+      { type: 'field_input', name: 'KEY', text: '' },
+      { type: 'input_value', name: 'HOLD' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.BODY,
+  },
+
+  // ═══ Input / player queries ═══
+  {
+    type: 'cu_mouse_pos',
+    message0: '%{BKY_CU_MOUSE_POS}',
+    args0: [],
+    output: null,
+    colour: C.VALUE,
+  },
+  {
+    type: 'cu_get_held_item',
+    message0: '%{BKY_CU_GET_HELD_ITEM}',
+    args0: [],
+    output: null,
+    colour: C.VALUE,
+  },
+  {
+    type: 'cu_get_hovered_item',
+    message0: '%{BKY_CU_GET_HOVERED_ITEM}',
+    args0: [],
+    output: null,
+    colour: C.VALUE,
+  },
+  {
+    type: 'cu_is_in_world',
+    message0: '%{BKY_CU_IS_IN_WORLD}',
+    args0: [],
+    output: 'Boolean',
+    colour: C.BOOL,
+  },
+  {
+    type: 'cu_has_equipped',
+    message0: '%{BKY_CU_HAS_EQUIPPED}',
+    args0: [
+      { type: 'input_value', name: 'ITEM' },
+    ],
+    output: 'Boolean',
+    colour: C.BOOL,
+  },
+  {
+    type: 'cu_is_modded_item',
+    message0: '%{BKY_CU_IS_MODDED_ITEM}',
+    args0: [
+      { type: 'input_value', name: 'ITEM' },
+    ],
+    output: 'Boolean',
+    colour: C.BOOL,
+  },
+  {
+    type: 'cu_is_minigame_busy',
+    message0: '%{BKY_CU_IS_MINIGAME_BUSY}',
+    args0: [],
+    output: 'Boolean',
+    colour: C.BOOL,
+  },
+
+  // ═══ Item runtime overrides ═══
+  {
+    type: 'cu_set_worn_sprite',
+    message0: '%{BKY_CU_SET_WORN_SPRITE}',
+    args0: [
+      { type: 'input_value', name: 'ITEM' },
+      { type: 'input_value', name: 'SPRITE' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.ITEM,
+  },
+  {
+    type: 'cu_set_multi_worn_sprite',
+    message0: '%{BKY_CU_SET_MULTI_WORN_SPRITE}',
+    args0: [
+      { type: 'input_value', name: 'ITEM' },
+      { type: 'field_input', name: 'LIMB', text: 'HandA' },
+      { type: 'input_value', name: 'SPRITE' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.ITEM,
+  },
+  {
+    type: 'cu_edit_vanilla_item',
+    message0: '%{BKY_CU_EDIT_VANILLA_ITEM}',
+    args0: [
+      { type: 'input_value', name: 'ITEM' },
+      { type: 'input_statement', name: 'BODY' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.ITEM,
+  },
+
+  // ═══ World: liquid tiles and structures ═══
+  {
+    type: 'cu_register_liquid_tile',
+    message0: '%{BKY_CU_REGISTER_LIQUID_TILE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myLiquidTile' },
+      { type: 'field_input', name: 'LIQUID_ID', text: 'water' },
+      { type: 'input_value', name: 'BUOYANCY' },
+      { type: 'input_value', name: 'DRAG' },
+      { type: 'input_value', name: 'WETNESS' },
+      { type: 'input_value', name: 'TEMPERATURE' },
+      { type: 'input_value', name: 'SICKNESS' },
+      { type: 'input_value', name: 'SLIP' },
+      { type: 'input_value', name: 'SPAWN_AMOUNT' },
+      { type: 'input_value', name: 'MAX_FILL' },
+      { type: 'input_value', name: 'R' },
+      { type: 'input_value', name: 'G' },
+      { type: 'input_value', name: 'B' },
+      { type: 'field_dropdown', name: 'VISUAL_MODE', options: [
+        ['液体加染色','Existing liquid + tint','Жидкость + тонировка','ExistingLiquidPlusTint'],
+      ]},
+      { type: 'input_value', name: 'CONSUME_DRINK' },
+      { type: 'input_value', name: 'CONSUME_FILL' },
+      { type: 'field_input', name: 'FILL_LIQUID', text: 'water' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.WORLD,
+  },
+  {
+    type: 'cu_place_liquid_tile',
+    message0: '%{BKY_CU_PLACE_LIQUID_TILE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myLiquidTile' },
+      { type: 'input_value', name: 'X' },
+      { type: 'input_value', name: 'Y' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.WORLD,
+  },
+  {
+    type: 'cu_flood_liquid_tile',
+    message0: '%{BKY_CU_FLOOD_LIQUID_TILE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myLiquidTile' },
+      { type: 'input_value', name: 'X' },
+      { type: 'input_value', name: 'Y' },
+      { type: 'input_value', name: 'MAX' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.WORLD,
+  },
+  {
+    type: 'cu_register_structure_file',
+    message0: '%{BKY_CU_REGISTER_STRUCTURE_FILE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myStructure' },
+      { type: 'field_input', name: 'PATH', text: 'Structures/house.json' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.WORLD,
+  },
+  {
+    type: 'cu_place_structure',
+    message0: '%{BKY_CU_PLACE_STRUCTURE}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myStructure' },
+      { type: 'input_value', name: 'X' },
+      { type: 'input_value', name: 'Y' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.WORLD,
+  },
+  {
+    type: 'cu_structure_spawn_counts',
+    message0: '%{BKY_CU_STRUCTURE_SPAWN_COUNTS}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myStructure' },
+      { type: 'field_input', name: 'COUNTS', text: '1, 2, 3' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.WORLD,
+  },
+
+  // ═══ Body animation packs ═══
+  {
+    type: 'cu_play_body_animation',
+    message0: '%{BKY_CU_PLAY_BODY_ANIMATION}',
+    args0: [
+      { type: 'input_value', name: 'BODY' },
+      { type: 'field_input', name: 'BUNDLE', text: 'myBundle' },
+      { type: 'field_input', name: 'ANIM', text: 'walk' },
+      { type: 'input_value', name: 'LOOP' },
+      { type: 'input_value', name: 'SPEED' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.BODY,
+  },
+  {
+    type: 'cu_stop_body_animation',
+    message0: '%{BKY_CU_STOP_BODY_ANIMATION}',
+    args0: [
+      { type: 'input_value', name: 'BODY' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.BODY,
+  },
+
+  // ═══ Console commands ═══
+  {
+    type: 'cu_register_console_command',
+    message0: '%{BKY_CU_REGISTER_CONSOLE_COMMAND}',
+    args0: [
+      { type: 'field_input', name: 'NAME', text: 'mycommand' },
+      { type: 'field_input', name: 'DESC', text: 'What the command does' },
+      { type: 'field_input', name: 'ARG_DESC', text: '' },
+      { type: 'input_statement', name: 'BODY' },
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.CONFIG,
+  },
+  {
+    type: 'cu_console_arg',
+    message0: '%{BKY_CU_CONSOLE_ARG}',
+    args0: [
+      { type: 'field_input', name: 'INDEX', text: '0' },
+    ],
+    output: 'String',
+    colour: C.CONFIG,
+  },
 ];
 
 // ── Messages ──
@@ -2077,6 +2673,52 @@ const MSG_ZH: Record<string, string> = {
   CU_GET_TEXTFIELD_CONTENT: '文本框 %1 的内容',
   CU_GET_CONTROL_VALUE: '控件 %1 的值',
   CU_GET_TOGGLE_STATE: '开关 %1 的状态',
+  CU_REGISTER_MOD_OPTION: '设置菜单 %2 = %1',
+  CU_CFG_GET: '%1 配置 %2',
+  CU_CFG_SET: '设置 %1 配置 %2 = %3',
+  CU_REGISTER_KEYBIND: '注册按键 %1：%2',
+  CU_KEY_CODE: '按键 %1',
+  CU_KEY_SPRITE: '按键图标 %1',
+  CU_FRIENDLY_KEY_NAME: '按键名称 %1',
+  CU_KEYBIND_CODE: '按键代码 %1',
+  CU_LOAD_EMBEDDED_SPRITE: '内置精灵 %1 @%2',
+  CU_SPLIT_SPRITE_SHEET: '精灵表 %2×%3 第 %4 帧',
+  CU_CACHE_SPRITE: '缓存精灵 %1',
+  CU_GET_CACHED_SPRITE: '读取缓存精灵 %1',
+  CU_REGISTER_BUNDLE: '注册资源包 %1：%2',
+  CU_BUNDLE_ASSET: '资源包 %1 中的 %2',
+  CU_FRAME_ANIMATION: '帧动画 %1（%2 帧/秒）',
+  CU_LOAD_TEXTURE_FILE: '纹理 %1（%2/%3）',
+  CU_LIQUID_MATERIAL: '液体材质 %1',
+  CU_LIQUID_TILE_MATERIAL: '液体材质文件 %1',
+  CU_ALERT: '提示 %1',
+  CU_DELAY: '等待 %1 秒后',
+  CU_CALL_WHEN: '当 %1 为真时',
+  CU_CONSOLE_LOG: '控制台输出 %1',
+  CU_TALK_ELECTRONIC: '电子设备说话 %1',
+  CU_END_MINIGAME: '结束小游戏',
+  CU_MOODLE: '情绪图标 强度 %1 名称 %2',
+  CU_MOODLE_ANIMATED: '动画情绪图标 强度 %1 名称 %2',
+  CU_MOUSE_POS: '鼠标位置',
+  CU_GET_HELD_ITEM: '手持物品',
+  CU_GET_HOVERED_ITEM: '悬停物品',
+  CU_IS_IN_WORLD: '是否在世界中',
+  CU_HAS_EQUIPPED: '是否装备了 %1',
+  CU_IS_MODDED_ITEM: '%1 是否为模组物品',
+  CU_IS_MINIGAME_BUSY: '小游戏是否进行中',
+  CU_SET_WORN_SPRITE: '设置 %1 的佩戴精灵 = %2',
+  CU_SET_MULTI_WORN_SPRITE: '设置 %1 部位 %2 的佩戴精灵 = %3',
+  CU_EDIT_VANILLA_ITEM: '修改原生物品 %1',
+  CU_REGISTER_LIQUID_TILE: '注册液体方块 %1（%2）',
+  CU_PLACE_LIQUID_TILE: '放置液体方块 %1 到 (%2, %3)',
+  CU_FLOOD_LIQUID_TILE: '扩散液体方块 %1 到 (%2, %3) 上限 %4',
+  CU_REGISTER_STRUCTURE_FILE: '注册结构 %1：%2',
+  CU_PLACE_STRUCTURE: '放置结构 %1 到 (%2, %3)',
+  CU_STRUCTURE_SPAWN_COUNTS: '结构 %1 生成次数 %2',
+  CU_PLAY_BODY_ANIMATION: '播放身体动画 %1：%2',
+  CU_STOP_BODY_ANIMATION: '停止身体动画',
+  CU_REGISTER_CONSOLE_COMMAND: '注册控制台命令 %1：%2',
+  CU_CONSOLE_ARG: '命令参数 %1',
 };
 
 const MSG_EN: Record<string, string> = {
@@ -2297,6 +2939,52 @@ const MSG_EN: Record<string, string> = {
   CU_GET_TEXTFIELD_CONTENT: 'content of textfield %1',
   CU_GET_CONTROL_VALUE: 'value of control %1',
   CU_GET_TOGGLE_STATE: 'state of toggle %1',
+  CU_REGISTER_MOD_OPTION: 'setting %2 = %1',
+  CU_CFG_GET: '%1 config %2',
+  CU_CFG_SET: 'set %1 config %2 = %3',
+  CU_REGISTER_KEYBIND: 'register keybind %1: %2',
+  CU_KEY_CODE: 'key %1',
+  CU_KEY_SPRITE: 'key icon %1',
+  CU_FRIENDLY_KEY_NAME: 'key name %1',
+  CU_KEYBIND_CODE: 'keybind code %1',
+  CU_LOAD_EMBEDDED_SPRITE: 'embedded sprite %1 @%2',
+  CU_SPLIT_SPRITE_SHEET: 'sheet %2x%3 frame %4',
+  CU_CACHE_SPRITE: 'cache sprite %1',
+  CU_GET_CACHED_SPRITE: 'cached sprite %1',
+  CU_REGISTER_BUNDLE: 'register bundle %1: %2',
+  CU_BUNDLE_ASSET: 'bundle asset %1: %2',
+  CU_FRAME_ANIMATION: 'frame animation %1 (%2 fps)',
+  CU_LOAD_TEXTURE_FILE: 'texture %1 (%2/%3)',
+  CU_LIQUID_MATERIAL: 'liquid material %1',
+  CU_LIQUID_TILE_MATERIAL: 'liquid texture file %1',
+  CU_ALERT: 'alert %1',
+  CU_DELAY: 'after %1 seconds',
+  CU_CALL_WHEN: 'when %1 is true',
+  CU_CONSOLE_LOG: 'console log %1',
+  CU_TALK_ELECTRONIC: 'electronic talk %1',
+  CU_END_MINIGAME: 'end minigame',
+  CU_MOODLE: 'moodle intensity %1 name %2',
+  CU_MOODLE_ANIMATED: 'animated moodle intensity %1 name %2',
+  CU_MOUSE_POS: 'mouse position',
+  CU_GET_HELD_ITEM: 'held item',
+  CU_GET_HOVERED_ITEM: 'hovered item',
+  CU_IS_IN_WORLD: 'in world',
+  CU_HAS_EQUIPPED: 'equipped %1',
+  CU_IS_MODDED_ITEM: '%1 is modded item',
+  CU_IS_MINIGAME_BUSY: 'minigame in progress',
+  CU_SET_WORN_SPRITE: 'worn sprite of %1 = %2',
+  CU_SET_MULTI_WORN_SPRITE: 'worn sprite of %1 limb %2 = %3',
+  CU_EDIT_VANILLA_ITEM: 'edit vanilla item %1',
+  CU_REGISTER_LIQUID_TILE: 'register liquid tile %1 (%2)',
+  CU_PLACE_LIQUID_TILE: 'place liquid tile %1 at (%2, %3)',
+  CU_FLOOD_LIQUID_TILE: 'flood fill liquid tile %1 at (%2, %3) max %4',
+  CU_REGISTER_STRUCTURE_FILE: 'register structure %1: %2',
+  CU_PLACE_STRUCTURE: 'place structure %1 at (%2, %3)',
+  CU_STRUCTURE_SPAWN_COUNTS: 'structure %1 spawn counts %2',
+  CU_PLAY_BODY_ANIMATION: 'play body animation %1: %2',
+  CU_STOP_BODY_ANIMATION: 'stop body animation',
+  CU_REGISTER_CONSOLE_COMMAND: 'register console command %1: %2',
+  CU_CONSOLE_ARG: 'command arg %1',
 };
 
 const MSG_RU: Record<string, string> = {
@@ -2508,6 +3196,52 @@ const MSG_RU: Record<string, string> = {
   CU_GET_TEXTFIELD_CONTENT: 'содержимое текстового поля %1',
   CU_GET_CONTROL_VALUE: 'значение элемента %1',
   CU_GET_TOGGLE_STATE: 'состояние переключателя %1',
+  CU_REGISTER_MOD_OPTION: 'настройка %2 = %1',
+  CU_CFG_GET: '%1 настройка %2',
+  CU_CFG_SET: 'установить %1 настройку %2 = %3',
+  CU_REGISTER_KEYBIND: 'зарегистрировать клавишу %1: %2',
+  CU_KEY_CODE: 'клавиша %1',
+  CU_KEY_SPRITE: 'иконка клавиши %1',
+  CU_FRIENDLY_KEY_NAME: 'имя клавиши %1',
+  CU_KEYBIND_CODE: 'код клавиши %1',
+  CU_LOAD_EMBEDDED_SPRITE: 'встроенный спрайт %1 @%2',
+  CU_SPLIT_SPRITE_SHEET: 'сетка %2x%3 кадр %4',
+  CU_CACHE_SPRITE: 'записать спрайт %1',
+  CU_GET_CACHED_SPRITE: 'спрайт из кэша %1',
+  CU_REGISTER_BUNDLE: 'зарегистрировать бандл %1: %2',
+  CU_BUNDLE_ASSET: 'ресурс бандла %1: %2',
+  CU_FRAME_ANIMATION: 'кадровая анимация %1 (%2 к/с)',
+  CU_LOAD_TEXTURE_FILE: 'текстура %1 (%2/%3)',
+  CU_LIQUID_MATERIAL: 'материал жидкости %1',
+  CU_LIQUID_TILE_MATERIAL: 'файл текстуры жидкости %1',
+  CU_ALERT: 'всплывашка %1',
+  CU_DELAY: 'после %1 секунд',
+  CU_CALL_WHEN: 'когда %1 истинно',
+  CU_CONSOLE_LOG: 'лог в консоль %1',
+  CU_TALK_ELECTRONIC: 'электро-реплика %1',
+  CU_END_MINIGAME: 'завершить мини-игру',
+  CU_MOODLE: 'мудл сила %1 имя %2',
+  CU_MOODLE_ANIMATED: 'аним. мудл сила %1 имя %2',
+  CU_MOUSE_POS: 'позиция курсора',
+  CU_GET_HELD_ITEM: 'предмет в руке',
+  CU_GET_HOVERED_ITEM: 'предмет под курсором',
+  CU_IS_IN_WORLD: 'в мире',
+  CU_HAS_EQUIPPED: 'снаряжено %1',
+  CU_IS_MODDED_ITEM: '%1 предмет мода',
+  CU_IS_MINIGAME_BUSY: 'мини-игра идёт',
+  CU_SET_WORN_SPRITE: 'снаряжённый спрайт %1 = %2',
+  CU_SET_MULTI_WORN_SPRITE: 'снаряжённый спрайт %1 конечность %2 = %3',
+  CU_EDIT_VANILLA_ITEM: 'изменить стандартный предмет %1',
+  CU_REGISTER_LIQUID_TILE: 'зарегистрировать жидкий тайл %1 (%2)',
+  CU_PLACE_LIQUID_TILE: 'поставить жидкий тайл %1 в (%2, %3)',
+  CU_FLOOD_LIQUID_TILE: 'заливка жидкого тайла %1 в (%2, %3) макс %4',
+  CU_REGISTER_STRUCTURE_FILE: 'зарегистрировать структуру %1: %2',
+  CU_PLACE_STRUCTURE: 'поставить структуру %1 в (%2, %3)',
+  CU_STRUCTURE_SPAWN_COUNTS: 'структура %1 счётчики спавна %2',
+  CU_PLAY_BODY_ANIMATION: 'воспроизвести анимацию тела %1: %2',
+  CU_STOP_BODY_ANIMATION: 'остановить анимацию тела',
+  CU_REGISTER_CONSOLE_COMMAND: 'зарегистрирать команду %1: %2',
+  CU_CONSOLE_ARG: 'аргумент команды %1',
 };
 
 export function setMessages(lang: string) {
@@ -3889,6 +4623,295 @@ csharpGenerator.forBlock['cu_get_toggle_state'] = (block) => {
   return [`CuUI.GetToggle("${id}")`, ORDER_ATOMIC];
 };
 
+// ═══ CUCoreLib: settings, assets, scheduling, moodles, liquid tiles, structures ═══
+let _tmpSeq = 0;
+function tmp(name: string): string { return name + (++_tmpSeq); }
+function q(s: string): string { return (s || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"'); }
+function listPaths(s: string): string[] {
+  return (s || '').split(',').map(t => t.trim()).filter(t => t.length > 0);
+}
+function toInt(v: string): string { return /^\d+$/.test((v || '').trim()) ? v.trim() : `(int)(${v})`; }
+
+// ── Settings menu option (ModOptionsRegistry) ──
+csharpGenerator.forBlock['cu_register_mod_option'] = (block, gen) => {
+  const kind = block.getFieldValue('KIND') || 'float';
+  const id = q(block.getFieldValue('ID') || 'myOption');
+  const label = q(block.getFieldValue('LABEL') || 'My option');
+  const desc = q(block.getFieldValue('DESC') || '');
+  const cat = q(block.getFieldValue('CATEGORY') || 'MyMod');
+  const body = gen.statementToCode(block, 'ACTION') || '';
+  const lambda = body ? ` (${kind === 'keybind' ? 'KeyCode' : kind === 'bool' ? 'bool' : kind === 'float' ? 'float' : 'int'}) optVal => { ${body} }` : '';
+  let def: string;
+  if (kind === 'int') {
+    def = `Int("${id}", "${label}", "${desc}", "${cat}", ${block.getFieldValue('MIN') || 0}, ${block.getFieldValue('MAX') || 99}, ${block.getFieldValue('DEFAULT') || 0}`;
+  } else if (kind === 'bool') {
+    def = `Bool("${id}", "${label}", "${desc}", "${cat}", ${(block.getFieldValue('DEFAULT') || 'false').toLowerCase()}`;
+  } else if (kind === 'keybind') {
+    def = `Keybind("${id}", "${label}", "${desc}", "${cat}", KeyCode.${block.getFieldValue('KEYCODE') || 'None'}`;
+  } else if (kind === 'dropdown') {
+    const choices = listPaths(block.getFieldValue('CHOICES') || '')
+      .map(p => { const [k, ...rest] = p.split('|'); return `new ModDropdownChoice("${q((k || '').trim())}", "${q(rest.join('|').trim())}")`; })
+      .join(', ');
+    def = `Dropdown("${id}", "${label}", "${desc}", "${cat}", ${block.getFieldValue('DEFAULT') || 0}, new ModDropdownChoice[] { ${choices} }`;
+  } else {
+    def = `Float("${id}", "${label}", "${desc}", "${cat}", ${float(block.getFieldValue('MIN') || '0')}, ${float(block.getFieldValue('MAX') || '10')}, ${float(block.getFieldValue('DEFAULT') || '1')}`;
+  }
+  return `ModOptionsRegistry.Register(ModOptionDefinition.${def}${lambda}));\n`;
+};
+
+// ── Persistent key/value config (CUCoreUtils.Get*/Set*) ──
+csharpGenerator.forBlock['cu_cfg_get'] = (block, gen) => {
+  const type = block.getFieldValue('TYPE') || 'float';
+  const key = q(block.getFieldValue('KEY') || 'myKey');
+  const dv = gen.valueToCode(block, 'DEFAULT', ORDER_ATOMIC) || (type === 'string' ? '""' : type === 'bool' ? 'false' : '0f');
+  if (type === 'string') return [`CUCoreUtils.GetString("${key}", ${dv})`, ORDER_ATOMIC];
+  if (type === 'bool') return [`CUCoreUtils.GetBool("${key}", ${dv})`, ORDER_ATOMIC];
+  return [`CUCoreUtils.GetFloat("${key}", ${dv})`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_cfg_set'] = (block, gen) => {
+  const type = block.getFieldValue('TYPE') || 'float';
+  const key = q(block.getFieldValue('KEY') || 'myKey');
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || (type === 'string' ? '""' : type === 'bool' ? 'false' : '0f');
+  if (type === 'string') return `CUCoreUtils.SetString("${key}", ${v});\n`;
+  if (type === 'bool') return `CUCoreUtils.SetBool("${key}", ${bool(v)});\n`;
+  return `CUCoreUtils.SetFloat("${key}", ${float(v)});\n`;
+};
+csharpGenerator.forBlock['cu_register_keybind'] = (block) => {
+  const id = q(block.getFieldValue('ID') || 'myAction');
+  const desc = q(block.getFieldValue('DESC') || '');
+  return `CUCoreUtils.AllowKeybindRebind("${id}", "${desc}");\n`;
+};
+csharpGenerator.forBlock['cu_key_code'] = (block) => [`KeyCode.${block.getFieldValue('KEY') || 'None'}`, ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_key_sprite'] = (block) => [`CUCoreUtils.GetKeySprite(KeyCode.${block.getFieldValue('KEY') || 'None'})`, ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_friendly_key_name'] = (block) => [`CUCoreUtils.GetFriendlyKeyName(KeyCode.${block.getFieldValue('KEY') || 'None'})`, ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_keybind_code'] = (block) => {
+  const id = q(block.getFieldValue('ID') || 'myAction');
+  return [`(KeyCode)CUCoreUtils.GetFriendlyKeyBind("${id}")`, ORDER_ATOMIC];
+};
+
+// ── Assets ──
+csharpGenerator.forBlock['cu_load_embedded_sprite'] = (block, gen) => {
+  const path = q(block.getFieldValue('PATH') || 'Assets/icon.png');
+  const ppu = gen.valueToCode(block, 'PPU', ORDER_ATOMIC) || '8';
+  return [`CUCoreUtils.LoadEmbeddedSprite("${path}", ${float(ppu)}, typeof(Plugin).Assembly)`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_split_sprite_sheet'] = (block, gen) => {
+  const sheet = gen.valueToCode(block, 'SHEET', ORDER_ATOMIC) || 'null';
+  const cols = gen.valueToCode(block, 'COLS', ORDER_ATOMIC) || '1';
+  const rows = gen.valueToCode(block, 'ROWS', ORDER_ATOMIC) || '1';
+  const idx = gen.valueToCode(block, 'INDEX', ORDER_ATOMIC) || '0';
+  return [`CUCoreUtils.SplitSpriteSheet(${sheet}, ${toInt(cols)}, ${toInt(rows)})[${toInt(idx)}]`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_cache_sprite'] = (block, gen) => {
+  const id = q(block.getFieldValue('ID') || 'mySprite');
+  const sprite = gen.valueToCode(block, 'SPRITE', ORDER_ATOMIC) || 'null';
+  return `AssetLoader.CacheSprite("${id}", ${sprite});\n`;
+};
+csharpGenerator.forBlock['cu_get_cached_sprite'] = (block) => {
+  const id = q(block.getFieldValue('ID') || 'mySprite');
+  return [`AssetLoader.GetCachedSprite("${id}")`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_register_bundle'] = (block) => {
+  const id = q(block.getFieldValue('ID') || 'myBundle');
+  const path = q(block.getFieldValue('PATH') || 'Assets/bundle.bundle');
+  return `AssetLoader.RegisterBundleFromPluginFolder(Plugin.Instance, "${id}", "${path}");\n`;
+};
+csharpGenerator.forBlock['cu_bundle_asset'] = (block) => {
+  const bundle = q(block.getFieldValue('BUNDLE') || 'myBundle');
+  const name = q(block.getFieldValue('NAME') || 'asset');
+  const n = tmp('cuAsset');
+  return [`AssetLoader.TryLoadBundleAsset<Sprite>("${bundle}", "${name}", out var ${n}) ? ${n} : null`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_frame_animation'] = (block) => {
+  const id = q(block.getFieldValue('ID') || 'myAnim');
+  const ppu = float(block.getFieldValue('PPU') || '8');
+  const fps = float(block.getFieldValue('FPS') || '12');
+  const loop = (block.getFieldValue('LOOP') || 'FALSE') === 'FALSE' ? 'true' : 'false';
+  const frames = listPaths(block.getFieldValue('FRAMES') || '').map(p => `"${q(p)}"`).join(', ');
+  return `AssetLoader.LoadFrameAnimationFromFiles("${id}", new[] { ${frames} }, ${ppu}, ${fps}, ${loop});\n`;
+};
+csharpGenerator.forBlock['cu_load_texture_file'] = (block) => {
+  const path = q(block.getFieldValue('PATH') || 'Assets/texture.png');
+  const filter = block.getFieldValue('FILTER') || 'Point';
+  const wrap = block.getFieldValue('WRAP') || 'Repeat';
+  return [`LiquidVisualHelper.LoadTextureFromFile("${path}", FilterMode.${filter}, TextureWrapMode.${wrap})`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_liquid_material'] = (block, gen) => {
+  const tex = gen.valueToCode(block, 'TEXTURE', ORDER_ATOMIC) || 'null';
+  const shader = (block.getFieldValue('SHADER') || '').trim();
+  return [shader ? `LiquidVisualHelper.CreateLiquidMaterial(${tex}, null, "${q(shader)}")` : `LiquidVisualHelper.CreateLiquidMaterial(${tex})`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_liquid_tile_material'] = (block) => {
+  const path = q(block.getFieldValue('PATH') || 'Assets/water.png');
+  const shader = (block.getFieldValue('SHADER') || '').trim();
+  return [shader ? `LiquidVisualHelper.CreateLiquidMaterialFromFile("${path}", null, "${q(shader)}")` : `LiquidVisualHelper.CreateLiquidMaterialFromFile("${path}")`, ORDER_ATOMIC];
+};
+
+// ── Scheduling / feedback ──
+csharpGenerator.forBlock['cu_alert'] = (block, gen) => {
+  const text = gen.valueToCode(block, 'TEXT', ORDER_ATOMIC) || '""';
+  const imp = gen.valueToCode(block, 'IMPORTANT', ORDER_ATOMIC) || 'false';
+  return `CUCoreUtils.ShowAlert(${text}, ${bool(imp)});\n`;
+};
+csharpGenerator.forBlock['cu_delay'] = (block, gen) => {
+  const secs = gen.valueToCode(block, 'SECONDS', ORDER_ATOMIC) || '1';
+  const body = gen.statementToCode(block, 'BODY') || '{ }';
+  return `CUCoreUtils.DelayCall(${float(secs)}, () => { ${body} });\n`;
+};
+csharpGenerator.forBlock['cu_call_when'] = (block, gen) => {
+  const cond = gen.valueToCode(block, 'COND', ORDER_ATOMIC) || 'true';
+  const body = gen.statementToCode(block, 'BODY') || '{ }';
+  return `CUCoreUtils.CallWhen(() => ${bool(cond)}, () => { ${body} });\n`;
+};
+csharpGenerator.forBlock['cu_console_log'] = (block, gen) => {
+  const text = gen.valueToCode(block, 'TEXT', ORDER_ATOMIC) || '""';
+  return `Log.LogInfo($"[CuBlocky] {text}");\n`;
+};
+csharpGenerator.forBlock['cu_talk_electronic'] = (block, gen) => {
+  const text = gen.valueToCode(block, 'TEXT', ORDER_ATOMIC) || '""';
+  return `CUCoreUtils.TalkElectronic(${text});\n`;
+};
+csharpGenerator.forBlock['cu_end_minigame'] = () => `CUCoreMinigames.EndActiveMinigame();\n`;
+
+// ── Moodles ──
+function moodleCommon(block: any, gen: any) {
+  return {
+    intensity: toInt(gen.valueToCode(block, 'INTENSITY', ORDER_ATOMIC) || '3'),
+    name: q(gen.valueToCode(block, 'NAME', ORDER_ATOMIC).replace(/^"|"$/g, '') || ''),
+    desc: q(gen.valueToCode(block, 'DESC', ORDER_ATOMIC).replace(/^"|"$/g, '') || ''),
+    critical: bool(gen.valueToCode(block, 'CRITICAL', ORDER_ATOMIC) || 'false'),
+    important: bool(gen.valueToCode(block, 'IMPORTANT', ORDER_ATOMIC) || 'true'),
+    key: q(block.getFieldValue('KEY') || ''),
+    hold: float(gen.valueToCode(block, 'HOLD', ORDER_ATOMIC) || '0.75'),
+  };
+}
+csharpGenerator.forBlock['cu_moodle'] = (block, gen) => {
+  const m = moodleCommon(block, gen);
+  const icon = gen.valueToCode(block, 'ICON', ORDER_ATOMIC) || '""';
+  return `MoodleRegistry.AddMoodle(${m.intensity}, ${icon}, "${m.name}", "${m.desc}", ${m.critical}, false, ${m.important}, "${m.key}", ${m.hold});\n`;
+};
+csharpGenerator.forBlock['cu_moodle_animated'] = (block, gen) => {
+  const m = moodleCommon(block, gen);
+  const anim = gen.valueToCode(block, 'ANIM_ID', ORDER_ATOMIC) || '""';
+  return `MoodleRegistry.AddAnimatedMoodle(${m.intensity}, ${anim}, "${m.name}", "${m.desc}", ${m.critical}, false, ${m.important}, "${m.key}", ${m.hold});\n`;
+};
+
+// ── Input / player queries ──
+csharpGenerator.forBlock['cu_mouse_pos'] = () => ['CUCoreUtils.GetMousePosition()', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_get_held_item'] = () => {
+  const n = tmp('cuHeld');
+  return [`CUCoreUtils.TryGetHeldItem(out Item ${n}) ? ${n} : null`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_get_hovered_item'] = () => {
+  const n = tmp('cuHover');
+  return [`CUCoreUtils.TryGetHoveredItem(out Item ${n}) ? ${n} : null`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_is_in_world'] = () => ['CUCoreUtils.IsInWorld()', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_has_equipped'] = (block, gen) => [`CUCoreUtils.HasEquipped(${gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || '""'})`, ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_is_modded_item'] = (block, gen) => [`CUCoreUtils.IsModdedItem(${gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || '""'})`, ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_is_minigame_busy'] = () => ['CUCoreMinigames.IsBusy()', ORDER_ATOMIC];
+
+// ── Item runtime overrides ──
+csharpGenerator.forBlock['cu_set_worn_sprite'] = (block, gen) => {
+  const item = gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || '""';
+  const sprite = gen.valueToCode(block, 'SPRITE', ORDER_ATOMIC) || 'null';
+  return `CUCoreUtils.SetWornSprite(${item}, ${sprite});\n`;
+};
+csharpGenerator.forBlock['cu_set_multi_worn_sprite'] = (block, gen) => {
+  const item = gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || '""';
+  const limb = q(block.getFieldValue('LIMB') || 'HandA');
+  const sprite = gen.valueToCode(block, 'SPRITE', ORDER_ATOMIC) || 'null';
+  return `CUCoreUtils.SetMultiWornSprite(${item}, "${limb}", ${sprite});\n`;
+};
+csharpGenerator.forBlock['cu_edit_vanilla_item'] = (block, gen) => {
+  const item = gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || '""';
+  const body = gen.statementToCode(block, 'BODY') || '{ }';
+  return `CUCoreUtils.EditVanillaItem(${item}, item => { ${body} });\n`;
+};
+
+// ── World: liquid tiles & structures ──
+csharpGenerator.forBlock['cu_register_liquid_tile'] = (block, gen) => {
+  const id = q(block.getFieldValue('ID') || 'myLiquidTile');
+  const g = (name: string, fb: string) => gen.valueToCode(block, name, ORDER_ATOMIC) || fb;
+  const vm = block.getFieldValue('VISUAL_MODE') || 'ExistingLiquidPlusTint';
+  return `LiquidTileRegistry.Register("${id}", new CustomLiquidTileInfo {\n` +
+    `  LiquidId = "${q(block.getFieldValue('LIQUID_ID') || 'water')}",\n` +
+    `  Buoyancy = ${float(g('BUOYANCY', '0.6'))},\n` +
+    `  Drag = ${float(g('DRAG', '0.915'))},\n` +
+    `  WetnessPerSecond = ${float(g('WETNESS', '20'))},\n` +
+    `  TemperaturePerSecond = ${float(g('TEMPERATURE', '0'))},\n` +
+    `  SicknessPerSecond = ${float(g('SICKNESS', '0'))},\n` +
+    `  SlipPerSecond = ${float(g('SLIP', '0'))},\n` +
+    `  SpawnAmount = ${float(g('SPAWN_AMOUNT', '0'))},\n` +
+    `  MaxFloodFill = ${toInt(g('MAX_FILL', '128'))},\n` +
+    `  Tint = new Color(${float(g('R', '1'))}, ${float(g('G', '1'))}, ${float(g('B', '1'))}),\n` +
+    `  VisualMode = LiquidTileVisualMode.${vm},\n` +
+    `  ConsumeOnDrink = ${bool(g('CONSUME_DRINK', 'true'))},\n` +
+    `  ConsumeOnFill = ${bool(g('CONSUME_FILL', 'true'))},\n` +
+    `  FillLiquidId = "${q(block.getFieldValue('FILL_LIQUID') || 'water')}"\n` +
+    `});\n`;
+};
+csharpGenerator.forBlock['cu_place_liquid_tile'] = (block, gen) => {
+  const id = q(block.getFieldValue('ID') || 'myLiquidTile');
+  const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
+  const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
+  return `LiquidTileRegistry.Place("${id}", new Vector2(${float(x)}, ${float(y)}));\n`;
+};
+csharpGenerator.forBlock['cu_flood_liquid_tile'] = (block, gen) => {
+  const id = q(block.getFieldValue('ID') || 'myLiquidTile');
+  const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
+  const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
+  const max = gen.valueToCode(block, 'MAX', ORDER_ATOMIC) || '-1';
+  return `LiquidTileRegistry.FloodFill("${id}", new Vector2Int(${toInt(x)}, ${toInt(y)}), ${toInt(max)});\n`;
+};
+csharpGenerator.forBlock['cu_register_structure_file'] = (block) => {
+  const id = q(block.getFieldValue('ID') || 'myStructure');
+  const path = q(block.getFieldValue('PATH') || 'Structures/house.json');
+  return `StructureRegistry.RegisterFromFile("${id}", "${path}");\n`;
+};
+csharpGenerator.forBlock['cu_place_structure'] = (block, gen) => {
+  const id = q(block.getFieldValue('ID') || 'myStructure');
+  const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
+  const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
+  return `StructureRegistry.Place("${id}", new Vector2(${float(x)}, ${float(y)}));\n`;
+};
+csharpGenerator.forBlock['cu_structure_spawn_counts'] = (block) => {
+  const id = q(block.getFieldValue('ID') || 'myStructure');
+  const counts = listPaths(block.getFieldValue('COUNTS') || '1').map(c => `${toInt(c)}`).join(', ');
+  return `StructureRegistry.TrySetSpawnCounts("${id}", ${counts});\n`;
+};
+
+// ── Body animation packs ──
+csharpGenerator.forBlock['cu_play_body_animation'] = (block, gen) => {
+  const body = gen.valueToCode(block, 'BODY', ORDER_ATOMIC) || 'body';
+  const bundle = q(block.getFieldValue('BUNDLE') || 'myBundle');
+  const anim = q(block.getFieldValue('ANIM') || 'walk');
+  const loop = bool(gen.valueToCode(block, 'LOOP', ORDER_ATOMIC) || 'true');
+  const speed = float(gen.valueToCode(block, 'SPEED', ORDER_ATOMIC) || '1');
+  return `BodyAnimationPlayer.PlayBundled(${body}, "${bundle}", "${anim}", ${loop}, ${speed});\n`;
+};
+csharpGenerator.forBlock['cu_stop_body_animation'] = (block, gen) => {
+  const body = gen.valueToCode(block, 'BODY', ORDER_ATOMIC) || 'body';
+  return `BodyAnimationPlayer.Stop(${body});\n`;
+};
+
+// ── Console commands ──
+csharpGenerator.forBlock['cu_register_console_command'] = (block, gen) => {
+  const name = q(block.getFieldValue('NAME') || 'mycommand');
+  const desc = q(block.getFieldValue('DESC') || '');
+  const argDesc = (block.getFieldValue('ARG_DESC') || '').trim();
+  const body = gen.statementToCode(block, 'BODY') || '{ }';
+  if (argDesc) {
+    const parts = listPaths(argDesc).map(p => { const [s, ...r] = p.split('|'); return `("${q((s || '').trim())}", "${q(r.join('|').trim())}")`; }).join(', ');
+    return `ConsoleCommandRegistry.Register("${name}", "${desc}", (string[] args) => { ${body} }, null, new (string, string)[] { ${parts} });\n`;
+  }
+  return `ConsoleCommandRegistry.Register("${name}", "${desc}", (string[] args) => { ${body} });\n`;
+};
+csharpGenerator.forBlock['cu_console_arg'] = (block) => {
+  const i = toInt(block.getFieldValue('INDEX') || '0');
+  return [`args[${i}]`, ORDER_ATOMIC];
+};
+
 // ═══ Extract structured function data from workspace ═════════════
 export function extractFunctions(ws: Blockly.Workspace): FunctionDef[] {
   const result: FunctionDef[] = [];
@@ -4114,6 +5137,11 @@ const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_set_limb_flag: { PROP: LIMB_BOOL_OPTIONS, VALUE: TRUE_FALSE_OPTIONS },
   cu_set_skill: { STAT: SKILL_OPTIONS },
   cu_set_skill_range: { STAT: SKILL_OPTIONS },
+  cu_register_mod_option: { KIND: MOD_OPTION_KIND_OPTIONS },
+  cu_cfg_get: { TYPE: CFG_TYPE_OPTIONS },
+  cu_cfg_set: { TYPE: CFG_TYPE_OPTIONS },
+  cu_load_texture_file: { FILTER: FILTER_MODE_OPTIONS, WRAP: TEXTURE_WRAP_OPTIONS },
+  cu_register_liquid_tile: { VISUAL_MODE: LIQUID_VISUAL_MODE_OPTIONS },
 };
 
 function dd(lang: string, opts: DdOption[]): [string, string][] {

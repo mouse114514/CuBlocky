@@ -493,11 +493,13 @@ namespace {ns}
         public const string ModVersion = ""{ver}"";
 
         internal static new ManualLogSource Logger;
+        public static Plugin Instance;
         private readonly Harmony _harmony = new(ModGUID);
 
         private void Awake()
         {{
             Logger = base.Logger;
+            Instance = this;
             Logger.LogInfo(""[CuBlocky] Awake started"");
             try
             {{
@@ -816,6 +818,7 @@ Copy the built DLL from `bin/Release/` into
                         sb.AppendLine($"        private static void {handlerName}()");
                         sb.AppendLine("        {");
                         sb.AppendLine($"            Log.LogInfo($\"[CuBlocky] {handlerName} fired\");");
+                        sb.AppendLine("            var body = CUCoreUtils.EventPlayer;");
                         bodyCode = DeclareLocals(bodyCode, hoisted);
                         foreach (var bline in bodyCode.Split('\n'))
                         {

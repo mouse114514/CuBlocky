@@ -46,6 +46,8 @@ const CAT_ICONS: Record<string, string> = {
   CAT_BUILDING: `/media/cat-icons/building.png?v=${_t}`,
   CAT_TILE: `/media/cat-icons/tile.png?v=${_t}`,
   CAT_CREATURE: `/media/cat-icons/creature.png?v=${_t}`,
+  CAT_CONFIG: '',
+  CAT_ASSET: '',
   CAT_UI: '',
   CAT_LOCALE: '',
 };
@@ -417,6 +419,10 @@ const TOOLBOX = `
     <block type="cu_item_name"></block>
     <block type="cu_item_id"></block>
     <block type="cu_item_category"></block>
+    <sep></sep>
+    <block type="cu_set_worn_sprite"></block>
+    <block type="cu_set_multi_worn_sprite"></block>
+    <block type="cu_edit_vanilla_item"></block>
   </category>
   <category name="%{BKY_CAT_SOUND}" colour="#9c27b0">
     <block type="cu_play_sound"></block>
@@ -463,6 +469,24 @@ const TOOLBOX = `
       <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
     <block type="cu_world_depth"></block>
+    <sep></sep>
+    <block type="cu_register_liquid_tile"></block>
+    <block type="cu_place_liquid_tile">
+      <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+      <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_flood_liquid_tile">
+      <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+      <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+      <value name="MAX"><shadow type="cu_number"><field name="NUM">128</field></shadow></value>
+    </block>
+    <sep></sep>
+    <block type="cu_register_structure_file"></block>
+    <block type="cu_place_structure">
+      <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+      <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_structure_spawn_counts"></block>
   </category>
   <category name="%{BKY_CAT_FLOW}" colour="#ff5722" icon="🔀">
     <block type="cu_if"></block>
@@ -475,6 +499,20 @@ const TOOLBOX = `
       <value name="FROM"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
       <value name="TO"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
     </block>
+    <sep></sep>
+    <block type="cu_delay">
+      <value name="SECONDS"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+    </block>
+    <block type="cu_call_when"></block>
+    <block type="cu_alert">
+      <value name="TEXT"><shadow type="cu_text"><field name="TEXT">Alert</field></shadow></value>
+    </block>
+    <block type="cu_talk_electronic">
+      <value name="TEXT"><shadow type="cu_text"><field name="TEXT">Beep</field></shadow></value>
+    </block>
+    <block type="cu_moodle"></block>
+    <block type="cu_moodle_animated"></block>
+    <block type="cu_end_minigame"></block>
   </category>
   <category name="%{BKY_CAT_VALUE}" colour="#59c059" icon="🔢">
     <block type="cu_number"></block>
@@ -563,6 +601,20 @@ const TOOLBOX = `
     </block>
     <block type="cu_list_length"></block>
     <block type="cu_list_add"></block>
+    <sep></sep>
+    <block type="cu_mouse_pos"></block>
+    <block type="cu_get_held_item"></block>
+    <block type="cu_get_hovered_item"></block>
+    <sep></sep>
+    <block type="cu_load_embedded_sprite"></block>
+    <block type="cu_get_cached_sprite"></block>
+    <block type="cu_bundle_asset"></block>
+    <block type="cu_load_texture_file"></block>
+    <block type="cu_key_sprite"></block>
+    <block type="cu_friendly_key_name"></block>
+    <block type="cu_key_code"></block>
+    <block type="cu_keybind_code"></block>
+    <block type="cu_console_arg"></block>
   </category>
   <category name="%{BKY_CAT_BOOLEAN}" colour="#7b1fa2" icon="✅">
     <block type="cu_true"></block>
@@ -598,6 +650,15 @@ const TOOLBOX = `
     <block type="cu_logic_compare"></block>
     <block type="cu_not"></block>
     <block type="cu_string_contains"></block>
+    <sep></sep>
+    <block type="cu_is_in_world"></block>
+    <block type="cu_is_minigame_busy"></block>
+    <block type="cu_has_equipped">
+      <value name="ITEM"><shadow type="cu_item_vanilla"><field name="ID">bandage</field></shadow></value>
+    </block>
+    <block type="cu_is_modded_item">
+      <value name="ITEM"><shadow type="cu_item_vanilla"><field name="ID">bandage</field></shadow></value>
+    </block>
   </category>
   <category name="%{BKY_CAT_VAR}" colour="#ff7043" icon="📝">
     <block type="cu_var_get"></block>
@@ -644,6 +705,39 @@ const TOOLBOX = `
     <sep></sep>
     <block type="cu_creature_position"></block>
   </category>
+  <category name="%{BKY_CAT_CONFIG}" colour="#3f51b5">
+    <block type="cu_register_mod_option"></block>
+    <sep></sep>
+    <block type="cu_register_keybind"></block>
+    <block type="cu_key_code"></block>
+    <block type="cu_key_sprite"></block>
+    <block type="cu_friendly_key_name"></block>
+    <block type="cu_keybind_code"></block>
+    <sep></sep>
+    <block type="cu_cfg_get"></block>
+    <block type="cu_cfg_set"></block>
+    <sep></sep>
+    <block type="cu_register_console_command"></block>
+    <block type="cu_console_arg"></block>
+    <block type="cu_console_log"></block>
+  </category>
+  <category name="%{BKY_CAT_ASSET}" colour="#607d8b">
+    <block type="cu_load_embedded_sprite"></block>
+    <block type="cu_split_sprite_sheet"></block>
+    <block type="cu_cache_sprite"></block>
+    <block type="cu_get_cached_sprite"></block>
+    <sep></sep>
+    <block type="cu_register_bundle"></block>
+    <block type="cu_bundle_asset"></block>
+    <block type="cu_frame_animation"></block>
+    <sep></sep>
+    <block type="cu_load_texture_file"></block>
+    <block type="cu_liquid_material"></block>
+    <block type="cu_liquid_tile_material"></block>
+    <sep></sep>
+    <block type="cu_play_body_animation"></block>
+    <block type="cu_stop_body_animation"></block>
+  </category>
   <category name="%{BKY_CAT_UI}" colour="#00acc1">
     <block type="cu_sprite_ref"></block>
     <block type="cu_show_control"></block>
@@ -663,14 +757,14 @@ const CAT_MSG_ZH: Record<string, string> = {
   CAT_SOUND: '音效', CAT_WORLD: '世界', CAT_FLOW: '流程', CAT_VALUE: '取值',
   CAT_BOOLEAN: '布尔', CAT_VAR: '变量', CAT_FUNC: '函数',
   CAT_BUILDING: '建筑', CAT_TILE: '地块', CAT_UI: '界面', CAT_LOCALE: '本地化',
-  CAT_CREATURE: '生物',
+  CAT_CREATURE: '生物', CAT_CONFIG: '设置', CAT_ASSET: '资源',
 };
 const CAT_MSG_EN: Record<string, string> = {
   CAT_EVENT: 'Events', CAT_REGISTER: 'Register', CAT_BODY: 'Body', CAT_ITEM: 'Item',
   CAT_SOUND: 'Sound', CAT_WORLD: 'World', CAT_FLOW: 'Flow', CAT_VALUE: 'Value',
   CAT_BOOLEAN: 'Boolean', CAT_VAR: 'Variable', CAT_FUNC: 'Function',
   CAT_BUILDING: 'Building', CAT_TILE: 'Tile', CAT_UI: 'UI', CAT_LOCALE: 'Locale',
-  CAT_CREATURE: 'Creature',
+  CAT_CREATURE: 'Creature', CAT_CONFIG: 'Settings', CAT_ASSET: 'Assets',
 };
 
 export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, searchTerm }: Props) {
