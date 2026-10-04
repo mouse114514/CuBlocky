@@ -303,6 +303,109 @@ const VANILLA_ITEMS: DdOption[] = [
   ['等离子切割器', 'Plasma Cutter', 'Plasma Cutter', 'plasmacutter'],
 ];
 
+// Generic player property setter options: every public field on Body
+const PLAYER_PROP_OPTIONS: DdOption[] = [
+  ['体力(stamina)', 'Stamina (stamina)', 'Выносливость (stamina)', 'stamina'],
+  ['饱食度(hunger)', 'Hunger (hunger)', 'Сытость (hunger)', 'hunger'],
+  ['口渴度(thirst)', 'Thirst (thirst)', 'Жажда (thirst)', 'thirst'],
+  ['精力(energy)', 'Energy (energy)', 'Энергия (energy)', 'energy'],
+  ['脑部健康(brainHealth)', 'Brain health (brainHealth)', 'Здоровье мозга (brainHealth)', 'brainHealth'],
+  ['意识(consciousness)', 'Consciousness (consciousness)', 'Сознание (consciousness)', 'consciousness'],
+  ['血量(bloodVolume)', 'Blood volume (bloodVolume)', 'Объём крови (bloodVolume)', 'bloodVolume'],
+  ['血氧(bloodOxygen)', 'Blood oxygen (bloodOxygen)', 'Кислород крови (bloodOxygen)', 'bloodOxygen'],
+  ['心率(heartRate)', 'Heart rate (heartRate)', 'Частота пульса (heartRate)', 'heartRate'],
+  ['血压(bloodPressure)', 'Blood pressure (bloodPressure)', 'Давление (bloodPressure)', 'bloodPressure'],
+  ['呼吸频率(respiratoryRate)', 'Respiratory rate (respiratoryRate)', 'Частота дыхания (respiratoryRate)', 'respiratoryRate'],
+  ['休克(shock)', 'Shock (shock)', 'Шок (shock)', 'shock'],
+  ['体温(temperature)', 'Temperature (temperature)', 'Температура (temperature)', 'temperature'],
+  ['衣物温度(clothingTemperature)', 'Clothing temperature (clothingTemperature)', 'Темп. одежды (clothingTemperature)', 'clothingTemperature'],
+  ['平均疼痛(averagePain)', 'Average pain (averagePain)', 'Средняя боль (averagePain)', 'averagePain'],
+  ['幸福度(happiness)', 'Happiness (happiness)', 'Счастье (happiness)', 'happiness'],
+  ['生病值(sicknessAmount)', 'Sickness (sicknessAmount)', 'Болезнь (sicknessAmount)', 'sicknessAmount'],
+  ['免疫力(immunity)', 'Immunity (immunity)', 'Иммунитет (immunity)', 'immunity'],
+  ['抗生素免疫时间(antibioticImmunityTime)', 'Antibiotic immunity (antibioticImmunityTime)', 'Иммунитет от антибиотика (antibioticImmunityTime)', 'antibioticImmunityTime'],
+  ['辐射值(radiationSickness)', 'Radiation (radiationSickness)', 'Радиация (radiationSickness)', 'radiationSickness'],
+  ['湿度(wetness)', 'Wetness (wetness)', 'Влажность (wetness)', 'wetness'],
+  ['肾上腺素(adrenaline)', 'Adrenaline (adrenaline)', 'Адреналин (adrenaline)', 'adrenaline'],
+  ['创伤值(traumaAmount)', 'Trauma (traumaAmount)', 'Травма (traumaAmount)', 'traumaAmount'],
+  ['听力损失(hearingLoss)', 'Hearing loss (hearingLoss)', 'Потеря слуха (hearingLoss)', 'hearingLoss'],
+  ['内出血(internalBleeding)', 'Internal bleeding (internalBleeding)', 'Внутреннее кровотечение (internalBleeding)', 'internalBleeding'],
+  ['气胸(hemothorax)', 'Hemothorax (hemothorax)', 'Пневмоторакс (hemothorax)', 'hemothorax'],
+  ['心脏颤动(fibrillationProgress)', 'Fibrillation (fibrillationProgress)', 'Фибрилляция (fibrillationProgress)', 'fibrillationProgress'],
+  ['血液黏度(bloodViscosity)', 'Blood viscosity (bloodViscosity)', 'Вязкость крови (bloodViscosity)', 'bloodViscosity'],
+  ['败血症休克(septicShock)', 'Septic shock (septicShock)', 'Септический шок (septicShock)', 'septicShock'],
+  ['体重偏移(weightOffset)', 'Weight offset (weightOffset)', 'Смещение веса (weightOffset)', 'weightOffset'],
+  ['睡眠欠账(badSleepAmount)', 'Sleep debt (badSleepAmount)', 'Долг сна (badSleepAmount)', 'badSleepAmount'],
+  ['积雪(snowAmount)', 'Snow (snowAmount)', 'Снег (snowAmount)', 'snowAmount'],
+  ['咖啡因(caffeinated)', 'Caffeine (caffeinated)', 'Кофеин (caffeinated)', 'caffeinated'],
+  ['阿片药效(opiateHappiness)', 'Opiate effect (opiateHappiness)', 'Эффект опиатов (opiateHappiness)', 'opiateHappiness'],
+  ['抗抑郁药效(antidepressantHappiness)', 'Antidepressant effect (antidepressantHappiness)', 'Эффект антидепрессанта (antidepressantHappiness)', 'antidepressantHappiness'],
+  ['最大速度(maxSpeed)', 'Max speed (maxSpeed)', 'Макс. скорость (maxSpeed)', 'maxSpeed'],
+  ['跳跃力(jumpSpeed)', 'Jump speed (jumpSpeed)', 'Скорость прыжка (jumpSpeed)', 'jumpSpeed'],
+  ['刺激剂倍率(stimulantMultiplier)', 'Stimulant multiplier (stimulantMultiplier)', 'Мн. стимулятора (stimulantMultiplier)', 'stimulantMultiplier'],
+  ['移动减速(temporarySlowdown)', 'Movement slowdown (temporarySlowdown)', 'Замедление (temporarySlowdown)', 'temporarySlowdown'],
+  ['蹲下程度(crouchAmount)', 'Crouch amount (crouchAmount)', 'Склон (crouchAmount)', 'crouchAmount'],
+  ['手持槽位(handSlot)', 'Hand slot (handSlot)', 'Слот руки (handSlot)', 'handSlot'],
+];
+
+const PLAYER_BOOL_OPTIONS: DdOption[] = [
+  ['站立(standing)', 'Standing (standing)', 'Стоя (standing)', 'standing'],
+  ['蹲下(crouching)', 'Crouching (crouching)', 'Присел (crouching)', 'crouching'],
+  ['呼吸中(breathing)', 'Breathing (breathing)', 'Дышит (breathing)', 'breathing'],
+  ['在水中(inWater)', 'In water (inWater)', 'В воде (inWater)', 'inWater'],
+  ['睡觉中(sleeping)', 'Sleeping (sleeping)', 'Спит (sleeping)', 'sleeping'],
+  ['强制行走(forceWalk)', 'Force walk (forceWalk)', 'Принуд. ходьба (forceWalk)', 'forceWalk'],
+  ['强制颤动(fibrillationForced)', 'Forced fibrillation (fibrillationForced)', 'Принуд. фибрилляция (fibrillationForced)', 'fibrillationForced'],
+  ['反向操控(reversedControls)', 'Reversed controls (reversedControls)', 'Инверсия управления (reversedControls)', 'reversedControls'],
+  ['面部毁容(disfigured)', 'Disfigured (disfigured)', 'Уродство (disfigured)', 'disfigured'],
+  ['左眼缺失(eyeGone)', 'Eye gone (eyeGone)', 'Без глаза (eyeGone)', 'eyeGone'],
+  ['双眼缺失(bothEyesGone)', 'Both eyes gone (bothEyesGone)', 'Без глаз (bothEyesGone)', 'bothEyesGone'],
+];
+
+const LIMB_PROP_OPTIONS: DdOption[] = [
+  ['皮肤健康(skinHealth)', 'Skin health (skinHealth)', 'Кожа (skinHealth)', 'skinHealth'],
+  ['肌肉健康(muscleHealth)', 'Muscle health (muscleHealth)', 'Мышцы (muscleHealth)', 'muscleHealth'],
+  ['疼痛(pain)', 'Pain (pain)', 'Боль (pain)', 'pain'],
+  ['出血量(bleedAmount)', 'Bleed amount (bleedAmount)', 'Кровотечение (bleedAmount)', 'bleedAmount'],
+  ['感染值(infectionAmount)', 'Infection (infectionAmount)', 'Инфекция (infectionAmount)', 'infectionAmount'],
+  ['基础质量(baseMass)', 'Base mass (baseMass)', 'Масса (baseMass)', 'baseMass'],
+  ['骨折疼痛倍率(brokenPainMultiplier)', 'Broken pain multiplier (brokenPainMultiplier)', 'Мн. боли при переломе (brokenPainMultiplier)', 'brokenPainMultiplier'],
+  ['感染速度倍率(infectionSpeedMult)', 'Infection speed (infectionSpeedMult)', 'Скор. инфекции (infectionSpeedMult)', 'infectionSpeedMult'],
+  ['饥饿损伤倍率(starvationHealthLossMult)', 'Starvation loss multiplier (starvationHealthLossMult)', 'Мн. голода (starvationHealthLossMult)', 'starvationHealthLossMult'],
+  ['碎骨片(shrapnel)', 'Shrapnel (shrapnel)', 'Осколки (shrapnel)', 'shrapnel'],
+  ['消毒时间(disinfectionTime)', 'Disinfection time (disinfectionTime)', 'Обработка (disinfectionTime)', 'disinfectionTime'],
+  ['绷带速度倍率(bandageMinigameSpeedMult)', 'Bandage speed multiplier (bandageMinigameSpeedMult)', 'Скор. перевязки (bandageMinigameSpeedMult)', 'bandageMinigameSpeedMult'],
+  ['绷带迟缓值(bandageSlowAmount)', 'Bandage slow amount (bandageSlowAmount)', 'Замедл. повязки (bandageSlowAmount)', 'bandageSlowAmount'],
+  ['皮肤愈合量(skinHealAmount)', 'Skin heal amount (skinHealAmount)', 'Растущая кожа (skinHealAmount)', 'skinHealAmount'],
+  ['毛发积血(furBloodAmount)', 'Fur blood (furBloodAmount)', 'Кровь в шерсти (furBloodAmount)', 'furBloodAmount'],
+  ['脱臼计时(dislocationTimer)', 'Dislocation timer (dislocationTimer)', 'Таймер вывиха (dislocationTimer)', 'dislocationTimer'],
+  ['骨折愈合计时(boneHealTimer)', 'Bone heal timer (boneHealTimer)', 'Таймер сращивания (boneHealTimer)', 'boneHealTimer'],
+  ['额外旋转(bonusRot)', 'Bonus rotation (bonusRot)', 'Поворот (bonusRot)', 'bonusRot'],
+  ['重量视觉缩放(weightVisualScaleMult)', 'Weight visual scale (weightVisualScaleMult)', 'Масштаб веса (weightVisualScaleMult)', 'weightVisualScaleMult'],
+];
+
+const LIMB_BOOL_OPTIONS: DdOption[] = [
+  ['骨折(broken)', 'Broken (broken)', 'Сломана (broken)', 'broken'],
+  ['脱臼(dislocated)', 'Dislocated (dislocated)', 'Вывихнута (dislocated)', 'dislocated'],
+  ['打夹板(splinted)', 'Splinted (splinted)', 'Шина (splinted)', 'splinted'],
+  ['感染(infected)', 'Infected (infected)', 'Заражена (infected)', 'infected'],
+  ['已止血(blockedBleeding)', 'Bleeding blocked (blockedBleeding)', 'Кровь остановлена (blockedBleeding)', 'blockedBleeding'],
+  ['断肢(dismembered)', 'Dismembered (dismembered)', 'Отрезана (dismembered)', 'dismembered'],
+  ['产热(generateHeat)', 'Generates heat (generateHeat)', 'Выделяет тепло (generateHeat)', 'generateHeat'],
+  ['中风影响(strokeAffected)', 'Stroke affected (strokeAffected)', 'Инсульт (strokeAffected)', 'strokeAffected'],
+];
+
+const SKILL_OPTIONS: DdOption[] = [
+  ['力量(STR)', 'Strength (STR)', 'Сила (STR)', 'STR'],
+  ['耐力(RES)', 'Endurance (RES)', 'Выносливость (RES)', 'RES'],
+  ['智力(INT)', 'Intellect (INT)', 'Интеллект (INT)', 'INT'],
+];
+
+const TRUE_FALSE_OPTIONS: DdOption[] = [
+  ['真(true)', 'True (true)', 'Истина (true)', 'true'],
+  ['假(false)', 'False (false)', 'Ложь (false)', 'false'],
+];
+
 const BLOCK_JSON: any[] = [
   // ═══ Events (orange) ═════════════════════════════════════════
   { type: 'cu_when_awake', message0: '%{BKY_CU_WHEN_AWAKE}', colour: C.EVENT, hat: 'cap', nextStatement: null },
@@ -1190,6 +1293,49 @@ const BLOCK_JSON: any[] = [
     colour: C.BODY, previousStatement: null, nextStatement: null,
   },
 
+  // ═══ Generic player property setters (green) ═══════════════════
+  {
+    type: 'cu_set_player_property', message0: '%{BKY_CU_SET_PLAYER_PROPERTY}',
+    args0: [
+      { type: 'field_searchable_dropdown', name: 'PROP', options: PLAYER_PROP_OPTIONS, lang: 'zh' },
+      { type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_set_player_flag', message0: '%{BKY_CU_SET_PLAYER_FLAG}',
+    args0: [
+      { type: 'field_searchable_dropdown', name: 'PROP', options: PLAYER_BOOL_OPTIONS, lang: 'zh' },
+      { type: 'field_dropdown', name: 'VALUE', options: [
+        ['真(true)', 'true'], ['假(false)', 'false'],
+      ]},
+    ],
+    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+
+  // ═══ Skills (green) ══════════════════════════════════════════
+  {
+    type: 'cu_set_skill', message0: '%{BKY_CU_SET_SKILL}',
+    args0: [
+      { type: 'field_dropdown', name: 'STAT', options: [
+        ['力量(STR)', 'STR'], ['耐力(RES)', 'RES'], ['智力(INT)', 'INT'],
+      ]},
+      { type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_set_skill_range', message0: '%{BKY_CU_SET_SKILL_RANGE}',
+    args0: [
+      { type: 'field_dropdown', name: 'STAT', options: [
+        ['力量(STR)', 'STR'], ['耐力(RES)', 'RES'], ['智力(INT)', 'INT'],
+      ]},
+      { type: 'input_value', name: 'MIN', check: 'Number' },
+      { type: 'input_value', name: 'MAX', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+
   // ═══ Extended Body actions (green) ═══════════════════════════
   { type: 'cu_ragdoll', message0: '%{BKY_CU_RAGDOLL}', colour: C.BODY, previousStatement: null, nextStatement: null },
   { type: 'cu_jump', message0: '%{BKY_CU_JUMP}', colour: C.BODY, previousStatement: null, nextStatement: null },
@@ -1280,6 +1426,27 @@ const BLOCK_JSON: any[] = [
     args0: [
       { type: 'input_value', name: 'LIMB', check: 'Number' },
       { type: 'input_value', name: 'VALUE', check: 'Number' },
+    ],
+    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  // Generic limb property setter: a dropdown for which field to set + limb + value
+  {
+    type: 'cu_set_limb_property', message0: '%{BKY_CU_SET_LIMB_PROPERTY}',
+    args0: [
+      { type: 'field_searchable_dropdown', name: 'PROP', options: LIMB_PROP_OPTIONS, lang: 'zh' },
+      { type: 'input_value', name: 'LIMB', check: 'Number' },
+      { type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_set_limb_flag', message0: '%{BKY_CU_SET_LIMB_FLAG}',
+    args0: [
+      { type: 'field_searchable_dropdown', name: 'PROP', options: LIMB_BOOL_OPTIONS, lang: 'zh' },
+      { type: 'input_value', name: 'LIMB', check: 'Number' },
+      { type: 'field_dropdown', name: 'VALUE', options: [
+        ['真(true)', 'true'], ['假(false)', 'false'],
+      ]},
     ],
     colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
   },
@@ -1840,6 +2007,12 @@ const MSG_ZH: Record<string, string> = {
   CU_SET_SICKNESS: '设置生病值 %1',
   CU_SET_WETNESS: '设置湿度 %1',
   CU_SET_RADIATION: '设置辐射值 %1',
+  CU_SET_PLAYER_PROPERTY: '设置玩家属性 %1 为 %2',
+  CU_SET_PLAYER_FLAG: '设置玩家状态 %1 为 %2',
+  CU_SET_SKILL: '设置技能 %1 为 %2',
+  CU_SET_SKILL_RANGE: '设置技能 %1 经验范围 %2 到 %3',
+  CU_SET_LIMB_PROPERTY: '肢体 %2 的 %1 = %3',
+  CU_SET_LIMB_FLAG: '肢体 %2 的 %1 = %3',
   // Extended Body actions
   CU_RAGDOLL: '触发布娃娃',
   CU_JUMP: '跳跃',
@@ -2054,6 +2227,12 @@ const MSG_EN: Record<string, string> = {
   CU_SET_SICKNESS: 'set sickness %1',
   CU_SET_WETNESS: 'set wetness %1',
   CU_SET_RADIATION: 'set radiation %1',
+  CU_SET_PLAYER_PROPERTY: 'set player %1 to %2',
+  CU_SET_PLAYER_FLAG: 'set player %1 to %2',
+  CU_SET_SKILL: 'set skill %1 to %2',
+  CU_SET_SKILL_RANGE: 'set skill %1 experience range %2 to %3',
+  CU_SET_LIMB_PROPERTY: 'limb %2 %1 = %3',
+  CU_SET_LIMB_FLAG: 'limb %2 %1 = %3',
   // Extended Body actions
   CU_RAGDOLL: 'ragdoll',
   CU_JUMP: 'jump',
@@ -2265,6 +2444,12 @@ const MSG_RU: Record<string, string> = {
   CU_SET_SICKNESS: 'установить болезнь %1',
   CU_SET_WETNESS: 'установить влажность %1',
   CU_SET_RADIATION: 'установить радиацию %1',
+  CU_SET_PLAYER_PROPERTY: 'у игрока %1 = %2',
+  CU_SET_PLAYER_FLAG: 'у игрока %1 = %2',
+  CU_SET_SKILL: 'навык %1 = %2',
+  CU_SET_SKILL_RANGE: 'диапазон опыта навыка %1 от %2 до %3',
+  CU_SET_LIMB_PROPERTY: 'у конечности %2 %1 = %3',
+  CU_SET_LIMB_FLAG: 'у конечности %2 %1 = %3',
   CU_RAGDOLL: ' ragdoll',
   CU_JUMP: 'прыжок',
   CU_SWITCH_HANDS: 'поменять руки',
@@ -2828,7 +3013,7 @@ csharpGenerator.forBlock['cu_set_pain'] = (block, gen) => {
 };
 csharpGenerator.forBlock['cu_set_stress'] = (block, gen) => {
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `/* body.stress does not exist; use averagePain or another field */\n`;
+  return `body.averagePain = ${float(v)};\n`;
 };
 csharpGenerator.forBlock['cu_set_heart_rate'] = (block, gen) => {
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
@@ -3307,6 +3492,35 @@ csharpGenerator.forBlock['cu_set_radiation'] = (block, gen) => {
   return `body.radiationSickness = ${float(v)};\n`;
 };
 
+// ═══ Generic player property setters ═══════════════════════════
+const PLAYER_INT_FIELDS = new Set(['handSlot']);
+const LIMB_INT_FIELDS = new Set(['shrapnel']);
+
+csharpGenerator.forBlock['cu_set_player_property'] = (block, gen) => {
+  const f = block.getFieldValue('PROP');
+  const v = floatSuffix(gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0');
+  if (f === 'adrenaline') return `body.adrenaline = ${v}; body.curAdrenaline = ${v};\n`;
+  const rhs = PLAYER_INT_FIELDS.has(f) ? `(int)${v}` : v;
+  return `body.${f} = ${rhs};\n`;
+};
+csharpGenerator.forBlock['cu_set_player_flag'] = (block, gen) => {
+  const f = block.getFieldValue('PROP');
+  return `body.${f} = ${block.getFieldValue('VALUE') === 'true' ? 'true' : 'false'};\n`;
+};
+
+// ═══ Skill setters ═══════════════════════════════════════════
+csharpGenerator.forBlock['cu_set_skill'] = (block, gen) => {
+  const s = block.getFieldValue('STAT');
+  const v = floatSuffix(gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '10');
+  return `body.skills.${s} = (int)${v}; body.skills.UpdateExpBoundaries();\n`;
+};
+csharpGenerator.forBlock['cu_set_skill_range'] = (block, gen) => {
+  const s = block.getFieldValue('STAT');
+  const mn = floatSuffix(gen.valueToCode(block, 'MIN', ORDER_ATOMIC) || '1');
+  const mx = floatSuffix(gen.valueToCode(block, 'MAX', ORDER_ATOMIC) || '20');
+  return `body.skills.min${s} = (int)${mn}; body.skills.max${s} = (int)${mx};\n`;
+};
+
 // ═══ Extended Body actions ═══════════════════════════════════
 csharpGenerator.forBlock['cu_ragdoll'] = () => 'body.Ragdoll();\n';
 csharpGenerator.forBlock['cu_jump'] = () => 'body.Jump();\n';
@@ -3377,6 +3591,18 @@ csharpGenerator.forBlock['cu_set_limb_bleed'] = (block, gen) => {
   const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
   return `${limb}.bleedAmount = ${float(v)};\n`;
+};
+csharpGenerator.forBlock['cu_set_limb_property'] = (block, gen) => {
+  const f = block.getFieldValue('PROP');
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  const v = floatSuffix(gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0');
+  const rhs = LIMB_INT_FIELDS.has(f) ? `(int)${v}` : v;
+  return `${limb}.${f} = ${rhs};\n`;
+};
+csharpGenerator.forBlock['cu_set_limb_flag'] = (block, gen) => {
+  const f = block.getFieldValue('PROP');
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  return `${limb}.${f} = ${block.getFieldValue('VALUE') === 'true' ? 'true' : 'false'};\n`;
 };
 
 // ═══ Limb actions ═══════════════════════════════════════════
@@ -3882,6 +4108,12 @@ const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_item_magazine: { AMMO_TYPE: AMMO_TYPE_OPTIONS },
   cu_set_item_base_stats: { DECAY_ENABLED: DECAY_BOOL_OPTIONS },
   cu_number_compare: { OP: NUMBER_CMP_OPTIONS },
+  cu_set_player_property: { PROP: PLAYER_PROP_OPTIONS },
+  cu_set_player_flag: { PROP: PLAYER_BOOL_OPTIONS, VALUE: TRUE_FALSE_OPTIONS },
+  cu_set_limb_property: { PROP: LIMB_PROP_OPTIONS },
+  cu_set_limb_flag: { PROP: LIMB_BOOL_OPTIONS, VALUE: TRUE_FALSE_OPTIONS },
+  cu_set_skill: { STAT: SKILL_OPTIONS },
+  cu_set_skill_range: { STAT: SKILL_OPTIONS },
 };
 
 function dd(lang: string, opts: DdOption[]): [string, string][] {

@@ -252,6 +252,19 @@ const TOOLBOX = `
     <block type="cu_set_radiation">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
+    <block type="cu_set_player_property">
+      <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_set_player_flag">
+      <field name="VALUE">true</field>
+    </block>
+    <block type="cu_set_skill">
+      <value name="VALUE"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
+    </block>
+    <block type="cu_set_skill_range">
+      <value name="MIN"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="MAX"><shadow type="cu_number"><field name="NUM">20</field></shadow></value>
+    </block>
     <block type="cu_status_set">
       <value name="STATUS"><shadow type="cu_status_ref"><field name="ID">myStatus</field></shadow></value>
       <value name="LEVEL"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
@@ -273,6 +286,14 @@ const TOOLBOX = `
     <block type="cu_set_limb_bleed">
       <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_set_limb_property">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+      <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_set_limb_flag">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
+      <field name="VALUE">false</field>
     </block>
     <block type="cu_limb_break">
       <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
