@@ -230,6 +230,15 @@ const VANILLA_ITEMS: DdOption[] = [
   ['等离子切割器', 'Plasma Cutter', 'Plasma Cutter', 'plasmacutter'],
 ];
 
+const VANILLA_SOUNDS: DdOption[] = [
+  ['使用物品', 'use item', 'использовать предмет', 'useItem'],
+  ['咀嚼(食物)', 'eat (crunch)', 'есть (хруст)', 'eatCrunch'],
+  ['咀嚼(血肉)', 'eat (flesh)', 'есть (мясо)', 'eatFlesh'],
+  ['饮水', 'drink', 'пить', 'drink'],
+  ['合成', 'combine', 'соединить', 'combine'],
+  ['打击', 'hit', 'удар', 'hit'],
+];
+
 // Generic player property setter options: every public field on Body
 const PLAYER_PROP_OPTIONS: DdOption[] = [
   ['体力值(stamina)', 'Stamina (stamina)', 'Выносливость (stamina)', 'stamina'],
@@ -677,41 +686,16 @@ const BLOCK_JSON: any[] = [
     type: 'cu_play_sound',
     message0: '%{BKY_CU_PLAY_SOUND}',
     args0: [
-      { type: 'field_dropdown', name: 'SOUND', options: [
-        ['useItem','useItem'],['eatCrunch','eatCrunch'],['eatFlesh','eatFlesh'],
-        ['drink','drink'],['combine','combine'],['hit','hit'],
-      ]},
+      { type: 'input_value', name: 'SOUND', check: 'Sound' },
+      { type: 'input_value', name: 'VOLUME', check: 'Number', align: 'RIGHT' },
     ],
-    colour: C.SOUND, previousStatement: null, nextStatement: null,
+    colour: C.SOUND, previousStatement: null, nextStatement: null, inputsInline: true,
   },
   {
     type: 'cu_play_sound_at',
     message0: '%{BKY_CU_PLAY_SOUND_AT}',
     args0: [
-      { type: 'field_dropdown', name: 'SOUND', options: [
-        ['useItem','useItem'],['eatCrunch','eatCrunch'],['eatFlesh','eatFlesh'],
-        ['drink','drink'],['combine','combine'],['hit','hit'],
-      ]},
-      { type: 'input_value', name: 'X', check: 'Number', align: 'RIGHT' },
-      { type: 'input_value', name: 'Y', check: 'Number', align: 'RIGHT' },
-      { type: 'input_value', name: 'VOLUME', check: 'Number', align: 'RIGHT' },
-    ],
-    colour: C.SOUND, previousStatement: null, nextStatement: null, inputsInline: true,
-  },
-  {
-    type: 'cu_play_sound_file',
-    message0: '%{BKY_CU_PLAY_SOUND_FILE}',
-    args0: [
-      { type: 'field_input', name: 'FILE', text: 'sound.wav' },
-      { type: 'input_value', name: 'VOLUME', check: 'Number', align: 'RIGHT' },
-    ],
-    colour: C.SOUND, previousStatement: null, nextStatement: null, inputsInline: true,
-  },
-  {
-    type: 'cu_play_sound_file_at',
-    message0: '%{BKY_CU_PLAY_SOUND_FILE_AT}',
-    args0: [
-      { type: 'field_input', name: 'FILE', text: 'sound.wav' },
+      { type: 'input_value', name: 'SOUND', check: 'Sound' },
       { type: 'input_value', name: 'X', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'Y', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'VOLUME', check: 'Number', align: 'RIGHT' },
@@ -781,6 +765,22 @@ const BLOCK_JSON: any[] = [
       { type: 'field_searchable_dropdown', name: 'ID', options: VANILLA_ITEMS, lang: 'zh' },
     ],
     output: 'Item', colour: C.VALUE,
+  },
+  {
+    type: 'cu_sound_vanilla',
+    message0: '%{BKY_CU_SOUND_VANILLA} %1',
+    args0: [
+      { type: 'field_searchable_dropdown', name: 'ID', options: VANILLA_SOUNDS, lang: 'zh' },
+    ],
+    output: 'Sound', colour: C.VALUE,
+  },
+  {
+    type: 'cu_sound_custom',
+    message0: '%{BKY_CU_SOUND_CUSTOM} %1',
+    args0: [
+      { type: 'field_input', name: 'FILE', text: 'sound.wav' },
+    ],
+    output: 'Sound', colour: C.VALUE,
   },
   { type: 'cu_happiness', message0: '%{BKY_CU_HAPPINESS}', output: 'Number', colour: C.VALUE },
   { type: 'cu_temperature', message0: '%{BKY_CU_TEMPERATURE}', output: 'Number', colour: C.VALUE },
@@ -2391,7 +2391,7 @@ const MSG_ZH: Record<string, string> = {
   CU_ITEM_SET_VALUE: '设置 %1 物品价值 %2',
   CU_ITEM_SET_DECAY: '设置 %1 腐烂时间 %2',
   CU_ITEM_SET_SLOT_ROTATION: '设置 %1 插槽旋转 %2',
-  CU_PLAY_SOUND: '播放音效 %1',
+  CU_PLAY_SOUND: '播放音效 %1 音量%2',
   CU_PLAY_SOUND_AT: '播放音效 %1 位置(%2,%3) 音量%4',
   CU_IF: '如果 %1 那么',
   CU_ELSE: '否则',
@@ -2466,6 +2466,8 @@ const MSG_ZH: Record<string, string> = {
   CU_ITEM_IS_IN_INVENTORY: '物品是否在背包中',
   CU_ITEM_CUSTOM: '自定义物品',
   CU_ITEM_VANILLA: '物品',
+  CU_SOUND_CUSTOM: '自定义音效',
+  CU_SOUND_VANILLA: '音效',
   CU_LIMB_INDEX: '肢体',
   // Extended Body getters
   CU_PLAYER_ENERGY: '精力',
@@ -2600,8 +2602,6 @@ const MSG_ZH: Record<string, string> = {
   CU_STOP_BODY_ANIMATION: '在 %1 上停止动画',
   CU_REGISTER_CONSOLE_COMMAND: '控制台命令 %1（%2）参数 %3 -> %4',
   CU_CONSOLE_ARG: '命令参数 %1',
-  CU_PLAY_SOUND_FILE: '播放音效 %1 音量 %2',
-  CU_PLAY_SOUND_FILE_AT: '播放音效 %1 在 (%2,%3) 音量 %4',
   CU_SET_VELOCITY: '设置速度(%1,%2)',
   CU_ADD_VELOCITY: '增加速度(%1,%2)',
   CU_MAKE_SPRITE: '切分 %1（%2×%3 网格）第 %4 帧 PPU %5',
@@ -2645,7 +2645,7 @@ const MSG_EN: Record<string, string> = {
   CU_ITEM_SET_VALUE: 'set %1 item value %2',
   CU_ITEM_SET_DECAY: 'set %1 decay minutes %2',
   CU_ITEM_SET_SLOT_ROTATION: 'set %1 slot rotation %2',
-  CU_PLAY_SOUND: 'play sound %1',
+  CU_PLAY_SOUND: 'play sound %1 volume %2',
   CU_PLAY_SOUND_AT: 'play sound %1 at(%2,%3) vol%4',
   CU_IF: 'if %1 then',
   CU_ELSE: 'else',
@@ -2720,6 +2720,8 @@ const MSG_EN: Record<string, string> = {
   CU_ITEM_IS_IN_INVENTORY: 'is item in inventory',
   CU_ITEM_CUSTOM: 'custom item',
   CU_ITEM_VANILLA: 'item',
+  CU_SOUND_CUSTOM: 'custom sound',
+  CU_SOUND_VANILLA: 'sound',
   CU_LIMB_INDEX: 'limb',
   // Extended Body getters
   CU_PLAYER_ENERGY: 'energy',
@@ -2854,8 +2856,6 @@ const MSG_EN: Record<string, string> = {
   CU_STOP_BODY_ANIMATION: 'stop animation on %1',
   CU_REGISTER_CONSOLE_COMMAND: 'console command %1 (%2) args %3 -> %4',
   CU_CONSOLE_ARG: 'command arg %1',
-  CU_PLAY_SOUND_FILE: 'play sound %1 volume %2',
-  CU_PLAY_SOUND_FILE_AT: 'play sound %1 at (%2,%3) volume %4',
   CU_SET_VELOCITY: 'set velocity (%1,%2)',
   CU_ADD_VELOCITY: 'add velocity (%1,%2)',
   CU_MAKE_SPRITE: 'slice %1 (%2x%3 grid) frame %4 ppu %5',
@@ -2899,7 +2899,7 @@ const MSG_RU: Record<string, string> = {
   CU_ITEM_SET_VALUE: 'установить %1 стоимость %2',
   CU_ITEM_SET_DECAY: 'установить %1 гниение минут %2',
   CU_ITEM_SET_SLOT_ROTATION: 'установить %1 поворот слота %2',
-  CU_PLAY_SOUND: 'воспроизвести звук %1',
+  CU_PLAY_SOUND: 'воспроизвести звук %1 громкость %2',
   CU_PLAY_SOUND_AT: 'воспроизвести звук %1 поз(%2,%3) громк%4',
   CU_IF: 'если %1 то',
   CU_ELSE: 'иначе',
@@ -2974,6 +2974,8 @@ const MSG_RU: Record<string, string> = {
   CU_ITEM_IS_IN_INVENTORY: 'предмет в инвентаре',
   CU_ITEM_CUSTOM: 'свой предмет',
   CU_ITEM_VANILLA: 'предмет',
+  CU_SOUND_CUSTOM: 'свой звук',
+  CU_SOUND_VANILLA: 'звук',
   CU_LIMB_INDEX: 'конечность',
   CU_PLAYER_ENERGY: 'энергия',
   CU_PLAYER_BRAIN_HEALTH: 'целостность мозга',
@@ -3099,8 +3101,6 @@ const MSG_RU: Record<string, string> = {
   CU_STOP_BODY_ANIMATION: 'остановить анимацию на %1',
   CU_REGISTER_CONSOLE_COMMAND: 'консольная команда %1 (%2), аргументы %3 -> %4',
   CU_CONSOLE_ARG: 'аргумент команды %1',
-  CU_PLAY_SOUND_FILE: 'воспроизвести звук %1 громкость %2',
-  CU_PLAY_SOUND_FILE_AT: 'воспроизвести звук %1 в (%2,%3) громкость %4',
   CU_SET_VELOCITY: 'установить скорость (%1,%2)',
   CU_ADD_VELOCITY: 'добавить скорость (%1,%2)',
   CU_MAKE_SPRITE: 'разрезать %1 (%2x%3) кадр %4 PPU %5',
@@ -3368,7 +3368,7 @@ export function createSpriteBlock(assetName: string, ws: Blockly.WorkspaceSvg) {
 }
 
 export function createSoundBlock(assetName: string, ws: Blockly.WorkspaceSvg) {
-  createBlockAtCenter('cu_play_sound_file', { FILE: assetName }, ws);
+  createBlockAtCenter('cu_sound_custom', { FILE: assetName }, ws);
 }
 
 function createBlockAtCenter(type: string, fields: Record<string, string>, ws: Blockly.WorkspaceSvg) {
@@ -3657,29 +3657,32 @@ csharpGenerator.forBlock['cu_item_set_slot_rotation'] = (block, gen) => {
 };
 
 // Sound
-csharpGenerator.forBlock['cu_play_sound'] = (block) => {
-  const s = block.getFieldValue('SOUND');
-  return `Sound.Play("${s}", body.transform.position);\n`;
-};
-csharpGenerator.forBlock['cu_play_sound_at'] = (block, gen) => {
-  const s = block.getFieldValue('SOUND');
-  const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
-  const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
-  const vol = gen.valueToCode(block, 'VOLUME', ORDER_ATOMIC) || '1';
-  return `Sound.Play("${s}", new Vector3(${floatSuffix(x)}, ${floatSuffix(y)}, 0f), twoDimensional: false, pitchShift: false, null, ${floatSuffix(float(vol))});\n`;
-};
-csharpGenerator.forBlock['cu_play_sound_file'] = (block, gen) => {
-  const f = q(block.getFieldValue('FILE') || '');
-  const vol = gen.valueToCode(block, 'VOLUME', ORDER_ATOMIC) || '1';
-  return `CUCoreUtils.PlaySoundAt(AssetLoader.LoadEmbeddedAudio("${f}"), volume: ${floatSuffix(float(vol))});\n`;
-};
-csharpGenerator.forBlock['cu_play_sound_file_at'] = (block, gen) => {
-  const f = q(block.getFieldValue('FILE') || '');
-  const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
-  const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
-  const vol = gen.valueToCode(block, 'VOLUME', ORDER_ATOMIC) || '1';
-  return `CUCoreUtils.PlaySoundAt(AssetLoader.LoadEmbeddedAudio("${f}"), volume: ${floatSuffix(float(vol))}, position: new Vector2(${floatSuffix(x)}, ${floatSuffix(y)}));\n`;
-};
+csharpGenerator.forBlock['cu_sound_vanilla'] = (block) => [`"${block.getFieldValue('ID')}"`, ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_sound_custom'] = (block) => [`"${block.getFieldValue('FILE')}"`, ORDER_ATOMIC];
+
+function soundInput(block: any, gen: any): string {
+  return gen.valueToCode(block, 'SOUND', ORDER_ATOMIC);
+}
+function isCustomSound(block: any): boolean {
+  return block.getInputTargetBlock ? block.getInputTargetBlock('SOUND')?.type === 'cu_sound_custom' : false;
+}
+function soundCall(block: any, gen: any, x: string, y: string, vol: string): string {
+  const s = soundInput(block, gen) || '"useItem"';
+  if (isCustomSound(block)) {
+    if (x) return `CUCoreUtils.PlaySoundAt(AssetLoader.LoadEmbeddedAudio(${s}), null, null, new Vector3(${x}, ${y}, 0f), null);\n`;
+    return `CUCoreUtils.PlaySoundAt(AssetLoader.LoadEmbeddedAudio(${s}), volume: ${vol});\n`;
+  }
+  if (x) return `Sound.Play(${s}, new Vector3(${x}, ${y}, 0f), false, false, null, ${vol});\n`;
+  return `Sound.Play(${s}, body.transform.position);\n`;
+}
+
+csharpGenerator.forBlock['cu_play_sound'] = (block, gen) =>
+  soundCall(block, gen, '', '', floatSuffix(gen.valueToCode(block, 'VOLUME', ORDER_ATOMIC) || '1'));
+csharpGenerator.forBlock['cu_play_sound_at'] = (block, gen) =>
+  soundCall(block, gen,
+    floatSuffix(gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0'),
+    floatSuffix(gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0'),
+    floatSuffix(gen.valueToCode(block, 'VOLUME', ORDER_ATOMIC) || '1'));
 
 // Flow
 csharpGenerator.forBlock['cu_if'] = (block, gen) => {
@@ -4963,6 +4966,7 @@ const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_limb_index: { LIMB: LIMB_OPTIONS },
   cu_item_wearable: { WEAR_LIMB: WEAR_LIMB_OPTIONS },
   cu_item_vanilla: { ID: VANILLA_ITEMS },
+  cu_sound_vanilla: { ID: VANILLA_SOUNDS },
   cu_register_status: { TYPE: STATUS_TYPE_OPTIONS },
   cu_status_get: { FIELD: STATUS_FIELD_OPTIONS },
   cu_define_function: { RETURN_TYPE: RETURN_TYPE_OPTIONS },

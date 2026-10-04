@@ -381,16 +381,12 @@ const TOOLBOX = `
     </block>
   </category>
   <category name="%{BKY_CAT_SOUND}" colour="#9c27b0">
-    <block type="cu_play_sound"></block>
+    <block type="cu_play_sound">
+      <value name="SOUND"><shadow type="cu_sound_vanilla"><field name="ID">hit</field></shadow></value>
+      <value name="VOLUME"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+    </block>
     <block type="cu_play_sound_at">
-      <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
-      <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
-      <value name="VOLUME"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
-    </block>
-    <block type="cu_play_sound_file">
-      <value name="VOLUME"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
-    </block>
-    <block type="cu_play_sound_file_at">
+      <value name="SOUND"><shadow type="cu_sound_vanilla"><field name="ID">hit</field></shadow></value>
       <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
       <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
       <value name="VOLUME"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
@@ -503,6 +499,8 @@ const TOOLBOX = `
     <block type="cu_text"></block>
     <block type="cu_item_custom"></block>
     <block type="cu_item_vanilla"></block>
+    <block type="cu_sound_vanilla"></block>
+    <block type="cu_sound_custom"></block>
     <block type="cu_var_get"></block>
     <sep></sep>
     <block type="cu_happiness"></block>
