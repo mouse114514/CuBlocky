@@ -46,19 +46,60 @@ jobs:
       - name: Package release
         shell: pwsh
         run: |
-          $tag = "N-${{ steps.sha.outputs.short }}"
-          $publishDir = "server/bin/Release/net9.0/win-x64/publish"
-          $zipFile = "CuBlocky-$tag.zip"
+          $ErrorActionPreference = 'Stop'
 
-          # Copy extra files into publish dir
-          Copy-Item "Launch.ps1" "$publishDir/"
-          Copy-Item "README.md" "$publishDir/"
-
-          Compress-Archive -Path "$publishDir/*" -DestinationPath $zipFile -Force
-
-          # Create release
           $token = "${{ secrets.GITHUB_TOKEN }}"
           $headers = @{ Authorization = "Bearer $token"; "Accept" = "application/vnd.github+json" }
+          $repo = "${{ github.repository }}"
+          $tag = "N-${{ steps.sha.outputs.short }}"
+          $zipFile = "CuBlocky-$tag.zip"
+          $publishDir = "server/bin/Release/net9.0/win-x64/publish"
+
+          if (-not (Test-Path $publishDir)) {
+            Write-Host "Publish dir not found: $publishDir"
+            Get-ChildItem "server/bin/Release" -Recurse -Directory | ForEach-Object { Write-Host $_.FullName }
+            exit 1
+          }
+
+          $missing = @('Launch.cmd', 'README.md')
+          foreach ($f in $missing) {
+            if (-not (Test-Path $f)) {
+              Write-Host "Required file for the zip is missing: $f"
+              exit 1
+            }
+          }
+
+          # A release for this exact SHA means this commit is already published.
+          $existing = $null
+          try {
+            $existing = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases/tags/$tag" -Headers $headers
+          } catch {
+            $code = $null
+            try { $code = [int]$_.Exception.Response.StatusCode } catch { }
+            if ($code -ne 404) { throw }
+          }
+          if ($existing) {
+            $have = $false
+            foreach ($a in $existing.assets) { if ($a.name -eq $zipFile) { $have = $true } }
+            if ($have) {
+              Write-Host "Release $tag already has $zipFile, nothing to do."
+              exit 0
+            }
+            Write-Host "Release $tag exists but the asset is missing."
+          }
+
+          Copy-Item "Launch.cmd" "$publishDir/"
+          Copy-Item "README.md" "$publishDir/"
+          Compress-Archive -Path "$publishDir/*" -DestinationPath $zipFile -Force
+
+          $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path $zipFile).Path)
+
+          if ($existing) {
+            $uploadUrl = $existing.upload_url -replace "\{\?name,label\}", "?name=$zipFile"
+            Invoke-RestMethod -Uri $uploadUrl -Method Post -Headers $headers -ContentType "application/zip" -Body $bytes
+            Write-Host "Uploaded $zipFile to existing release $tag"
+            exit 0
+          }
 
           $body = @{
             tag_name    = $tag
@@ -67,13 +108,10 @@ jobs:
             body        = "This is a night build version, which may be somewhat unstable and has not been fully tested. You can try out the latest exciting features."
           } | ConvertTo-Json
 
-          $release = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" `
+          $release = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases" `
             -Method Post -Headers $headers -ContentType "application/json" -Body $body
 
           $uploadUrl = $release.upload_url -replace "\{\?name,label\}", "?name=$zipFile"
-          $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path $zipFile).Path)
-
-          Invoke-RestMethod -Uri $uploadUrl -Method Post `
-            -Headers $headers -ContentType "application/zip" -Body $bytes
+          Invoke-RestMethod -Uri $uploadUrl -Method Post -Headers $headers -ContentType "application/zip" -Body $bytes
 
           Write-Host "Published $tag (release id: $($release.id))"
