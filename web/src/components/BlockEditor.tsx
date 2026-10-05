@@ -396,7 +396,7 @@ const TOOLBOX = `
       <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
       <value name="VOLUME"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
     </block>
-    <block type="cu_play_sound_music">
+    <block type="cu_play_sound_2d">
       <value name="SOUND"><shadow type="cu_sound_vanilla"><field name="ID">beep</field></shadow></value>
       <value name="VOLUME"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
     </block>
