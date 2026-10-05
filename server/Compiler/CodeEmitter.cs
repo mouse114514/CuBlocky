@@ -48,30 +48,237 @@ public static class CodeEmitter
         sb.AppendLine("            _spriteLog.AppendLine(\"  -> result=\" + (sprite != null ? \"OK\" : \"NULL\"));");
         sb.AppendLine("            return sprite;");
         sb.AppendLine("        }");
-        sb.AppendLine("        private static readonly System.Collections.Generic.HashSet<string> _audioReported = new System.Collections.Generic.HashSet<string>();");
-        sb.AppendLine("        private static AudioClip _loadAudio(string name)");
-        sb.AppendLine("        {");
-        sb.AppendLine("            var asm = typeof(RegisterContent).Assembly;");
-        sb.AppendLine("            var names = asm.GetManifestResourceNames();");
-        sb.AppendLine("            bool found = names.Any(n => n.EndsWith(name) || n.Contains(name));");
-        sb.AppendLine("            _spriteLog.AppendLine(\"Audio '\" + name + \"' -> embedded=\" + found + \" resources=[\" + string.Join(\",\", names) + \"]\");");
-        sb.AppendLine("            var clip = AssetLoader.LoadEmbeddedAudio(name);");
-        sb.AppendLine("            if (clip == null)");
-        sb.AppendLine("            {");
-        sb.AppendLine("                Plugin.Logger.LogWarning(\"[CuBlocky] embedded audio '\" + name + \"' not found (embedded=\" + found + \")\");");
-        sb.AppendLine("                _spriteLog.AppendLine(\"  -> result=NULL\");");
-        sb.AppendLine("                return null;");
-        sb.AppendLine("            }");
-        sb.AppendLine("            if (_audioReported.Add(name))");
-        sb.AppendLine("            {");
-        sb.AppendLine("                if (clip.samples <= 0)");
-        sb.AppendLine("                    Plugin.Logger.LogError(\"[CuBlocky] audio '\" + name + \"' came back EMPTY (samples=0): it decoded fine but Unity refused to hold it as a non-streamed AudioClip, so it plays silently. Use a shorter/smaller file.\");");
-        sb.AppendLine("                else");
-        sb.AppendLine("                    Plugin.Logger.LogInfo(\"[CuBlocky] audio '\" + name + \"' loaded: \" + clip.samples + \" samples, \" + clip.channels + \"ch, \" + clip.frequency + \"Hz, \" + clip.length + \"s\");");
-        sb.AppendLine("            }");
-        sb.AppendLine("            _spriteLog.AppendLine(\"  -> result=OK samples=\" + clip.samples);");
-        sb.AppendLine("            return clip;");
-        sb.AppendLine("        }");
+        sb.Append("""
+        private static readonly System.Collections.Generic.HashSet<string> _audioReported = new System.Collections.Generic.HashSet<string>();
+        private static readonly System.Collections.Generic.Dictionary<string, UnityEngine.AudioClip> _audioCache = new System.Collections.Generic.Dictionary<string, UnityEngine.AudioClip>();
+        private static readonly System.Collections.Generic.Dictionary<string, WavStream> _wavCache = new System.Collections.Generic.Dictionary<string, WavStream>();
+
+        private sealed class WavStream
+        {
+            public byte[] Pcm;
+            public int DataOffset;
+            public int Channels;
+            public int BitsPerSample;
+            public int SampleRate;
+            public bool IsFloat;
+            public int SamplesPerChannel;
+            public int Position;
+
+            public float ReadSample(int frame, int channel)
+            {
+                if (frame < 0 || frame >= SamplesPerChannel || channel < 0 || channel >= Channels) return 0f;
+                int bps = BitsPerSample >> 3;
+                int so = DataOffset + (frame * Channels + channel) * bps;
+                if (so < 0 || so + bps > Pcm.Length) return 0f;
+                switch (BitsPerSample)
+                {
+                    case 8:
+                        return (Pcm[so] - 128) / 128f;
+                    case 16:
+                        return System.BitConverter.ToInt16(Pcm, so) / 32768f;
+                    case 24:
+                    {
+                        int v = Pcm[so] | (Pcm[so + 1] << 8) | (Pcm[so + 2] << 16);
+                        if ((v & 0x00800000) != 0) v |= unchecked((int)0xFF000000);
+                        return v / 8388608f;
+                    }
+                    case 32:
+                        if (IsFloat) return System.BitConverter.ToSingle(Pcm, so);
+                        return System.BitConverter.ToInt32(Pcm, so) / 2147483648f;
+                    default:
+                        return 0f;
+                }
+            }
+
+            public void FillData(float[] data)
+            {
+                int frames = data.Length / Channels;
+                int written = 0;
+                for (int i = 0; i < frames; i++)
+                {
+                    int at = Position + i;
+                    if (at >= SamplesPerChannel) break;
+                    for (int c = 0; c < Channels; c++)
+                        data[i * Channels + c] = ReadSample(at, c);
+                    written = i + 1;
+                }
+                for (int i = written; i < frames; i++)
+                {
+                    for (int c = 0; c < Channels; c++)
+                        data[i * Channels + c] = 0f;
+                }
+                Position += frames;
+            }
+
+            public void SetPosition(int pos)
+            {
+                if (pos < 0) pos = 0;
+                if (Channels > 1 && pos >= SamplesPerChannel * Channels) pos /= Channels;
+                if (pos > SamplesPerChannel) pos = SamplesPerChannel;
+                Position = pos;
+            }
+        }
+
+        private static WavStream _parseWav(System.IO.Stream stream)
+        {
+            using (var ms = new System.IO.MemoryStream())
+            {
+                stream.CopyTo(ms);
+                byte[] b = ms.ToArray();
+                if (b.Length < 12 || b[0] != (byte)'R' || b[1] != (byte)'I' || b[2] != (byte)'F' || b[3] != (byte)'F' ||
+                    b[8] != (byte)'W' || b[9] != (byte)'A' || b[10] != (byte)'V' || b[11] != (byte)'E')
+                    throw new System.IO.InvalidDataException("not a RIFF/WAVE file");
+                int code = 0;
+                int channels = 0;
+                int rate = 0;
+                int bits = 0;
+                bool isFloat = false;
+                int dataOffset = -1;
+                int dataSize = 0;
+                int p = 12;
+                while (p + 8 <= b.Length)
+                {
+                    string id = System.Text.Encoding.ASCII.GetString(b, p, 4);
+                    int sz = b[p + 4] | (b[p + 5] << 8) | (b[p + 6] << 16) | (b[p + 7] << 24);
+                    int body = p + 8;
+                    if (id == "fmt " && body + 16 <= b.Length)
+                    {
+                        code = b[body] | (b[body + 1] << 8);
+                        channels = b[body + 2] | (b[body + 3] << 8);
+                        rate = b[body + 4] | (b[body + 5] << 8) | (b[body + 6] << 16) | (b[body + 7] << 24);
+                        bits = b[body + 14] | (b[body + 15] << 8);
+                        if (code == 3) isFloat = true;
+                        if (code == 0xFFFE && body + 26 <= b.Length)
+                        {
+                            bits = b[body + 18] | (b[body + 19] << 8);
+                            isFloat = b[body + 24] == 3;
+                        }
+                    }
+                    else if (id == "data")
+                    {
+                        dataOffset = body;
+                        dataSize = sz;
+                        break;
+                    }
+                    int next = body + sz;
+                    if (sz < 0 || next > b.Length) break;
+                    p = next + (sz & 1);
+                }
+                if (code != 1 && code != 3 && code != 0xFFFE)
+                    throw new System.IO.InvalidDataException("unsupported WAV format code " + code);
+                if (channels <= 0 || rate <= 0 || bits <= 0 || dataOffset < 0 || dataOffset > b.Length)
+                    throw new System.IO.InvalidDataException("malformed WAV header");
+                if (isFloat && bits != 32)
+                    throw new System.IO.InvalidDataException("only 32-bit IEEE float PCM is supported");
+                if (!isFloat && bits != 8 && bits != 16 && bits != 24 && bits != 32)
+                    throw new System.IO.InvalidDataException("unsupported bit depth " + bits);
+                int avail = System.Math.Min(dataSize, b.Length - dataOffset);
+                int block = channels * (bits >> 3);
+                return new WavStream
+                {
+                    Pcm = b,
+                    DataOffset = dataOffset,
+                    Channels = channels,
+                    BitsPerSample = bits,
+                    SampleRate = rate,
+                    IsFloat = isFloat,
+                    SamplesPerChannel = avail / block
+                };
+            }
+        }
+
+        private static WavStream _findWav(string name)
+        {
+            var asm = typeof(RegisterContent).Assembly;
+            var res = asm.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith(name) || n.Contains(name));
+            if (res == null) return null;
+            using (var s = asm.GetManifestResourceStream(res))
+            {
+                if (s == null) return null;
+                return _parseWav(s);
+            }
+        }
+
+        private static UnityEngine.AudioClip _loadAudioStreaming(string name)
+        {
+            if (!_wavCache.TryGetValue(name, out var w))
+            {
+                w = _findWav(name);
+                if (w == null || w.SamplesPerChannel <= 0) return null;
+                _wavCache[name] = w;
+            }
+            var tries = new System.Collections.Generic.List<int>();
+            tries.Add(w.SamplesPerChannel);
+            int s30 = w.SampleRate * 30;
+            int s10 = w.SampleRate * 10;
+            if (s30 < w.SamplesPerChannel) tries.Add(s30);
+            if (s10 < s30) tries.Add(s10);
+            foreach (int len in tries)
+            {
+                if (len <= 0) continue;
+                UnityEngine.AudioClip clip = UnityEngine.AudioClip.Create("cu_" + name, len, w.Channels, w.SampleRate, true,
+                    d => w.FillData(d), pos => w.SetPosition(pos));
+                if (clip == null)
+                    clip = UnityEngine.AudioClip.Create("cu_" + name, len, w.Channels, w.SampleRate, false,
+                        d => w.FillData(d), pos => w.SetPosition(pos));
+                if (clip != null)
+                {
+                    if (len < w.SamplesPerChannel)
+                        Plugin.Logger.LogWarning("[CuBlocky] audio '" + name + "' exceeds the runtime clip limit - truncated to " + (len / w.SampleRate) + "s of " + (w.SamplesPerChannel / w.SampleRate) + "s.");
+                    return clip;
+                }
+            }
+            return null;
+        }
+
+        private static UnityEngine.AudioClip _loadAudio(string name)
+        {
+            if (_audioCache.TryGetValue(name, out var cached)) return cached;
+            var asm = typeof(RegisterContent).Assembly;
+            var names = asm.GetManifestResourceNames();
+            bool found = names.Any(n => n.EndsWith(name) || n.Contains(name));
+            _spriteLog.AppendLine("Audio '" + name + "' -> embedded=" + found + " resources=[" + string.Join(",", names) + "]");
+            UnityEngine.AudioClip clip = null;
+            bool streamed = false;
+            try
+            {
+                clip = _loadAudioStreaming(name);
+                streamed = clip != null;
+                if (streamed) _spriteLog.AppendLine("  streaming clip ok");
+            }
+            catch (System.Exception ex)
+            {
+                _spriteLog.AppendLine("  streaming threw " + ex.GetType().Name + ": " + ex.Message);
+            }
+            if (clip == null)
+            {
+                try
+                {
+                    clip = AssetLoader.LoadEmbeddedAudio(name);
+                }
+                catch (System.Exception ex)
+                {
+                    _spriteLog.AppendLine("  CCL threw " + ex.GetType().Name + ": " + ex.Message);
+                }
+            }
+            if (clip == null)
+            {
+                Plugin.Logger.LogWarning("[CuBlocky] embedded audio '" + name + "' not found or unreadable (embedded=" + found + ")");
+                _spriteLog.AppendLine("  -> result=NULL");
+                return null;
+            }
+            if (_audioReported.Add(name))
+            {
+                if (clip.samples <= 0 && !streamed)
+                    Plugin.Logger.LogError("[CuBlocky] audio '" + name + "' came back EMPTY (samples=0).");
+                else
+                    Plugin.Logger.LogInfo("[CuBlocky] audio '" + name + "' loaded: " + clip.samples + " samples, " + clip.channels + "ch, " + clip.frequency + "Hz, " + clip.length + "s");
+            }
+            _spriteLog.AppendLine("  -> result=OK samples=" + clip.samples);
+            _audioCache[name] = clip;
+            return clip;
+        }
+""");
         sb.AppendLine("        private static Sprite LoadSprite(string name) => _loadSprite(name);");
         sb.AppendLine("        public static AudioClip LoadAudio(string name) => _loadAudio(name);");
         sb.AppendLine("        private static void DumpSpriteLog()");

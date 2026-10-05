@@ -291,6 +291,55 @@ app.MapPost("/api/build", async (HttpRequest req) =>
             }
         }
 
+        // Warn about WAVs longer than the runtime clip cap: the generated loader still plays them
+        // by streaming, but Unity caps the clip length, so anything past 30s is cut off silently.
+        var audioDir = Path.Combine(buildDir, "Audio");
+        if (Directory.Exists(audioDir))
+        {
+            foreach (var file in Directory.EnumerateFiles(audioDir, "*", SearchOption.AllDirectories))
+            {
+                if (Path.GetExtension(file).ToLowerInvariant() != ".wav") continue;
+                try
+                {
+                    byte[] b = File.ReadAllBytes(file);
+                    int rate = 0, channels = 0, bits = 0, dataOffset = -1, dataSize = 0, p = 12;
+                    if (b.Length >= 12 && b[0] == (byte)'R' && b[1] == (byte)'I' && b[2] == (byte)'F' && b[3] == (byte)'F')
+                    {
+                        while (p + 8 <= b.Length)
+                        {
+                            string id = System.Text.Encoding.ASCII.GetString(b, p, 4);
+                            int sz = b[p + 4] | (b[p + 5] << 8) | (b[p + 6] << 16) | (b[p + 7] << 24);
+                            int body = p + 8;
+                            if (id == "fmt " && body + 16 <= b.Length)
+                            {
+                                channels = b[body + 2] | (b[body + 3] << 8);
+                                rate = b[body + 4] | (b[body + 5] << 8) | (b[body + 6] << 16) | (b[body + 7] << 24);
+                                bits = b[body + 14] | (b[body + 15] << 8);
+                            }
+                            else if (id == "data")
+                            {
+                                dataOffset = body;
+                                dataSize = sz;
+                                break;
+                            }
+                            p = body + sz + (sz & 1);
+                        }
+                    }
+                    if (channels > 0 && rate > 0 && bits > 0 && dataOffset >= 0)
+                    {
+                        int avail = Math.Min(dataSize, b.Length - dataOffset);
+                        double secs = (double)avail / (channels * (bits / 8)) / rate;
+                        if (secs > 30.0)
+                            Console.WriteLine($"[Build] WARNING: audio '{Path.GetFileName(file)}' is {secs:F1}s long - Unity caps AudioClip length, so only the first 30s will be heard. Shorten the file.");
+                    }
+                }
+                catch
+                {
+                    // unreadable WAV: nothing to warn about
+                }
+            }
+        }
+
         // Patch .csproj to embed sprite resources
         Console.WriteLine($"[Build] spriteFiles count={spriteFiles.Count}");
         if (spriteFiles.Count > 0)
