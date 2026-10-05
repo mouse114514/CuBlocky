@@ -722,6 +722,15 @@ const BLOCK_JSON: any[] = [
     ],
     colour: C.SOUND, previousStatement: null, nextStatement: null, inputsInline: true,
   },
+  {
+    type: 'cu_play_sound_music',
+    message0: '%{BKY_CU_PLAY_SOUND_MUSIC}',
+    args0: [
+      { type: 'input_value', name: 'SOUND', check: 'Sound' },
+      { type: 'input_value', name: 'VOLUME', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.SOUND, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
 
   // ═══ Flow (deep orange) ══════════════════════════════════════
   {
@@ -2401,6 +2410,7 @@ const MSG_ZH: Record<string, string> = {
   CU_ITEM_SET_SLOT_ROTATION: '设置 %1 插槽旋转 %2',
   CU_PLAY_SOUND: '播放音效 %1 音量%2',
   CU_PLAY_SOUND_AT: '播放音效 %1 位置(%2,%3) 音量%4',
+  CU_PLAY_SOUND_MUSIC: '播放背景音乐 %1 音量%2',
   CU_IF: '如果 %1 那么',
   CU_ELSE: '否则',
   CU_REPEAT: '重复 %1 次',
@@ -2659,6 +2669,7 @@ const MSG_EN: Record<string, string> = {
   CU_ITEM_SET_SLOT_ROTATION: 'set %1 slot rotation %2',
   CU_PLAY_SOUND: 'play sound %1 volume %2',
   CU_PLAY_SOUND_AT: 'play sound %1 at(%2,%3) vol%4',
+  CU_PLAY_SOUND_MUSIC: 'play music %1 volume %2',
   CU_IF: 'if %1 then',
   CU_ELSE: 'else',
   CU_REPEAT: 'repeat %1 times',
@@ -2913,6 +2924,7 @@ const MSG_RU: Record<string, string> = {
   CU_ITEM_SET_SLOT_ROTATION: 'установить %1 поворот слота %2',
   CU_PLAY_SOUND: 'воспроизвести звук %1 громкость %2',
   CU_PLAY_SOUND_AT: 'воспроизвести звук %1 поз(%2,%3) громк%4',
+  CU_PLAY_SOUND_MUSIC: 'воспроизвести музыку %1 громкость %2',
   CU_IF: 'если %1 то',
   CU_ELSE: 'иначе',
   CU_REPEAT: 'повторить %1 раз',
@@ -3695,6 +3707,16 @@ csharpGenerator.forBlock['cu_play_sound_at'] = (block, gen) =>
     floatSuffix(gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0'),
     floatSuffix(gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0'),
     floatSuffix(gen.valueToCode(block, 'VOLUME', ORDER_ATOMIC) || '1'));
+
+// Non-positional: spatialBlend = 0, so volume is identical wherever the player stands.
+// Goes through Sound.Play directly because PlaySoundAt has no twoDimensional switch,
+// and pitchShift stays false so music is never pitch-randomised.
+csharpGenerator.forBlock['cu_play_sound_music'] = (block, gen) => {
+  const vol = floatSuffix(gen.valueToCode(block, 'VOLUME', ORDER_ATOMIC) || '1');
+  const s = soundInput(block, gen) || '"beep"';
+  const clip = isCustomSound(block) ? `RegisterContent.LoadAudio(${s})` : s;
+  return `Sound.Play(${clip}, body.transform.position, true, false, null, ${vol});\n`;
+};
 
 // Flow
 csharpGenerator.forBlock['cu_if'] = (block, gen) => {
