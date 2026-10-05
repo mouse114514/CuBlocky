@@ -46,9 +46,9 @@ const CAT_ICONS: Record<string, string> = {
   CAT_BUILDING: `/media/cat-icons/building.png?v=${_t}`,
   CAT_TILE: `/media/cat-icons/tile.png?v=${_t}`,
   CAT_CREATURE: `/media/cat-icons/creature.png?v=${_t}`,
-  CAT_CONFIG: '',
-  CAT_ASSET: '',
-  CAT_UI: '',
+  CAT_CONFIG: `/media/cat-icons/settings.png?v=${_t}`,
+  CAT_ASSET: `/media/cat-icons/assets.png?v=${_t}`,
+  CAT_UI: `/media/cat-icons/ui.png?v=${_t}`,
   CAT_LOCALE: '',
 };
 
@@ -84,7 +84,7 @@ const TOOLBOX = `
       <value name="ID"><shadow type="cu_status_ref"><field name="ID">myStatus</field></shadow></value>
     </block>
     <block type="cu_register_recipe">
-      <value name="INPUTS"><shadow type="cu_list_create"></shadow></value>
+      <value name="INPUTS"><shadow type="lists_create_with"></shadow></value>
       <value name="OUTPUT"><shadow type="cu_item_vanilla"><field name="ID">bandage</field></shadow></value>
       <value name="AMOUNT"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
       <value name="RESULT_CONDITION"><shadow type="cu_number"><field name="NUM">-1</field></shadow></value>
@@ -106,6 +106,11 @@ const TOOLBOX = `
     <block type="cu_liquid_color"></block>
     <block type="cu_liquid_value"></block>
     <block type="cu_liquid_flags"></block>
+    <sep></sep>
+    <block type="cu_register_liquid_tile">
+      <value name="CONSUME_DRINK"><shadow type="cu_true"></shadow></value>
+      <value name="CONSUME_FILL"><shadow type="cu_true"></shadow></value>
+    </block>
     <sep></sep>
     <block type="cu_set_item_category">
       <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
@@ -430,10 +435,6 @@ const TOOLBOX = `
     </block>
     <block type="cu_world_depth"></block>
     <sep></sep>
-    <block type="cu_register_liquid_tile">
-      <value name="CONSUME_DRINK"><shadow type="cu_true"></shadow></value>
-      <value name="CONSUME_FILL"><shadow type="cu_true"></shadow></value>
-    </block>
     <block type="cu_place_liquid_tile">
       <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
       <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
@@ -577,7 +578,7 @@ const TOOLBOX = `
     <sep></sep>
     <block type="cu_string_op"></block>
     <sep></sep>
-    <block type="cu_list_create"></block>
+    <block type="lists_create_with"></block>
     <block type="cu_list_get">
       <value name="INDEX"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
@@ -941,7 +942,7 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
 
       const forceHorizontal = () => {
         ws.getAllBlocks().forEach((b: any) => {
-          if ((b.type === 'cu_list_create' || b.type === 'cu_define_function' || b.type === 'cu_call_function' || b.type === 'cu_call_function_value') && !b.inputsInline) {
+          if ((b.type === 'lists_create_with' || b.type === 'cu_define_function' || b.type === 'cu_call_function' || b.type === 'cu_call_function_value') && !b.inputsInline) {
             b.inputsInline = true;
             b.render();
           }
