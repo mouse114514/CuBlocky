@@ -112,6 +112,9 @@ const C = {
   CREATURE: '#ff6f00',
   CONFIG:   '#3f51b5',
   ASSET:    '#607d8b',
+  NET:     '#00838f',
+  DATA:    '#ad1457',
+  SAVE:    '#795548',
 };
 
 type DdOption = [string, string, string, string]; // [zhLabel, enLabel, ruLabel, value]
@@ -351,6 +354,10 @@ const LIMB_BOOL_OPTIONS: DdOption[] = [
   ['中风影响(strokeAffected)', 'Stroke (strokeAffected)', 'Инсульт (strokeAffected)', 'strokeAffected'],
 ];
 
+// Read-only getters: union of value + flag dropdowns so one block can read any field.
+const GET_PLAYER_OPTIONS: DdOption[] = [...PLAYER_PROP_OPTIONS, ...PLAYER_BOOL_OPTIONS];
+const GET_LIMB_OPTIONS: DdOption[] = [...LIMB_PROP_OPTIONS, ...LIMB_BOOL_OPTIONS];
+
 const SKILL_OPTIONS: DdOption[] = [
   ['力量(STR)', 'Strength (STR)', 'Сила (STR)', 'STR'],
   ['韧性(RES)', 'Resilience (RES)', 'Твёрдость (RES)', 'RES'],
@@ -439,6 +446,12 @@ const BLOCK_JSON: any[] = [
     nextStatement: null,
   },
 
+  // ═══ Save (when_* events, do_* actions) ═════════════════════
+  { type: 'cu_when_save', message0: '%{BKY_CU_WHEN_SAVE}', colour: C.EVENT, hat: 'cap', nextStatement: null },
+  { type: 'cu_when_load', message0: '%{BKY_CU_WHEN_LOAD}', colour: C.EVENT, hat: 'cap', nextStatement: null },
+  { type: 'cu_do_save', message0: '%{BKY_CU_DO_SAVE}', colour: C.FLOW, previousStatement: null, nextStatement: null },
+  { type: 'cu_do_load', message0: '%{BKY_CU_DO_LOAD}', colour: C.FLOW, previousStatement: null, nextStatement: null },
+
   // ═══ Registration (pink) ═════════════════════════════════════
   // Item registration: id (item value block), fullName, description, category
   {
@@ -450,7 +463,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'DESC', text: 'A description', align: 'RIGHT' },
       { type: 'input_value', name: 'SPRITE_REF', check: 'Sprite', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
 
   // Sprite reference value block
@@ -486,7 +499,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'DESC', text: 'A status effect', align: 'RIGHT' },
       { type: 'input_value', name: 'SPRITE_REF', check: 'Sprite', align: 'RIGHT' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
 
   // Status value reader: level or remaining duration of a body status
@@ -542,17 +555,63 @@ const BLOCK_JSON: any[] = [
     args0: [
       { type: 'input_value', name: 'TARGET_ITEM', check: 'Item' },
       { type: 'field_dropdown', name: 'PROP', options: [
-        ['耐久(condition)','condition'],['重量(weight)','weight'],
+        ['耐久(condition)','condition'],
+        ['重量(weight)','weight'],
         ['价值(value)','value'],
-        ['可使用(usable)','usable'],['可穿戴(wearable)','wearable'],
+        ['可使用(usable)','usable'],
+        ['可穿戴(wearable)','wearable'],
         ['左手使用(useLimbAction)','useLimbAction'],
         ['零耐久销毁(destroyAtZeroCondition)','destroyAtZeroCondition'],
         ['可放置(placeable)','placeable'],
+        ['插槽旋转(slotRotation)','slotRotation'],
+        ['旋转速度(rotSpeed)','rotSpeed'],
+        ['跳跃高度变化(jumpHeightMultChange)','jumpHeightMultChange'],
+        ['穿戴视觉偏移(wearableVisualOffset)','wearableVisualOffset'],
+        ['穿戴护甲(wearableArmor)','wearableArmor'],
+        ['穿戴隔离(wearableIsolation)','wearableIsolation'],
+        ['精灵缩放(SpriteScale)','SpriteScale'],
+        ['图标缩放(InventoryIconScale)','InventoryIconScale'],
+        ['耐久趋向缩放(scaleConditionToward)','scaleConditionToward'],
+        ['生成频率(SpawnFrequency)','SpawnFrequency'],
+        ['图标动画ID(IconAnimationId)','IconAnimationId'],
+        ['穿戴精灵ID(WornSpriteAnimationId)','WornSpriteAnimationId'],
+        ['液体遮罩ID(LiquidMaskAnimationId)','LiquidMaskAnimationId'],
+        ['穿戴槽位(wearSlotId)','wearSlotId']
       ]},
       { type: 'input_value', name: 'VALUE', check: ['Number','String','Boolean','Item'], align: 'RIGHT' },
     ],
     extensions: ['prop_type_check'],
     colour: C.ITEM, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_get_item_property', message0: '%{BKY_CU_GET_ITEM_PROPERTY}',
+    args0: [
+      { type: 'input_value', name: 'TARGET_ITEM', check: 'Item' },
+      { type: 'field_dropdown', name: 'PROP', options: [
+        ['耐久(condition)','condition'],
+        ['重量(weight)','weight'],
+        ['价值(value)','value'],
+        ['可使用(usable)','usable'],
+        ['可穿戴(wearable)','wearable'],
+        ['左手使用(useLimbAction)','useLimbAction'],
+        ['零耐久销毁(destroyAtZeroCondition)','destroyAtZeroCondition'],
+        ['插槽旋转(slotRotation)','slotRotation'],
+        ['旋转速度(rotSpeed)','rotSpeed'],
+        ['跳跃高度变化(jumpHeightMultChange)','jumpHeightMultChange'],
+        ['穿戴视觉偏移(wearableVisualOffset)','wearableVisualOffset'],
+        ['穿戴护甲(wearableArmor)','wearableArmor'],
+        ['穿戴隔离(wearableIsolation)','wearableIsolation'],
+        ['精灵缩放(SpriteScale)','SpriteScale'],
+        ['图标缩放(InventoryIconScale)','InventoryIconScale'],
+        ['耐久趋向缩放(scaleConditionToward)','scaleConditionToward'],
+        ['生成频率(SpawnFrequency)','SpawnFrequency'],
+        ['图标动画ID(IconAnimationId)','IconAnimationId'],
+        ['穿戴精灵ID(WornSpriteAnimationId)','WornSpriteAnimationId'],
+        ['液体遮罩ID(LiquidMaskAnimationId)','LiquidMaskAnimationId'],
+        ['穿戴槽位(wearSlotId)','wearSlotId']
+      ]},
+    ],
+    colour: C.ITEM, output: null, inputsInline: true,
   },
   // Set item tag: dedicated block with tag dropdown
   {
@@ -593,7 +652,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'IS_REPAIR', check: 'Boolean' },
       { type: 'input_value', name: 'INT', check: 'Number' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
 
   // ═══ Body (green) ════════════════════════════════════════════
@@ -706,7 +765,7 @@ const BLOCK_JSON: any[] = [
     type: 'cu_play_sound',
     message0: '%{BKY_CU_PLAY_SOUND}',
     args0: [
-      { type: 'input_value', name: 'SOUND', check: 'Sound' },
+      { type: 'input_value', name: 'SOUND', check: ['Sound', 'String'] },
       { type: 'input_value', name: 'VOLUME', check: 'Number', align: 'RIGHT' },
     ],
     colour: C.SOUND, previousStatement: null, nextStatement: null, inputsInline: true,
@@ -715,7 +774,7 @@ const BLOCK_JSON: any[] = [
     type: 'cu_play_sound_at',
     message0: '%{BKY_CU_PLAY_SOUND_AT}',
     args0: [
-      { type: 'input_value', name: 'SOUND', check: 'Sound' },
+      { type: 'input_value', name: 'SOUND', check: ['Sound', 'String'] },
       { type: 'input_value', name: 'X', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'Y', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'VOLUME', check: 'Number', align: 'RIGHT' },
@@ -726,7 +785,7 @@ const BLOCK_JSON: any[] = [
     type: 'cu_play_sound_2d',
     message0: '%{BKY_CU_PLAY_SOUND_2D}',
     args0: [
-      { type: 'input_value', name: 'SOUND', check: 'Sound' },
+      { type: 'input_value', name: 'SOUND', check: ['Sound', 'String'] },
       { type: 'input_value', name: 'VOLUME', check: 'Number', align: 'RIGHT' },
     ],
     colour: C.SOUND, previousStatement: null, nextStatement: null, inputsInline: true,
@@ -948,7 +1007,7 @@ const BLOCK_JSON: any[] = [
     type: 'cu_list_create',
     message0: '%{BKY_CU_LIST_CREATE}',
     args0: [
-      { type: 'input_value', name: 'A', check: 'String' },
+      { type: 'input_value', name: 'A', check: ['String', 'Sound'] },
     ],
     output: 'Array',
     colour: C.VALUE,
@@ -976,7 +1035,7 @@ const BLOCK_JSON: any[] = [
     message0: '%{BKY_CU_LIST_ADD}',
     args0: [
       { type: 'input_value', name: 'LIST', check: 'Array' },
-      { type: 'input_value', name: 'ITEM' },
+      { type: 'input_value', name: 'ITEM', check: ['String', 'Sound'] },
     ],
     colour: C.VALUE,
     previousStatement: null,
@@ -993,7 +1052,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'NAME', text: 'My Building' },
       { type: 'field_input', name: 'DESC', text: 'A building' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_building_set_property',
@@ -1001,16 +1060,82 @@ const BLOCK_JSON: any[] = [
     args0: [
       { type: 'field_input', name: 'ID', text: 'myBuilding' },
       { type: 'field_dropdown', name: 'PROP', options: [
-        ['血量(health)','health'],['名称(name)','name'],
-        ['描述(description)','description'],['地面放置(requireGround)','requireGround'],
-        ['金属(metallic)','metallic'],['动物(animal)','animal'],
-        ['掉落倍率(dropChanceMultiplier)','dropChanceMultiplier'],
-        ['生成最小数(spawnMinPerChunk)','spawnMinPerChunk'],
-        ['生成最大数(spawnMaxPerChunk)','spawnMaxPerChunk'],
+        ['血量(health)','Health'],
+        ['名称(name)','Name'],
+        ['描述(description)','Description'],
+        ['地面放置(requireGround)','RequireGround'],
+        ['金属(metallic)','Metallic'],
+        ['动物(animal)','Animal'],
+        ['掉落倍率(dropChanceMultiplier)','DropChanceMultiplier'],
+        ['生成最小数(spawnMinPerChunk)','SpawnMinPerChunk'],
+        ['生成最大数(spawnMaxPerChunk)','SpawnMaxPerChunk'],
+        ['排序(sortingOrder)','SortingOrder'],
+        ['保证掉落数(guaranteedDropAmount)','GuaranteedDropAmount'],
+        ['生成层(spawnLayers)','SpawnLayers'],
+        ['每秒热量(heatPerSecond)','HeatPerSecond'],
+        ['热量半径(heatRadius)','HeatRadius'],
+        ['最大体温(maxHeatBodyTemperature)','MaxHeatBodyTemperature'],
+        ['刚体重力缩放(rigidbodyGravityScale)','RigidbodyGravityScale'],
+        ['表面偏移(surfaceOffset)','SurfaceOffset'],
+        ['图层(int, layer)','Layer'],
+        ['脚步音效ID(blockFootstepSoundId)','BlockFootstepSoundId'],
+        ['添加刚体(addRigidbody2D)','AddRigidbody2D'],
+        ['无法被击中(cantHit)','CantHit'],
+        ['碰撞为触发器(colliderIsTrigger)','ColliderIsTrigger'],
+        ['复制发光层(copyGlowPlantLayer)','CopyGlowPlantLayer'],
+        ['忽略优化(ignoreBodyOptimize)','IgnoreBodyOptimize'],
+        ['随机翻转(randomFlip)','RandomFlip'],
+        ['生成于地下(spawnInGround)','SpawnInGround'],
+        ['发光材质(useGlowPlantMaterial)','UseGlowPlantMaterial'],
+        ['受击音效ID(hitSoundReferenceId)','HitSoundReferenceId'],
+        ['渲染引用(renderReferenceId)','RenderReferenceId'],
+        ['精灵动画ID(spriteAnimationId)','SpriteAnimationId'],
+        ['放置面(placement:Floor/Wall/Ceiling)','Placement'],
+        ['生成风格(genStyle:None/Standard/DropPod)','GenerationStyle'],
+        ['层枚举(layerEnum:Default/Ground/...)','LayerEnum'],
+        ['刚体类型(rigidbodyBodyType:Static/Dynamic)','RigidbodyBodyType']
       ]},
       { type: 'input_value', name: 'VALUE', check: ['Number','String','Boolean'], align: 'RIGHT' },
     ],
     colour: C.BUILDING, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_get_building_property', message0: '%{BKY_CU_GET_BUILDING_PROPERTY}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myBuilding' },
+      { type: 'field_dropdown', name: 'PROP', options: [
+        ['血量(health)','Health'],
+        ['名称(name)','Name'],
+        ['描述(description)','Description'],
+        ['地面放置(requireGround)','RequireGround'],
+        ['金属(metallic)','Metallic'],
+        ['动物(animal)','Animal'],
+        ['掉落倍率(dropChanceMultiplier)','DropChanceMultiplier'],
+        ['生成最小数(spawnMinPerChunk)','SpawnMinPerChunk'],
+        ['生成最大数(spawnMaxPerChunk)','SpawnMaxPerChunk'],
+        ['排序(sortingOrder)','SortingOrder'],
+        ['保证掉落数(guaranteedDropAmount)','GuaranteedDropAmount'],
+        ['生成层(spawnLayers)','SpawnLayers'],
+        ['每秒热量(heatPerSecond)','HeatPerSecond'],
+        ['热量半径(heatRadius)','HeatRadius'],
+        ['最大体温(maxHeatBodyTemperature)','MaxHeatBodyTemperature'],
+        ['刚体重力缩放(rigidbodyGravityScale)','RigidbodyGravityScale'],
+        ['表面偏移(surfaceOffset)','SurfaceOffset'],
+        ['脚步音效ID(blockFootstepSoundId)','BlockFootstepSoundId'],
+        ['添加刚体(addRigidbody2D)','AddRigidbody2D'],
+        ['无法被击中(cantHit)','CantHit'],
+        ['碰撞为触发器(colliderIsTrigger)','ColliderIsTrigger'],
+        ['复制发光层(copyGlowPlantLayer)','CopyGlowPlantLayer'],
+        ['忽略优化(ignoreBodyOptimize)','IgnoreBodyOptimize'],
+        ['随机翻转(randomFlip)','RandomFlip'],
+        ['生成于地下(spawnInGround)','SpawnInGround'],
+        ['发光材质(useGlowPlantMaterial)','UseGlowPlantMaterial'],
+        ['受击音效ID(hitSoundReferenceId)','HitSoundReferenceId'],
+        ['渲染引用(renderReferenceId)','RenderReferenceId'],
+        ['精灵动画ID(spriteAnimationId)','SpriteAnimationId']
+      ]},
+    ],
+    colour: C.BUILDING, output: null, inputsInline: true,
   },
 
   // ═══ Tile (brown) ════════════════════════════════════════════
@@ -1022,7 +1147,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'NAME', text: 'My Tile' },
       { type: 'field_input', name: 'DESC', text: 'A tile' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_tile_set_property',
@@ -1030,16 +1155,46 @@ const BLOCK_JSON: any[] = [
     args0: [
       { type: 'field_input', name: 'ID', text: 'myTile' },
       { type: 'field_dropdown', name: 'PROP', options: [
-        ['血量(health)','health'],['名称(name)','name'],
-        ['描述(description)','description'],['金属(metallic)','metallic'],
-        ['毒性(toxicity)','toxicity'],['滑(slippery)','slippery'],
-        ['睡眠质量(sleepQuality)','sleepQuality'],
-        ['生成量(spawnAmount)','spawnAmount'],
-        ['碰撞体(collider)','collider'],['生成风格(genStyle)','genStyle'],
+        ['血量(health)','Health'],
+        ['名称(name)','Name'],
+        ['描述(description)','Description'],
+        ['金属(metallic)','Metallic'],
+        ['毒性(toxicity)','Toxicity'],
+        ['打滑(slippery)','Slippery'],
+        ['睡眠质量(sleepQuality:Bad/Good)','SleepQuality'],
+        ['生成数量(spawnAmount)','SpawnAmount'],
+        ['碰撞类型(collider:Grid/Sprite/None)','ColliderType'],
+        ['生成风格(genStyle:Vein/...)','GenerationStyle'],
+        ['无变化(noVariation)','NoVariation'],
+        ['生成层(spawnLayers)','SpawnLayers'],
+        ['受击音效(hitSound)','HitSound'],
+        ['脚步音效(stepSound)','StepSound'],
+        ['内部名(tileName)','TileName']
       ]},
       { type: 'input_value', name: 'VALUE', check: ['Number','String','Boolean'], align: 'RIGHT' },
     ],
     colour: C.TILE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_get_tile_property', message0: '%{BKY_CU_GET_TILE_PROPERTY}',
+    args0: [
+      { type: 'field_input', name: 'ID', text: 'myTile' },
+      { type: 'field_dropdown', name: 'PROP', options: [
+        ['血量(health)','Health'],
+        ['名称(name)','Name'],
+        ['描述(description)','Description'],
+        ['金属(metallic)','Metallic'],
+        ['毒性(toxicity)','Toxicity'],
+        ['打滑(slippery)','Slippery'],
+        ['生成数量(spawnAmount)','SpawnAmount'],
+        ['无变化(noVariation)','NoVariation'],
+        ['生成层(spawnLayers)','SpawnLayers'],
+        ['受击音效(hitSound)','HitSound'],
+        ['脚步音效(stepSound)','StepSound'],
+        ['内部名(tileName)','TileName']
+      ]},
+    ],
+    colour: C.TILE, output: null, inputsInline: true,
   },
 
   // ═══ Locale (indigo) ═════════════════════════════════════════
@@ -1054,7 +1209,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'ZH', text: '中文名' },
       { type: 'field_input', name: 'EN', text: 'English Name' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
 
   // ═══ Creature registration (register red) ═══════════════════
@@ -1068,7 +1223,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'SPRITE', check: 'Sprite', align: 'RIGHT' },
       { type: 'field_number', name: 'HEALTH', value: 100, min: 0, precision: 1 },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
 
   // ═══ Animation registration (register red) ═══════════════════
@@ -1083,7 +1238,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_number', name: 'FPS', value: 12, min: 0.1, precision: 0.1 },
       { type: 'field_dropdown', name: 'LOOP', options: [['循环','TRUE'], ['单次','FALSE']] },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
 
   // ═══ Creature control (orange) ═══════════════════════════════
@@ -1132,6 +1287,15 @@ const BLOCK_JSON: any[] = [
     args0: [
       { type: 'field_input', name: 'CREATURE_ID', text: 'myCreature' },
       { type: 'field_input', name: 'ANIM_ID', text: 'myAnim' },
+    ],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_set_creature_visible',
+    message0: '%{BKY_CU_SET_CREATURE_VISIBLE}',
+    args0: [
+      { type: 'field_input', name: 'CREATURE_ID', text: 'myCreature' },
+      { type: 'field_dropdown', name: 'VISIBLE', options: [['隐身', 'false'], ['显示', 'true']] },
     ],
     colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
   },
@@ -1265,6 +1429,13 @@ const BLOCK_JSON: any[] = [
     colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
   },
   {
+    type: 'cu_get_player_property', message0: '%{BKY_CU_GET_PLAYER_PROPERTY}',
+    args0: [
+      { type: 'field_searchable_dropdown', name: 'PROP', options: GET_PLAYER_OPTIONS, lang: 'zh' },
+    ],
+    colour: C.BODY, output: null, inputsInline: true,
+  },
+  {
     type: 'cu_set_player_flag', message0: '%{BKY_CU_SET_PLAYER_FLAG}',
     args0: [
       { type: 'field_searchable_dropdown', name: 'PROP', options: PLAYER_BOOL_OPTIONS, lang: 'zh' },
@@ -1306,6 +1477,14 @@ const BLOCK_JSON: any[] = [
     args0: [
       { type: 'input_value', name: 'X', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'Y', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_set_player_visible',
+    message0: '%{BKY_CU_SET_PLAYER_VISIBLE}',
+    args0: [
+      { type: 'field_dropdown', name: 'VISIBLE', options: [['隐身', 'false'], ['显示', 'true']] },
     ],
     colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
   },
@@ -1382,6 +1561,14 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'VALUE', check: 'Number', align: 'RIGHT' },
     ],
     colour: C.BODY, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_get_limb_property', message0: '%{BKY_CU_GET_LIMB_PROPERTY}',
+    args0: [
+      { type: 'field_searchable_dropdown', name: 'PROP', options: GET_LIMB_OPTIONS, lang: 'zh' },
+      { type: 'input_value', name: 'LIMB', check: 'Number' },
+    ],
+    colour: C.BODY, output: null, inputsInline: true,
   },
   {
     type: 'cu_set_limb_flag', message0: '%{BKY_CU_SET_LIMB_FLAG}',
@@ -1480,7 +1667,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'NAME', text: 'My Liquid' },
       { type: 'field_input', name: 'DESC', text: 'A custom liquid' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_liquid_color',
@@ -1491,7 +1678,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'COLOR_G', check: 'Number' },
       { type: 'input_value', name: 'COLOR_B', check: 'Number' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_liquid_value',
@@ -1500,7 +1687,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'ID', text: 'myLiquid' },
       { type: 'input_value', name: 'VALUE', check: 'Number' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_liquid_flags',
@@ -1598,9 +1785,9 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'SPRITE_RACKED', check: 'Sprite' },
       { type: 'input_value', name: 'SPRITE_NORMAL_NOMAG', check: 'Sprite' },
       { type: 'input_value', name: 'SPRITE_RACKED_NOMAG', check: 'Sprite' },
-      { type: 'input_value', name: 'SOUND_FIRE', check: 'String' },
-      { type: 'input_value', name: 'SOUND_RACK', check: 'String' },
-      { type: 'input_value', name: 'SOUND_UNRACK', check: 'String' },
+      { type: 'input_value', name: 'SOUND_FIRE', check: ['Sound', 'String'] },
+      { type: 'input_value', name: 'SOUND_RACK', check: ['Sound', 'String'] },
+      { type: 'input_value', name: 'SOUND_UNRACK', check: ['Sound', 'String'] },
     ],
     colour: C.REGISTER, inputsInline: false,
   },
@@ -1613,7 +1800,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'MAX_ROUNDS', check: 'Number' },
       { type: 'input_value', name: 'START_ROUNDS', check: 'Number' },
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_set_item_category',
@@ -1626,7 +1813,7 @@ const BLOCK_JSON: any[] = [
         ['armor','armor'],['container','container'],['misc','misc'],
       ]},
     ],
-    colour: C.REGISTER, inputsInline: true,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_set_item_base_stats',
@@ -1818,8 +2005,6 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'CHOICES', text: 'fast|Fast,slow|Slow' },
       { type: 'input_statement', name: 'ACTION' },
     ],
-    previousStatement: null,
-    nextStatement: null,
     colour: C.CONFIG,
   },
   {
@@ -1856,8 +2041,6 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'ID', text: 'myAction' },
       { type: 'field_input', name: 'DESC', text: 'Triggers my action' },
     ],
-    previousStatement: null,
-    nextStatement: null,
     colour: C.CONFIG,
   },
   {
@@ -1961,8 +2144,6 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'ID', text: 'myBundle' },
       { type: 'field_input', name: 'PATH', text: 'Assets/bundle.bundle' },
     ],
-    previousStatement: null,
-    nextStatement: null,
     colour: C.ASSET,
   },
   {
@@ -2291,9 +2472,7 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'ID', text: 'myStructure' },
       { type: 'field_input', name: 'PATH', text: 'Structures/house.json' },
     ],
-    previousStatement: null,
-    nextStatement: null,
-    colour: C.REGISTER,
+    colour: C.REGISTER, inputsInline: false,
   },
   {
     type: 'cu_place_structure',
@@ -2355,8 +2534,6 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'ARG_DESC', text: '' },
       { type: 'input_statement', name: 'BODY' },
     ],
-    previousStatement: null,
-    nextStatement: null,
     colour: C.CONFIG,
   },
   {
@@ -2368,6 +2545,246 @@ const BLOCK_JSON: any[] = [
     output: 'String',
     colour: C.CONFIG,
   },
+  // ══ Multiplayer (teal) ════════════════════════════════════════
+  {
+    type: 'cu_mp_on_server_message',
+    message0: '%{BKY_CU_MP_ON_SERVER_MESSAGE}',
+    args0: [
+      { type: 'field_input', name: 'CHANNEL', text: 'my.channel' },
+    ],
+    colour: C.NET,
+    hat: 'cap',
+    nextStatement: null,
+  },
+  {
+    type: 'cu_mp_on_client_message',
+    message0: '%{BKY_CU_MP_ON_CLIENT_MESSAGE}',
+    args0: [
+      { type: 'field_input', name: 'CHANNEL', text: 'my.channel' },
+    ],
+    colour: C.NET,
+    hat: 'cap',
+    nextStatement: null,
+  },
+  {
+    type: 'cu_mp_send_to_server',
+    message0: '%{BKY_CU_MP_SEND_TO_SERVER}',
+    args0: [
+      { type: 'field_input', name: 'CHANNEL', text: 'my.channel' },
+      { type: 'input_value', name: 'PAYLOAD' },
+    ],
+    colour: C.NET,
+    inputsInline: true,
+    previousStatement: null,
+    nextStatement: null,
+  },
+  {
+    type: 'cu_mp_send_to_client',
+    message0: '%{BKY_CU_MP_SEND_TO_CLIENT}',
+    args0: [
+      { type: 'input_value', name: 'CLIENT_ID', check: 'Number' },
+      { type: 'field_input', name: 'CHANNEL', text: 'my.channel' },
+      { type: 'input_value', name: 'PAYLOAD' },
+    ],
+    colour: C.NET,
+    inputsInline: true,
+    previousStatement: null,
+    nextStatement: null,
+  },
+  {
+    type: 'cu_mp_broadcast',
+    message0: '%{BKY_CU_MP_BROADCAST}',
+    args0: [
+      { type: 'field_input', name: 'CHANNEL', text: 'my.channel' },
+      { type: 'input_value', name: 'PAYLOAD' },
+      { type: 'field_dropdown', name: 'INCLUDE_HOST', options: [['Yes', 'true'], ['No', 'false']] },
+    ],
+    colour: C.NET,
+    inputsInline: true,
+    previousStatement: null,
+    nextStatement: null,
+  },
+  {
+    type: 'cu_mp_request_server',
+    message0: '%{BKY_CU_MP_REQUEST_SERVER}',
+    args0: [
+      { type: 'field_input', name: 'CHANNEL', text: 'my.channel' },
+      { type: 'input_value', name: 'PAYLOAD' },
+      { type: 'input_statement', name: 'BODY' },
+    ],
+    colour: C.NET,
+    previousStatement: null,
+    nextStatement: null,
+  },
+  {
+    type: 'cu_mp_state',
+    message0: '%{BKY_CU_MP_STATE}',
+    args0: [
+      { type: 'field_dropdown', name: 'STATE', options: [['available', 'available'], ['running', 'running'], ['isServer', 'isServer'], ['isClient', 'isClient'], ['isHost', 'isHost']] },
+    ],
+    output: 'Boolean',
+    colour: C.NET,
+    inputsInline: true,
+  },
+  {
+    type: 'cu_mp_payload_self',
+    message0: '%{BKY_CU_MP_PAYLOAD_SELF}',
+    output: 'Payload',
+    colour: C.NET,
+  },
+  {
+    type: 'cu_mp_payload_text',
+    message0: '%{BKY_CU_MP_PAYLOAD_TEXT}',
+    args0: [
+      { type: 'input_value', name: 'PAYLOAD', check: 'Payload' },
+      { type: 'field_input', name: 'KEY', text: 'key' },
+    ],
+    output: 'String',
+    colour: C.NET,
+    inputsInline: true,
+  },
+  {
+    type: 'cu_mp_payload_num',
+    message0: '%{BKY_CU_MP_PAYLOAD_NUM}',
+    args0: [
+      { type: 'input_value', name: 'PAYLOAD', check: 'Payload' },
+      { type: 'field_input', name: 'KEY', text: 'key' },
+    ],
+    output: 'Number',
+    colour: C.NET,
+    inputsInline: true,
+  },
+  {
+    type: 'cu_mp_payload_bool',
+    message0: '%{BKY_CU_MP_PAYLOAD_BOOL}',
+    args0: [
+      { type: 'input_value', name: 'PAYLOAD', check: 'Payload' },
+      { type: 'field_input', name: 'KEY', text: 'key' },
+    ],
+    output: 'Boolean',
+    colour: C.NET,
+    inputsInline: true,
+  },
+  {
+    type: 'cu_mp_payload_has',
+    message0: '%{BKY_CU_MP_PAYLOAD_HAS}',
+    args0: [
+      { type: 'input_value', name: 'PAYLOAD', check: 'Payload' },
+      { type: 'field_input', name: 'KEY', text: 'key' },
+    ],
+    output: 'Boolean',
+    colour: C.NET,
+    inputsInline: true,
+  },
+  {
+    type: 'cu_mp_capture_snapshot',
+    message0: '%{BKY_CU_MP_CAPTURE_SNAPSHOT}',
+    output: 'Payload',
+    colour: C.NET,
+  },
+  {
+    type: 'cu_mp_apply_snapshot',
+    message0: '%{BKY_CU_MP_APPLY_SNAPSHOT}',
+    args0: [
+      { type: 'input_value', name: 'SNAPSHOT', check: 'Payload' },
+    ],
+    colour: C.NET,
+    inputsInline: true,
+    previousStatement: null,
+    nextStatement: null,
+  },
+  {
+    type: 'cu_mp_broadcast_snapshot',
+    message0: '%{BKY_CU_MP_BROADCAST_SNAPSHOT}',
+    args0: [
+      { type: 'field_dropdown', name: 'INCLUDE_HOST', options: [['Yes', 'true'], ['No', 'false']] },
+    ],
+    colour: C.NET,
+    inputsInline: true,
+    previousStatement: null,
+    nextStatement: null,
+  },
+  {
+    type: 'cu_mp_request_initial_snapshot',
+    message0: '%{BKY_CU_MP_REQUEST_INITIAL_SNAPSHOT}',
+    colour: C.NET,
+    previousStatement: null,
+    nextStatement: null,
+  },
+  {
+    type: 'cu_mp_schedule_initial_snapshot',
+    message0: '%{BKY_CU_MP_SCHEDULE_INITIAL_SNAPSHOT}',
+    colour: C.NET,
+    previousStatement: null,
+    nextStatement: null,
+  },  {
+    type: 'cu_json_new_object',
+    message0: '%{BKY_CU_JSON_NEW_OBJECT}',
+    output: 'Payload',
+    colour: C.DATA,
+  },
+  {
+    type: 'cu_json_new_array',
+    message0: '%{BKY_CU_JSON_NEW_ARRAY}',
+    output: 'JArray',
+    colour: C.DATA,
+  },
+  {
+    type: 'cu_json_set',
+    message0: '%{BKY_CU_JSON_SET}',
+    args0: [
+      { type: 'input_value', name: 'OBJ', check: 'Payload' },
+      { type: 'field_input', name: 'KEY', text: 'key' },
+      { type: 'input_value', name: 'VALUE' },
+    ],
+    inputsInline: true,
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.DATA,
+  },
+  {
+    type: 'cu_json_get',
+    message0: '%{BKY_CU_JSON_GET}',
+    args0: [
+      { type: 'input_value', name: 'OBJ', check: 'Payload' },
+      { type: 'field_input', name: 'KEY', text: 'key' },
+    ],
+    output: 'Payload',
+    inputsInline: true,
+    colour: C.DATA,
+  },
+  {
+    type: 'cu_json_at',
+    message0: '%{BKY_CU_JSON_AT}',
+    args0: [
+      { type: 'input_value', name: 'ARR', check: 'JArray' },
+      { type: 'input_value', name: 'INDEX', check: 'Number' },
+    ],
+    output: 'Payload',
+    inputsInline: true,
+    colour: C.DATA,
+  },
+  {
+    type: 'cu_json_push',
+    message0: '%{BKY_CU_JSON_PUSH}',
+    args0: [
+      { type: 'input_value', name: 'ARR', check: 'JArray' },
+      { type: 'input_value', name: 'ITEM' },
+    ],
+    inputsInline: true,
+    previousStatement: null,
+    nextStatement: null,
+    colour: C.DATA,
+  },
+  {
+    type: 'cu_json_length',
+    message0: '%{BKY_CU_JSON_LENGTH}',
+    args0: [{ type: 'input_value', name: 'SRC' }],
+    output: 'Number',
+    inputsInline: true,
+    colour: C.DATA,
+  },
+
 ];
 
 // ── Messages ──
@@ -2383,6 +2800,10 @@ const MSG_ZH: Record<string, string> = {
   CU_WHEN_LASTSTAND: '当濒死战起',
   CU_WHEN_ENTER_WORLD: '当进入世界',
   CU_WHEN_BUTTON_PRESSED: '当按钮 %1 被按下',
+  CU_WHEN_SAVE: '当保存游戏时',
+  CU_WHEN_LOAD: '当读取存档时',
+  CU_DO_SAVE: '立即保存游戏',
+  CU_DO_LOAD: '立即读取存档',
   CU_REGISTER_ITEM: '注册物品 id %1 名称 %2 描述 %3 精灵图 %4',
   CU_SPRITE_REF: '精灵图 %1',
   CU_REGISTER_STATUS: '注册状态效果 id %1 名称 %2 类型 %3 描述 %4 精灵图 %5',
@@ -2392,6 +2813,7 @@ const MSG_ZH: Record<string, string> = {
   CU_DEFINE_ITEM_USE: '物品 %1 使用时',
   CU_DEFINE_ITEM_LIMB_USE: '物品 %1 肢体使用时',
   CU_ITEM_SET_PROPERTY: '设置物品 %1 属性 %2 为 %3',
+  CU_GET_ITEM_PROPERTY: '读取物品 %1 的 %2',
   CU_ITEM_SET_TAG: '设置物品 %1 标签为 %2',
   CU_ITEM_SET_START_CONDITION: '设置物品 %1 初始耐久为 %2',
   CU_REGISTER_RECIPE: '配方 %1 → %2 ×%3 耐久%4 材料耐久%5 修理%6 智力%7',
@@ -2446,8 +2868,10 @@ const MSG_ZH: Record<string, string> = {
   LISTS_CREATE_WITH_ITEM_TITLE: '变量',
   CU_REGISTER_BUILDING: '注册建筑 id %1 名称 %2 描述 %3',
   CU_BUILDING_SET_PROPERTY: '建筑 %1 设置 %2 为 %3',
+  CU_GET_BUILDING_PROPERTY: '读取建筑 %1 的 %2',
   CU_REGISTER_TILE: '注册地块 id %1 名称 %2 描述 %3',
   CU_TILE_SET_PROPERTY: '地块 %1 设置 %2 为 %3',
+  CU_GET_TILE_PROPERTY: '读取地块 %1 的 %2',
   CU_REGISTER_LOCALE: '本地化 %1 id %2 中文 %3 英文 %4',
   CU_REGISTER_CREATURE: '注册生物 id %1 名称 %2 描述 %3 精灵图 %4 血量 %5',
   CU_REGISTER_ANIMATION: '注册动画 id %1 精灵图表 %2 帧宽 %3 帧高 %4 帧率 %5 %6',
@@ -2456,6 +2880,8 @@ const MSG_ZH: Record<string, string> = {
   CU_MOVE_CREATURE_TO: '移动生物 %1 到 X %2 Y %3 速度 %4',
   CU_DESTROY_CREATURE: '销毁生物 %1',
   CU_PLAY_CREATURE_ANIMATION: '播放生物 %1 动画 %2',
+  CU_SET_PLAYER_VISIBLE: '设置玩家可见 %1',
+  CU_SET_CREATURE_VISIBLE: '设置生物 %1 可见 %2',
   CU_CREATURE_POSITION: '生物 %1 的位置列表',
   CU_PLAYER_HEALTH: '躯干皮肤健康值',
   CU_PLAYER_MAX_HEALTH: '皮肤健康上限',
@@ -2513,10 +2939,12 @@ const MSG_ZH: Record<string, string> = {
   CU_PLAYER_CROUCHING: '是否蹲下',
   // Extended Body setters
   CU_SET_PLAYER_PROPERTY: '设置玩家属性 %1 为 %2',
+  CU_GET_PLAYER_PROPERTY: '读取玩家属性 %1',
   CU_SET_PLAYER_FLAG: '设置玩家状态 %1 为 %2',
   CU_SET_SKILL: '设置技能 %1 为 %2',
   CU_SET_SKILL_RANGE: '设置技能 %1 经验范围 %2 到 %3',
   CU_SET_LIMB_PROPERTY: '肢体 %2 的 %1 = %3',
+  CU_GET_LIMB_PROPERTY: '读取肢体 %2 的 %1',
   CU_SET_LIMB_FLAG: '肢体 %2 的 %1 = %3',
   // Extended Body actions
   CU_RAGDOLL: '触发布娃娃',
@@ -2628,6 +3056,30 @@ const MSG_ZH: Record<string, string> = {
   CU_ADD_VELOCITY: '增加速度(%1,%2)',
   CU_MAKE_SPRITE: '切分 %1（%2×%3 网格）第 %4 帧 PPU %5',
   CU_FRAME_ANIMATION_SHEET: '帧动画 %1 来自 %2（%3×%4 网格，%5 FPS，PPU %6，循环 %7）',
+  CU_MP_ON_SERVER_MESSAGE: '当收到服务器消息(频道 %1)',
+  CU_MP_ON_CLIENT_MESSAGE: '当收到客户端消息(频道 %1)',
+  CU_MP_SEND_TO_SERVER: '发给服务器 频道%1 载荷%2',
+  CU_MP_SEND_TO_CLIENT: '发给客户端%1 频道%2 载荷%3',
+  CU_MP_BROADCAST: '广播 频道%1 载荷%2 含主机%3',
+  CU_MP_REQUEST_SERVER: '向服务器请求 频道%1 载荷%2 收到响应时%3',
+  CU_MP_STATE: '联机状态 %1',
+  CU_MP_PAYLOAD_SELF: '当前网络载荷',
+  CU_MP_PAYLOAD_TEXT: '载荷%1 的文本字段%2',
+  CU_MP_PAYLOAD_NUM: '载荷%1 的数字字段%2',
+  CU_MP_PAYLOAD_BOOL: '载荷%1 的布尔字段%2',
+  CU_MP_PAYLOAD_HAS: '载荷%1 含字段%2',
+  CU_MP_CAPTURE_SNAPSHOT: '捕获同步快照',
+  CU_MP_APPLY_SNAPSHOT: '应用同步快照%1',
+  CU_MP_BROADCAST_SNAPSHOT: '广播同步快照 含主机%1',
+  CU_MP_REQUEST_INITIAL_SNAPSHOT: '请求初始同步快照',
+  CU_MP_SCHEDULE_INITIAL_SNAPSHOT: '安排初始同步快照',  CU_JSON_NEW_OBJECT: '新建对象',
+  CU_JSON_NEW_ARRAY: '新建数组',
+  CU_JSON_SET: '设置 %1 的字段 %2 = %3',
+  CU_JSON_GET: '读取 %1 的字段 %2',
+  CU_JSON_AT: '读取 %1[%2]',
+  CU_JSON_PUSH: '向 %1 推入 %2',
+  CU_JSON_LENGTH: '%1 的长度',
+
 };
 
 const MSG_EN: Record<string, string> = {
@@ -2642,6 +3094,10 @@ const MSG_EN: Record<string, string> = {
   CU_WHEN_LASTSTAND: 'when last stand',
   CU_WHEN_ENTER_WORLD: 'when enter world',
   CU_WHEN_BUTTON_PRESSED: 'when button %1 pressed',
+  CU_WHEN_SAVE: 'when the game saves',
+  CU_WHEN_LOAD: 'when a save is loaded',
+  CU_DO_SAVE: 'save the game now',
+  CU_DO_LOAD: 'load the last save',
   CU_REGISTER_ITEM: 'register item id %1 name %2 desc %3 sprite %4',
   CU_SPRITE_REF: 'sprite %1',
   CU_REGISTER_STATUS: 'register status effect id %1 name %2 type %3 desc %4 sprite %5',
@@ -2651,6 +3107,7 @@ const MSG_EN: Record<string, string> = {
   CU_DEFINE_ITEM_USE: 'when %1 item used',
   CU_DEFINE_ITEM_LIMB_USE: 'when %1 item limb used',
   CU_ITEM_SET_PROPERTY: 'set item %1 property %2 to %3',
+  CU_GET_ITEM_PROPERTY: 'read item %1 %2',
   CU_ITEM_SET_TAG: 'set item %1 tag to %2',
   CU_ITEM_SET_START_CONDITION: 'set item %1 start condition to %2',
   CU_REGISTER_RECIPE: 'recipe %1 → %2 ×%3 cond%4 ing cond%5 repair%6 int%7',
@@ -2701,8 +3158,10 @@ const MSG_EN: Record<string, string> = {
   CU_LIST_ADD: 'add %2 to list %1',
   CU_REGISTER_BUILDING: 'register building id %1 name %2 desc %3',
   CU_BUILDING_SET_PROPERTY: 'building %1 set %2 to %3',
+  CU_GET_BUILDING_PROPERTY: 'read building %1 %2',
   CU_REGISTER_TILE: 'register tile id %1 name %2 desc %3',
   CU_TILE_SET_PROPERTY: 'tile %1 set %2 to %3',
+  CU_GET_TILE_PROPERTY: 'read tile %1 %2',
   CU_REGISTER_LOCALE: 'locale %1 id %2 zh %3 en %4',
   CU_REGISTER_CREATURE: 'register creature id %1 name %2 desc %3 sprite %4 health %5',
   CU_REGISTER_ANIMATION: 'register animation id %1 sheet %2 frame w %3 frame h %4 fps %5 loop %6',
@@ -2711,6 +3170,8 @@ const MSG_EN: Record<string, string> = {
   CU_MOVE_CREATURE_TO: 'move creature %1 to X %2 Y %3 speed %4',
   CU_DESTROY_CREATURE: 'destroy creature %1',
   CU_PLAY_CREATURE_ANIMATION: 'play creature %1 animation %2',
+  CU_SET_PLAYER_VISIBLE: 'set player visible %1',
+  CU_SET_CREATURE_VISIBLE: 'set creature %1 visible %2',
   CU_CREATURE_POSITION: 'position list of creature %1',
   CU_PLAYER_HEALTH: 'torso skin health',
   CU_PLAYER_MAX_HEALTH: 'max skin health',
@@ -2768,10 +3229,12 @@ const MSG_EN: Record<string, string> = {
   CU_PLAYER_CROUCHING: 'is crouching',
   // Extended Body setters
   CU_SET_PLAYER_PROPERTY: 'set player %1 to %2',
+  CU_GET_PLAYER_PROPERTY: 'read player %1',
   CU_SET_PLAYER_FLAG: 'set player %1 to %2',
   CU_SET_SKILL: 'set skill %1 to %2',
   CU_SET_SKILL_RANGE: 'set skill %1 experience range %2 to %3',
   CU_SET_LIMB_PROPERTY: 'limb %2 %1 = %3',
+  CU_GET_LIMB_PROPERTY: 'read limb %2 %1',
   CU_SET_LIMB_FLAG: 'limb %2 %1 = %3',
   // Extended Body actions
   CU_RAGDOLL: 'ragdoll',
@@ -2883,6 +3346,30 @@ const MSG_EN: Record<string, string> = {
   CU_ADD_VELOCITY: 'add velocity (%1,%2)',
   CU_MAKE_SPRITE: 'slice %1 (%2x%3 grid) frame %4 ppu %5',
   CU_FRAME_ANIMATION_SHEET: 'frame animation %1 from sheet %2 (%3x%4 grid, %5 fps, ppu %6, loop %7)',
+  CU_MP_ON_SERVER_MESSAGE: 'when server message received (channel %1)',
+  CU_MP_ON_CLIENT_MESSAGE: 'when client message received (channel %1)',
+  CU_MP_SEND_TO_SERVER: 'send to server, channel %1, payload %2',
+  CU_MP_SEND_TO_CLIENT: 'send to client %1, channel %2, payload %3',
+  CU_MP_BROADCAST: 'broadcast, channel %1, payload %2, include host %3',
+  CU_MP_REQUEST_SERVER: 'request server, channel %1, payload %2, on response %3',
+  CU_MP_STATE: 'multiplayer state %1',
+  CU_MP_PAYLOAD_SELF: 'current network payload',
+  CU_MP_PAYLOAD_TEXT: 'payload %1, text field %2',
+  CU_MP_PAYLOAD_NUM: 'payload %1, number field %2',
+  CU_MP_PAYLOAD_BOOL: 'payload %1, boolean field %2',
+  CU_MP_PAYLOAD_HAS: 'payload %1 has field %2',
+  CU_MP_CAPTURE_SNAPSHOT: 'capture sync snapshot',
+  CU_MP_APPLY_SNAPSHOT: 'apply sync snapshot %1',
+  CU_MP_BROADCAST_SNAPSHOT: 'broadcast sync snapshot, include host %1',
+  CU_MP_REQUEST_INITIAL_SNAPSHOT: 'request initial sync snapshot',
+  CU_MP_SCHEDULE_INITIAL_SNAPSHOT: 'schedule initial sync snapshot',  CU_JSON_NEW_OBJECT: 'new object',
+  CU_JSON_NEW_ARRAY: 'new array',
+  CU_JSON_SET: 'set %1[%2] = %3',
+  CU_JSON_GET: 'get field %2 of %1',
+  CU_JSON_AT: 'get %1[%2]',
+  CU_JSON_PUSH: 'push %2 into %1',
+  CU_JSON_LENGTH: 'length of %1',
+
 };
 
 const MSG_RU: Record<string, string> = {
@@ -2896,7 +3383,11 @@ const MSG_RU: Record<string, string> = {
   CU_WHEN_HEAL: 'при лечении',
   CU_WHEN_LASTSTAND: 'при последнем шансе',
   CU_WHEN_ENTER_WORLD: 'при входе в мир',
-  CU_WHEN_BUTTON_PRESSED: 'при нажатии кнопки %1',
+  CU_WHEN_BUTTON_PRESSED: 'при нажатии кнопки %1',  CU_WHEN_SAVE: 'когда игра сохраняется',
+  CU_WHEN_LOAD: 'когда загружается сохранение',
+  CU_DO_SAVE: 'сохранить игру сейчас',
+  CU_DO_LOAD: 'загрузить последнее сохранение',
+
   CU_REGISTER_ITEM: 'зарегистрировать предмет id %1 название %2 описание %3 спрайт %4',
   CU_SPRITE_REF: 'спрайт %1',
   CU_REGISTER_STATUS: 'зарегистрировать эффект id %1 название %2 тип %3 описание %4 спрайт %5',
@@ -2906,6 +3397,7 @@ const MSG_RU: Record<string, string> = {
   CU_DEFINE_ITEM_USE: 'при использовании %1',
   CU_DEFINE_ITEM_LIMB_USE: 'при использовании конечностью %1',
   CU_ITEM_SET_PROPERTY: 'установить предмету %1 свойство %2 = %3',
+  CU_GET_ITEM_PROPERTY: 'чтение предмета %1 %2',
   CU_ITEM_SET_TAG: 'установить предмету %1 тег %2',
   CU_ITEM_SET_START_CONDITION: 'установить начальное состояние %1 = %2',
   CU_REGISTER_RECIPE: 'рецепт %1 → %2 ×%3 прочн%4 прочн materials%5 ремонт%6 инт%7',
@@ -2956,8 +3448,10 @@ const MSG_RU: Record<string, string> = {
   CU_LIST_ADD: 'добавить %2 в список %1',
   CU_REGISTER_BUILDING: 'зарегистрировать здание id %1 название %2 описание %3',
   CU_BUILDING_SET_PROPERTY: 'здание %1 установить %2 = %3',
+  CU_GET_BUILDING_PROPERTY: 'чтение здания %1 %2',
   CU_REGISTER_TILE: 'зарегистрировать тайл id %1 название %2 описание %3',
   CU_TILE_SET_PROPERTY: 'тайл %1 установить %2 = %3',
+  CU_GET_TILE_PROPERTY: 'чтение тайла %1 %2',
   CU_REGISTER_LOCALE: 'локализация %1 id %2 кит %3 анг %4',
   CU_REGISTER_CREATURE: 'зарегистрировать существо id %1 название %2 описание %3 спрайт %4 здоровье %5',
   CU_REGISTER_ANIMATION: 'зарегистрировать анимацию id %1 лист %2 ширина кадра %3 высота кадра %4 кадр/с %5 %6',
@@ -2966,6 +3460,8 @@ const MSG_RU: Record<string, string> = {
   CU_MOVE_CREATURE_TO: 'переместить существо %1 к X %2 Y %3 скорость %4',
   CU_DESTROY_CREATURE: 'уничтожить существо %1',
   CU_PLAY_CREATURE_ANIMATION: 'проиграть существу %1 анимацию %2',
+  CU_SET_PLAYER_VISIBLE: 'видимость игрока: %1',
+  CU_SET_CREATURE_VISIBLE: 'видимость существа %1: %2',
   CU_CREATURE_POSITION: 'список позиций существа %1',
   CU_PLAYER_HEALTH: 'здоровье кожи туловища',
   CU_PLAYER_MAX_HEALTH: 'макс. здоровье кожи',
@@ -3020,10 +3516,12 @@ const MSG_RU: Record<string, string> = {
   CU_PLAYER_BREATHING: 'дышит',
   CU_PLAYER_CROUCHING: 'присел',
   CU_SET_PLAYER_PROPERTY: 'у игрока %1 = %2',
+  CU_GET_PLAYER_PROPERTY: 'чтение игрока %1',
   CU_SET_PLAYER_FLAG: 'у игрока %1 = %2',
   CU_SET_SKILL: 'навык %1 = %2',
   CU_SET_SKILL_RANGE: 'диапазон опыта навыка %1 от %2 до %3',
   CU_SET_LIMB_PROPERTY: 'у конечности %2 %1 = %3',
+  CU_GET_LIMB_PROPERTY: 'чтение конечности %2 %1',
   CU_SET_LIMB_FLAG: 'у конечности %2 %1 = %3',
   CU_RAGDOLL: ' ragdoll',
   CU_JUMP: 'прыжок',
@@ -3129,6 +3627,30 @@ const MSG_RU: Record<string, string> = {
   CU_ADD_VELOCITY: 'добавить скорость (%1,%2)',
   CU_MAKE_SPRITE: 'разрезать %1 (%2x%3) кадр %4 PPU %5',
   CU_FRAME_ANIMATION_SHEET: 'анимация %1 из листа %2 (%3x%4, %5 FPS, PPU %6, цикл %7)',
+  CU_MP_ON_SERVER_MESSAGE: 'когда получено сообщение от сервера (канал %1)',
+  CU_MP_ON_CLIENT_MESSAGE: 'когда получено сообщение от клиента (канал %1)',
+  CU_MP_SEND_TO_SERVER: 'отправить на сервер, канал %1, нагрузка %2',
+  CU_MP_SEND_TO_CLIENT: 'отправить клиенту %1, канал %2, нагрузка %3',
+  CU_MP_BROADCAST: 'широковещание, канал %1, нагрузка %2, включая хост %3',
+  CU_MP_REQUEST_SERVER: 'запрос к серверу, канал %1, нагрузка %2, при ответе %3',
+  CU_MP_STATE: 'состояние мультиплеера %1',
+  CU_MP_PAYLOAD_SELF: 'текущая сетевая нагрузка',
+  CU_MP_PAYLOAD_TEXT: 'нагрузка %1, текстовое поле %2',
+  CU_MP_PAYLOAD_NUM: 'нагрузка %1, числовое поле %2',
+  CU_MP_PAYLOAD_BOOL: 'нагрузка %1, логическое поле %2',
+  CU_MP_PAYLOAD_HAS: 'нагрузка %1 содержит поле %2',
+  CU_MP_CAPTURE_SNAPSHOT: 'захватить снимок синхронизации',
+  CU_MP_APPLY_SNAPSHOT: 'применить снимок синхронизации %1',
+  CU_MP_BROADCAST_SNAPSHOT: 'рассылать снимок синхронизации, включая хост %1',
+  CU_MP_REQUEST_INITIAL_SNAPSHOT: 'запросить начальный снимок синхронизации',
+  CU_MP_SCHEDULE_INITIAL_SNAPSHOT: 'отложить начальный снимок синхронизации',  CU_JSON_NEW_OBJECT: 'новый объект',
+  CU_JSON_NEW_ARRAY: 'новый массив',
+  CU_JSON_SET: 'задать %1[%2] = %3',
+  CU_JSON_GET: 'поле %2 из %1',
+  CU_JSON_AT: 'элемент %1[%2]',
+  CU_JSON_PUSH: 'добавить %2 в %1',
+  CU_JSON_LENGTH: 'длина %1',
+
 };
 
 export function setMessages(lang: string) {
@@ -3149,6 +3671,19 @@ export function defineBlocks(lang: string = 'zh') {
   const blocks = (Blockly as any).Blocks;
   if (blocks && blocks.lists_create_with) {
     blocks.lists_create_with.inputsInline = true;
+    const lcd: any = blocks.lists_create_with;
+    if (!lcd.__cuItemCheck && typeof lcd.init === 'function') {
+      const origInit = lcd.init;
+      lcd.init = function (this: any) {
+        origInit.call(this);
+        for (const inp of this.inputList || []) {
+          if (inp && typeof inp.name === 'string' && inp.name.indexOf('ADD') === 0 && inp.setCheck) {
+            inp.setCheck(['String', 'Sound']);
+          }
+        }
+      };
+      lcd.__cuItemCheck = true;
+    }
   }
   // Force function blocks to horizontal
   for (const t of ['cu_define_function', 'cu_call_function', 'cu_call_function_value']) {
@@ -3164,6 +3699,11 @@ export function defineBlocks(lang: string = 'zh') {
         usable: ['Boolean'], wearable: ['Boolean'],
         useLimbAction: ['Boolean'], destroyAtZeroCondition: ['Boolean'],
         placeable: [],
+        slotRotation: ['Number'], rotSpeed: ['Number'], jumpHeightMultChange: ['Number'],
+        wearableVisualOffset: ['Number'], wearableArmor: ['Number'], wearableIsolation: ['Number'],
+        SpriteScale: ['Number'], InventoryIconScale: ['Number'], scaleConditionToward: ['Number'],
+        SpawnFrequency: ['Number'], IconAnimationId: ['String'], WornSpriteAnimationId: ['String'],
+        LiquidMaskAnimationId: ['String'], wearSlotId: ['String'],
       };
       const updateCheck = () => {
         const prop = this.getFieldValue('PROP') as string;
@@ -3411,7 +3951,7 @@ function createBlockAtCenter(type: string, fields: Record<string, string>, ws: B
 // ── C# Code Generator ──
 export const csharpGenerator = new Blockly.Generator('CSharp');
 
-const EVENT_TYPES = new Set(['cu_when_awake', 'cu_when_update', 'cu_when_hurt', 'cu_when_die', 'cu_when_pickup', 'cu_when_drop', 'cu_when_wear', 'cu_when_heal', 'cu_when_laststand', 'cu_when_enter_world', 'cu_when_button_pressed']);
+const EVENT_TYPES = new Set(['cu_when_awake', 'cu_when_update', 'cu_when_hurt', 'cu_when_die', 'cu_when_pickup', 'cu_when_drop', 'cu_when_wear', 'cu_when_heal', 'cu_when_laststand', 'cu_when_enter_world', 'cu_when_button_pressed', 'cu_when_save', 'cu_when_load', 'cu_mp_on_server_message', 'cu_mp_on_client_message']);
 const origBlockToCode = csharpGenerator.blockToCode.bind(csharpGenerator);
 csharpGenerator.blockToCode = (block: Blockly.Block, opt_thisOnly?: boolean) => {
   if (block && EVENT_TYPES.has(block.type) && !opt_thisOnly) {
@@ -3452,6 +3992,10 @@ csharpGenerator.forBlock['cu_when_button_pressed'] = (block) => {
   const id = block.getFieldValue('CONTROL_ID') || 'myButton';
   return `//EVENT:OnButtonPressed:${id}\n`;
 };
+csharpGenerator.forBlock['cu_when_save'] = () => '//PATCH:OnSave\n';
+csharpGenerator.forBlock['cu_when_load'] = () => '//PATCH:OnLoad\n';
+csharpGenerator.forBlock['cu_do_save'] = () => 'SaveSystem.SaveGame();\n';
+csharpGenerator.forBlock['cu_do_load'] = () => 'SaveSystem.TryLoadGame();\n';
 
 // Registration
 csharpGenerator.forBlock['cu_register_item'] = (block, gen) => {
@@ -3516,17 +4060,45 @@ csharpGenerator.forBlock['cu_define_item_limb_use'] = (block, gen) => {
 csharpGenerator.forBlock['cu_item_set_property'] = (block, gen) => {
   const prop = block.getFieldValue('PROP');
   const target = gen.valueToCode(block, 'TARGET_ITEM', ORDER_ATOMIC) || '"myItem"';
-  if (prop === 'placeable') {
-    return `${target}.tags = "placeable";\n${target}.Stats.usable = true;\n${target}.Stats.usableWithLMB = true;\n`;
+  const val = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
+  // String id literal targets a registered CustomItemInfo (definition), which has
+  // the stats members directly and no .Stats property - mutate via TryGetCustomInfo.
+  if (target.startsWith('"')) {
+    const v = tmp('it');
+    // CustomItemInfo exposes no condition member; the start condition lives in the
+    // generated RegisterContent dictionary that the Item.Start patch reads from.
+    if (prop === 'condition') {
+      return `RegisterContent._startConditionConfigs[${target}] = ${float(val)};\n`;
+    }
+    if (prop === 'placeable') {
+      return `if (ItemRegistry.TryGetCustomInfo(${target}, out var ${v})) { ${v}.tags = "placeable"; ${v}.usable = true; ${v}.usableWithLMB = true; }\n`;
+    }
+    let a;
+    if (ITEM_TOP_FLOAT.has(prop)) a = `${v}.${prop} = ${float(val)};`;
+    else if (ITEM_TOP_INT.has(prop)) a = `${v}.${prop} = (int)(${val});`;
+    else if (ITEM_TOP_STRING.has(prop) || ITEM_STATS_STRING.has(prop)) a = `${v}.${prop} = ${val};`;
+    else if (ITEM_NUM_STATS.has(prop)) a = `${v}.${prop} = ${float(val)};`;
+    else if (ITEM_BOOL_STATS.has(prop)) a = `${v}.${prop} = ${bool(val)};`;
+    else a = `${v}.${prop} = ${val};`;
+    return `if (ItemRegistry.TryGetCustomInfo(${target}, out var ${v})) { ${a} }\n`;
   }
-  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  const itemProps = ['condition'];
-  const numStatsProps = ['weight','slotRotation','rotSpeed','jumpHeightMultChange','wearableVisualOffset','spriteScale','scaleConditionToward'];
-  const boolStatsProps = ['usable','wearable','useLimbAction','destroyAtZeroCondition','wearableArmor','wearableIsolation','wearableHitDurabilityLossMultiplier'];
-  if (itemProps.includes(prop)) return `${target}.${prop} = ${float(v)};\n`;
-  if (numStatsProps.includes(prop)) return `${target}.Stats.${prop} = ${float(v)};\n`;
-  if (boolStatsProps.includes(prop)) return `${target}.Stats.${prop} = ${bool(v)};\n`;
-  return `${target}.${prop} = ${v};\n`;
+  // Runtime Item expression (held item, event item, ...): legacy paths.
+  // Parenthesize: valueToCode may return a ternary (cu_get_held_item) which
+  // would otherwise swallow the member access on its false branch.
+  const t = `(${target})`;
+  if (prop === 'placeable') {
+    return `${t}.tags = "placeable";\n${t}.Stats.usable = true;\n${t}.Stats.usableWithLMB = true;\n`;
+  }
+  const v = val;
+  if (prop === 'condition') return `${t}.condition = ${float(v)};\n`;
+  const numStatsProps = ['weight','slotRotation','rotSpeed','jumpHeightMultChange','wearableVisualOffset','spriteScale','scaleConditionToward','wearableArmor','wearableIsolation'];
+  const boolStatsProps = ['usable','wearable','useLimbAction','destroyAtZeroCondition','wearableHitDurabilityLossMultiplier'];
+  if (numStatsProps.includes(prop)) return `${t}.Stats.${prop} = ${float(v)};\n`;
+  if (boolStatsProps.includes(prop)) return `${t}.Stats.${prop} = ${bool(v)};\n`;
+  if (ITEM_TOP_FLOAT.has(prop)) return `${t}.${prop} = ${float(v)};\n`;
+  if (ITEM_TOP_INT.has(prop)) return `${t}.${prop} = (int)(${v});\n`;
+  if (ITEM_TOP_STRING.has(prop)) return `${t}.${prop} = ${v};\n`;
+  return `${t}.${prop} = ${v};\n`;
 };
 csharpGenerator.forBlock['cu_item_set_tag'] = (block, gen) => {
   const tag = block.getFieldValue('TAG') || 'placeable';
@@ -3537,7 +4109,11 @@ csharpGenerator.forBlock['cu_item_set_start_condition'] = (block, gen) => {
   const target = gen.valueToCode(block, 'TARGET_ITEM', ORDER_ATOMIC) || '"myItem"';
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '1';
   const id = target.replace(/^"|"$/g, '');
-  return `//ITEM_START_CONDITION:{"Id":"${id.replace(/"/g, '\\"')}","Condition":${float(v)}}\n`;
+  // The value lands in JSON: strip the C# float suffix, or fall back to a JSON
+  // string when the value is an expression (the server parses both forms).
+  const lit = v.trim();
+  const condJson = /^-?\d+(\.\d+)?f?$/.test(lit) ? lit.replace(/f$/, '') : JSON.stringify(lit);
+  return `//ITEM_START_CONDITION:{"Id":"${id.replace(/"/g, '\\"')}","Condition":${condJson}}\n`;
 };
 // Helper: walk a lists_create_with block and extract item ID strings from each slot
 function extractListItemIds(listBlock: Blockly.Block | null): string[] {
@@ -3690,6 +4266,11 @@ function soundInput(block: any, gen: any): string {
 function isCustomSound(block: any): boolean {
   return block.getInputTargetBlock ? block.getInputTargetBlock('SOUND')?.type === 'cu_sound_custom' : false;
 }
+function soundNameExpr(block: any, s: string): string {
+  const target = block.getInputTargetBlock ? block.getInputTargetBlock('SOUND') : null;
+  if (!target || target.type === 'cu_sound_vanilla') return s;
+  return `RegisterContent.LoadAudio(${s})`;
+}
 function soundCall(block: any, gen: any, x: string, y: string, vol: string): string {
   const s = soundInput(block, gen) || '"beep"';
   if (isCustomSound(block)) {
@@ -3697,7 +4278,7 @@ function soundCall(block: any, gen: any, x: string, y: string, vol: string): str
     return `CUCoreUtils.PlaySoundAt(RegisterContent.LoadAudio(${s}), volume: ${vol});\n`;
   }
   const pos = x ? `new Vector2(${x}, ${y})` : 'body.transform.position';
-  return `Sound.Play(${s}, ${pos}, false, false, null, ${vol});\n`;
+  return `Sound.Play(${soundNameExpr(block, s)}, ${pos}, false, false, null, ${vol});\n`;
 }
 
 csharpGenerator.forBlock['cu_play_sound'] = (block, gen) =>
@@ -3714,7 +4295,7 @@ csharpGenerator.forBlock['cu_play_sound_at'] = (block, gen) =>
 csharpGenerator.forBlock['cu_play_sound_2d'] = (block, gen) => {
   const vol = floatSuffix(gen.valueToCode(block, 'VOLUME', ORDER_ATOMIC) || '1');
   const s = soundInput(block, gen) || '"beep"';
-  const clip = isCustomSound(block) ? `RegisterContent.LoadAudio(${s})` : s;
+  const clip = soundNameExpr(block, s);
   return `Sound.Play(${clip}, body.transform.position, true, false, null, ${vol});\n`;
 };
 
@@ -3780,7 +4361,7 @@ csharpGenerator.forBlock['cu_happiness'] = () => ['body.happiness', ORDER_ATOMIC
 csharpGenerator.forBlock['cu_temperature'] = () => ['body.temperature', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_hunger'] = () => ['body.hunger', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_weight'] = () => ['body.weightOffset', ORDER_ATOMIC];
-csharpGenerator.forBlock['cu_player_position'] = () => ['new List<float> { body.transform.position.x, body.transform.position.y }', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_player_position'] = () => ['new List<string> { body.transform.position.x.ToString(System.Globalization.CultureInfo.InvariantCulture), body.transform.position.y.ToString(System.Globalization.CultureInfo.InvariantCulture) }', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_item_condition'] = () => ['item.condition', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_item_name'] = () => ['item.fullName', ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_world_time'] = () => ['WorldGeneration.TotalRunTime()', ORDER_ATOMIC];
@@ -3908,10 +4489,18 @@ csharpGenerator.forBlock['cu_register_building'] = (block) => {
   return `//REGISTER_BUILDING:${json}\n`;
 };
 csharpGenerator.forBlock['cu_building_set_property'] = (block, gen) => {
-  const id = block.getFieldValue('ID');
-  const prop = block.getFieldValue('PROP');
+  const id = q(block.getFieldValue('ID') || 'myBuilding');
+  const raw = block.getFieldValue('PROP');
+  const prop = BUILDING_PROP_ALIAS[raw] || raw;
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `BuildingEntityRegistry.GetDefinition("${id}").${prop} = ${v};\n`;
+  const value = BUILDING_ENUM[prop]
+    ? `(${BUILDING_ENUM[prop]})System.Enum.Parse(typeof(${BUILDING_ENUM[prop]}), (string)(${v}))`
+    : BUILDING_INT.has(prop) ? `(int)(${v})`
+    : BUILDING_USHORT.has(prop) ? `(ushort)(${v})`
+    : BUILDING_FLOAT.has(prop) ? float(v)
+    : v;
+  const n = tmp('bd');
+  return `if (BuildingEntityRegistry.TryGetDefinition("${id}", out var ${n})) { ${n}.${prop} = ${value}; }\n`;
 };
 
 // Tile
@@ -3923,10 +4512,17 @@ csharpGenerator.forBlock['cu_register_tile'] = (block) => {
   return `//REGISTER_TILE:${json}\n`;
 };
 csharpGenerator.forBlock['cu_tile_set_property'] = (block, gen) => {
-  const id = block.getFieldValue('ID');
-  const prop = block.getFieldValue('PROP');
+  const id = q(block.getFieldValue('ID') || 'myTile');
+  const raw = block.getFieldValue('PROP');
+  const prop = TILE_PROP_ALIAS[raw] || raw;
   const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || '0';
-  return `TileRegistry.GetDefinition("${id}").${prop} = ${v};\n`;
+  const value = TILE_ENUM[prop]
+    ? `(${TILE_ENUM[prop]})System.Enum.Parse(typeof(${TILE_ENUM[prop]}), (string)(${v}))`
+    : TILE_INT.has(prop) ? `(int)(${v})`
+    : TILE_FLOAT.has(prop) ? float(v)
+    : v;
+  const n = tmp('td');
+  return `if (TileRegistry.TryGetDefinition("${id}", out var ${n})) { ${n}.${prop} = ${value}; }\n`;
 };
 
 // Locale
@@ -3989,9 +4585,14 @@ csharpGenerator.forBlock['cu_destroy_creature'] = (block) => {
   const id = (block.getFieldValue('CREATURE_ID') || 'myCreature').replace(/"/g, '\\"');
   return `CuCreatureManager.Destroy("${id}");\n`;
 };
+csharpGenerator.forBlock['cu_set_creature_visible'] = (block) => {
+  const id = (block.getFieldValue('CREATURE_ID') || 'myCreature').replace(/"/g, '\\"');
+  const vis = block.getFieldValue('VISIBLE') === 'true';
+  return `CuCreatureManager.SetVisible("${id}", ${vis});\n`;
+};
 csharpGenerator.forBlock['cu_creature_position'] = (block) => {
   const id = (block.getFieldValue('CREATURE_ID') || 'myCreature').replace(/"/g, '\\"');
-  return [`CuCreatureManager.GetPositionList("${id}")`, ORDER_ATOMIC];
+  return [`CuCreatureManager.GetPositionList("${id}").ConvertAll(v => v.ToString(System.Globalization.CultureInfo.InvariantCulture))`, ORDER_ATOMIC];
 };
 
 // Player state getters
@@ -4135,6 +4736,10 @@ csharpGenerator.forBlock['cu_add_velocity'] = (block, gen) => {
   const x = gen.valueToCode(block, 'X', ORDER_ATOMIC) || '0';
   const y = gen.valueToCode(block, 'Y', ORDER_ATOMIC) || '0';
   return `body.SetVelocity(body.lastTimeStepVelocity + new Vector2(${floatSuffix(x)}, ${floatSuffix(y)}));\n`;
+};
+csharpGenerator.forBlock['cu_set_player_visible'] = (block) => {
+  const vis = block.getFieldValue('VISIBLE') === 'true';
+  return `foreach (var _visR in body.transform.GetComponentsInChildren<SpriteRenderer>(true)) _visR.enabled = ${vis};\n`;
 };
 
 // ═══ Limb getters ═══════════════════════════════════════════
@@ -4513,7 +5118,8 @@ csharpGenerator.forBlock['cu_register_mod_option'] = (block, gen) => {
   } else {
     def = `Float("${id}", "${label}", "${desc}", "${cat}", ${float(block.getFieldValue('MIN') || '0')}, ${float(block.getFieldValue('MAX') || '10')}, ${float(block.getFieldValue('DEFAULT') || '1')}`;
   }
-  return `ModOptionsRegistry.Register(ModOptionDefinition.${def}${lambda}));\n`;
+  const call = `ModOptionsRegistry.Register(ModOptionDefinition.${def}${lambda}));`;
+  return `//REGISTER_CALL:${JSON.stringify({ Code: call })}\n`;
 };
 
 // ── Persistent key/value config (CUCoreUtils.Get*/Set*) ──
@@ -4536,7 +5142,8 @@ csharpGenerator.forBlock['cu_cfg_set'] = (block, gen) => {
 csharpGenerator.forBlock['cu_register_keybind'] = (block) => {
   const id = q(block.getFieldValue('ID') || 'myAction');
   const desc = q(block.getFieldValue('DESC') || '');
-  return `CUCoreUtils.AllowKeybindRebind("${id}", "${desc}");\n`;
+  const call = `CUCoreUtils.AllowKeybindRebind("${id}", "${desc}");`;
+  return `//REGISTER_CALL:${JSON.stringify({ Code: call })}\n`;
 };
 csharpGenerator.forBlock['cu_key_code'] = (block) => [`KeyCode.${block.getFieldValue('KEY') || 'None'}`, ORDER_ATOMIC];
 csharpGenerator.forBlock['cu_key_sprite'] = (block) => [`CUCoreUtils.GetKeySprite(KeyCode.${block.getFieldValue('KEY') || 'None'})`, ORDER_ATOMIC];
@@ -4579,7 +5186,8 @@ csharpGenerator.forBlock['cu_get_cached_sprite'] = (block) => {
 csharpGenerator.forBlock['cu_register_bundle'] = (block) => {
   const id = q(block.getFieldValue('ID') || 'myBundle');
   const path = q(block.getFieldValue('PATH') || 'Assets/bundle.bundle');
-  return `AssetLoader.RegisterBundleFromPluginFolder(Plugin.Instance, "${id}", "${path}");\n`;
+  const call = `AssetLoader.RegisterBundleFromPluginFolder(Plugin.Instance, "${id}", "${path}");`;
+  return `//REGISTER_CALL:${JSON.stringify({ Code: call })}\n`;
 };
 csharpGenerator.forBlock['cu_bundle_asset'] = (block) => {
   const bundle = q(block.getFieldValue('BUNDLE') || 'myBundle');
@@ -4640,7 +5248,7 @@ csharpGenerator.forBlock['cu_call_when'] = (block, gen) => {
 };
 csharpGenerator.forBlock['cu_console_log'] = (block, gen) => {
   const text = gen.valueToCode(block, 'TEXT', ORDER_ATOMIC) || '""';
-  return `Log.LogInfo($"[CuBlocky] {text}");\n`;
+  return `Log.LogInfo($"[CuBlocky] {${text}}");\n`;
 };
 csharpGenerator.forBlock['cu_talk_electronic'] = (block, gen) => {
   const text = gen.valueToCode(block, 'TEXT', ORDER_ATOMIC) || '""';
@@ -4673,6 +5281,62 @@ csharpGenerator.forBlock['cu_moodle_animated'] = (block, gen) => {
 
 // ── Input / player queries ──
 csharpGenerator.forBlock['cu_mouse_pos'] = () => ['CUCoreUtils.GetMousePosition()', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_get_player_property'] = (block) => {
+  const f = block.getFieldValue('PROP');
+  const e = `body.${f}`;
+  return GET_PLAYER_BOOL.has(f) ? [`(bool)(${e})`, ORDER_ATOMIC] : [e, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_get_limb_property'] = (block, gen) => {
+  const f = block.getFieldValue('PROP');
+  const limb = gen.valueToCode(block, 'LIMB', ORDER_ATOMIC) || 'body.limbs[0]';
+  const e = `${limb}.${f}`;
+  return GET_LIMB_BOOL.has(f) ? [`(bool)(${e})`, ORDER_ATOMIC] : [e, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_get_building_property'] = (block) => {
+  const id = q(block.getFieldValue('ID') || 'myBuilding');
+  const raw = block.getFieldValue('PROP');
+  const prop = BUILDING_PROP_ALIAS[raw] || raw;
+  const n = tmp('gd');
+  const e = `(BuildingEntityRegistry.TryGetDefinition("${id}", out var ${n}) ? ${n}.${prop} : default)`;
+  if (BUILDING_BOOL.has(prop)) return [`(bool)${e}`, ORDER_ATOMIC];
+  if (BUILDING_STRING.has(prop)) return [`(string)${e}`, ORDER_ATOMIC];
+  if (BUILDING_INT.has(prop) || BUILDING_USHORT.has(prop)) return [`(int)${e}`, ORDER_ATOMIC];
+  return [`(float)${e}`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_get_tile_property'] = (block) => {
+  const id = q(block.getFieldValue('ID') || 'myTile');
+  const raw = block.getFieldValue('PROP');
+  const prop = TILE_PROP_ALIAS[raw] || raw;
+  const n = tmp('gd');
+  const e = `(TileRegistry.TryGetDefinition("${id}", out var ${n}) ? ${n}.${prop} : default)`;
+  if (TILE_BOOL.has(prop)) return [`(bool)${e}`, ORDER_ATOMIC];
+  if (TILE_STRING.has(prop)) return [`(string)${e}`, ORDER_ATOMIC];
+  if (TILE_INT.has(prop)) return [`(int)${e}`, ORDER_ATOMIC];
+  return [`(float)${e}`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_get_item_property'] = (block, gen) => {
+  const target = gen.valueToCode(block, 'TARGET_ITEM', ORDER_ATOMIC) || '"myItem"';
+  const prop = block.getFieldValue('PROP');
+  let e;
+  if (target.startsWith('"')) {
+    const n = tmp(prop === 'condition' ? 'gc' : 'gi');
+    // CustomItemInfo has no condition member; the configured start condition
+    // lives in the generated RegisterContent dictionary.
+    if (prop === 'condition') {
+      e = `(RegisterContent._startConditionConfigs.TryGetValue(${target}, out var ${n}) ? ${n} : default)`;
+    } else {
+      e = `(ItemRegistry.TryGetCustomInfo(${target}, out var ${n}) ? ${n}.${prop} : default)`;
+    }
+  } else {
+    const def = ITEM_GET_STRING.has(prop) ? '""' : ITEM_GET_BOOL.has(prop) ? 'false' : ITEM_GET_INT.has(prop) ? '0' : '0f';
+    const path = ITEM_GET_TOP.has(prop) ? `?.${prop}` : `?.Stats?.${prop}`;
+    e = `((${target})${path} ?? ${def})`;
+  }
+  if (ITEM_GET_STRING.has(prop)) return [`(string)${e}`, ORDER_ATOMIC];
+  if (ITEM_GET_BOOL.has(prop)) return [`(bool)${e}`, ORDER_ATOMIC];
+  if (ITEM_GET_INT.has(prop)) return [`(int)${e}`, ORDER_ATOMIC];
+  return [`(float)${e}`, ORDER_ATOMIC];
+};
 csharpGenerator.forBlock['cu_get_held_item'] = () => {
   const n = tmp('cuHeld');
   return [`CUCoreUtils.TryGetHeldItem(out Item ${n}) ? ${n} : null`, ORDER_ATOMIC];
@@ -4709,7 +5373,7 @@ csharpGenerator.forBlock['cu_register_liquid_tile'] = (block, gen) => {
   const id = q(block.getFieldValue('ID') || 'myLiquidTile');
   const g = (name: string, fb: string) => gen.valueToCode(block, name, ORDER_ATOMIC) || fb;
   const vm = block.getFieldValue('VISUAL_MODE') || 'ExistingLiquidPlusTint';
-  return `LiquidTileRegistry.Register("${id}", new CustomLiquidTileInfo {\n` +
+  const call = `LiquidTileRegistry.Register("${id}", new CustomLiquidTileInfo {\n` +
     `  LiquidId = "${q(block.getFieldValue('LIQUID_ID') || 'water')}",\n` +
     `  Buoyancy = ${float(g('BUOYANCY', '0.6'))},\n` +
     `  Drag = ${float(g('DRAG', '0.915'))},\n` +
@@ -4724,7 +5388,8 @@ csharpGenerator.forBlock['cu_register_liquid_tile'] = (block, gen) => {
     `  ConsumeOnDrink = ${g('CONSUME_DRINK', 'true')},\n` +
     `  ConsumeOnFill = ${g('CONSUME_FILL', 'true')},\n` +
     `  FillLiquidId = "${q(block.getFieldValue('FILL_LIQUID') || 'water')}"\n` +
-    `});\n`;
+    `});`;
+  return `//REGISTER_CALL:${JSON.stringify({ Code: call })}\n`;
 };
 csharpGenerator.forBlock['cu_place_liquid_tile'] = (block, gen) => {
   const id = q(block.getFieldValue('ID') || 'myLiquidTile');
@@ -4742,7 +5407,8 @@ csharpGenerator.forBlock['cu_flood_liquid_tile'] = (block, gen) => {
 csharpGenerator.forBlock['cu_register_structure_file'] = (block) => {
   const id = q(block.getFieldValue('ID') || 'myStructure');
   const path = q(block.getFieldValue('PATH') || 'Structures/house.json');
-  return `StructureRegistry.RegisterFromFile("${id}", "${path}");\n`;
+  const call = `StructureRegistry.RegisterFromFile("${id}", "${path}");`;
+  return `//REGISTER_CALL:${JSON.stringify({ Code: call })}\n`;
 };
 csharpGenerator.forBlock['cu_place_structure'] = (block, gen) => {
   const id = q(block.getFieldValue('ID') || 'myStructure');
@@ -4778,9 +5444,11 @@ csharpGenerator.forBlock['cu_register_console_command'] = (block, gen) => {
   const body = gen.statementToCode(block, 'BODY') || '{ }';
   if (argDesc) {
     const parts = listPaths(argDesc).map(p => { const [s, ...r] = p.split('|'); return `("${q((s || '').trim())}", "${q(r.join('|').trim())}")`; }).join(', ');
-    return `ConsoleCommandRegistry.Register("${name}", "${desc}", (string[] args) => { ${body} }, null, new (string, string)[] { ${parts} });\n`;
+    const call = `ConsoleCommandRegistry.Register("${name}", "${desc}", (string[] args) => { ${body} }, null, new (string, string)[] { ${parts} });`;
+    return `//REGISTER_CALL:${JSON.stringify({ Code: call })}\n`;
   }
-  return `ConsoleCommandRegistry.Register("${name}", "${desc}", (string[] args) => { ${body} });\n`;
+  const call = `ConsoleCommandRegistry.Register("${name}", "${desc}", (string[] args) => { ${body} });`;
+  return `//REGISTER_CALL:${JSON.stringify({ Code: call })}\n`;
 };
 csharpGenerator.forBlock['cu_console_arg'] = (block) => {
   const i = toInt(block.getFieldValue('INDEX') || '0');
@@ -4812,13 +5480,72 @@ export function extractFunctions(ws: Blockly.Workspace): FunctionDef[] {
 // ═══ Dropdown i18n ═══════════════════════════════════════════
 let _blocksLang = 'zh';
 
+// ══ Property classification shared by set/get generators ══
+const BUILDING_PROP_ALIAS: Record<string, string> = {
+  health: 'Health', name: 'Name', description: 'Description', requireGround: 'RequireGround',
+  metallic: 'Metallic', animal: 'Animal', dropChanceMultiplier: 'DropChanceMultiplier',
+  spawnMinPerChunk: 'SpawnMinPerChunk', spawnMaxPerChunk: 'SpawnMaxPerChunk',
+};
+const TILE_PROP_ALIAS: Record<string, string> = {
+  health: 'Health', name: 'Name', description: 'Description', metallic: 'Metallic',
+  toxicity: 'Toxicity', slippery: 'Slippery', sleepQuality: 'SleepQuality',
+  spawnAmount: 'SpawnAmount', collider: 'ColliderType', genStyle: 'GenerationStyle',
+};
+const BUILDING_INT = new Set(['SortingOrder', 'GuaranteedDropAmount', 'SpawnLayers', 'Layer']);
+const BUILDING_USHORT = new Set(['BlockFootstepSoundId']);
+const BUILDING_FLOAT = new Set(['Health', 'DropChanceMultiplier', 'SpawnMinPerChunk', 'SpawnMaxPerChunk', 'HeatPerSecond', 'HeatRadius', 'MaxHeatBodyTemperature', 'RigidbodyGravityScale', 'SurfaceOffset']);
+const BUILDING_BOOL = new Set(['RequireGround','Metallic','Animal','AddRigidbody2D','CantHit','ColliderIsTrigger','CopyGlowPlantLayer','IgnoreBodyOptimize','RandomFlip','SpawnInGround','UseGlowPlantMaterial']);
+const BUILDING_STRING = new Set(['Name','Description','HitSoundReferenceId','RenderReferenceId','SpriteAnimationId']);
+const BUILDING_ENUM: Record<string, string> = {
+  Placement: 'BuildingPlacementType', GenerationStyle: 'BuildingGenerationStyle',
+  LayerEnum: 'BuildingLayer', RigidbodyBodyType: 'RigidbodyType2D',
+};
+const TILE_INT = new Set(['SpawnLayers']);
+const TILE_FLOAT = new Set(['Health', 'SpawnAmount', 'Toxicity']);
+const TILE_BOOL = new Set(['Metallic', 'Slippery', 'NoVariation']);
+const TILE_STRING = new Set(['Name', 'Description', 'HitSound', 'StepSound', 'TileName']);
+const TILE_ENUM: Record<string, string> = {
+  SleepQuality: 'global::Body.SleepQuality', ColliderType: 'UnityEngine.Tilemaps.Tile.ColliderType',
+  GenerationStyle: 'TileGenerationStyle',
+};
+const ITEM_TOP_FLOAT = new Set(['condition', 'SpriteScale', 'InventoryIconScale', 'scaleConditionToward']);
+const ITEM_TOP_INT = new Set(['SpawnFrequency', 'value']);
+const ITEM_TOP_STRING = new Set(['IconAnimationId', 'WornSpriteAnimationId', 'LiquidMaskAnimationId']);
+const ITEM_STATS_STRING = new Set(['wearSlotId']);
+const ITEM_NUM_STATS = new Set(['weight', 'slotRotation', 'rotSpeed', 'jumpHeightMultChange', 'wearableVisualOffset', 'wearableArmor', 'wearableIsolation']);
+const ITEM_BOOL_STATS = new Set(['usable', 'wearable', 'useLimbAction', 'destroyAtZeroCondition']);
+const GET_PLAYER_BOOL = new Set(PLAYER_BOOL_OPTIONS.map((o) => o[3]));
+const GET_LIMB_BOOL = new Set(LIMB_BOOL_OPTIONS.map((o) => o[3]));
+const BUILDING_GET_SKIP = new Set(['Placement', 'GenerationStyle', 'LayerEnum', 'RigidbodyBodyType', 'Layer']);
+const TILE_GET_SKIP = new Set(['SleepQuality', 'ColliderType', 'GenerationStyle']);
+const ITEM_GET_TOP = new Set([...ITEM_TOP_FLOAT, ...ITEM_TOP_INT, ...ITEM_TOP_STRING, 'condition']);
+const ITEM_GET_STRING = new Set([...ITEM_TOP_STRING, 'wearSlotId']);
+const ITEM_GET_BOOL = new Set(ITEM_BOOL_STATS);
+const ITEM_GET_INT = new Set(ITEM_TOP_INT);
+
 const PROP_OPTIONS: DdOption[] = [
-  ['耐久', 'Durability', 'Прочность', 'condition'], ['重量', 'Weight', 'Вес', 'weight'],
-  ['价值', 'Value', 'Стоимость', 'value'],
-  ['可使用', 'Usable', 'Используемый', 'usable'], ['可穿戴', 'Wearable', 'Экипируемый', 'wearable'],
-  ['左手使用', 'UseLimbAction', 'Действие конечности', 'useLimbAction'],
-  ['零耐久销毁', 'DestroyAtZero', 'Уничтожить при 0', 'destroyAtZeroCondition'],
-  ['可放置', 'Placeable', 'Размещаемый', 'placeable'],
+  ['耐久(condition)', 'Durability', 'Прочность', 'condition'],
+  ['重量(weight)', 'Weight', 'Вес', 'weight'],
+  ['价值(value)', 'Value', 'Стоимость', 'value'],
+  ['可使用(usable)', 'Usable', 'Используемый', 'usable'],
+  ['可穿戴(wearable)', 'Wearable', 'Экипируемый', 'wearable'],
+  ['左手使用(useLimbAction)', 'Use limb action', 'Действие конечности', 'useLimbAction'],
+  ['零耐久销毁(destroyAtZeroCondition)', 'Destroy at 0', 'Уничтожить при 0', 'destroyAtZeroCondition'],
+  ['可放置(placeable)', 'Placeable', 'Размещаемый', 'placeable'],
+  ['插槽旋转(slotRotation)', 'Slot rotation', 'Поворот слота', 'slotRotation'],
+  ['旋转速度(rotSpeed)', 'Rotation speed', 'Скор. вращения', 'rotSpeed'],
+  ['跳跃高度变化(jumpHeightMultChange)', 'Jump height change', 'Изм. высоты прыжка', 'jumpHeightMultChange'],
+  ['穿戴视觉偏移(wearableVisualOffset)', 'Wearable visual offset', 'Визуал. смещение', 'wearableVisualOffset'],
+  ['穿戴护甲(wearableArmor)', 'Wearable armor', 'Броня', 'wearableArmor'],
+  ['穿戴隔离(wearableIsolation)', 'Wearable isolation', 'Изоляция', 'wearableIsolation'],
+  ['精灵缩放(SpriteScale)', 'Sprite scale', 'Масштаб спрайта', 'SpriteScale'],
+  ['图标缩放(InventoryIconScale)', 'Icon scale', 'Масштаб иконки', 'InventoryIconScale'],
+  ['耐久趋向缩放(scaleConditionToward)', 'Scale condition toward', 'Сжатие прочности', 'scaleConditionToward'],
+  ['生成频率(SpawnFrequency)', 'Spawn frequency', 'Частота спавна', 'SpawnFrequency'],
+  ['图标动画ID(IconAnimationId)', 'Icon anim id', 'ID анимации иконки', 'IconAnimationId'],
+  ['穿戴精灵ID(WornSpriteAnimationId)', 'Worn sprite anim id', 'ID спрайта ношения', 'WornSpriteAnimationId'],
+  ['液体遮罩ID(LiquidMaskAnimationId)', 'Liquid mask anim id', 'ID маски жидкости', 'LiquidMaskAnimationId'],
+  ['穿戴槽位(wearSlotId)', 'Wear slot id', 'Слот ношения', 'wearSlotId'],
 ];
 
 const TARGET_OPTIONS: DdOption[] = [
@@ -4874,12 +5601,40 @@ const PLACEMENT_OPTIONS: DdOption[] = [
 ];
 
 const BUILDING_PROP_OPTIONS: DdOption[] = [
-  ['血量', 'Health', 'Здоровье', 'health'], ['名称', 'Name', 'Имя', 'name'],
-  ['描述', 'Description', 'Описание', 'description'], ['地面放置', 'RequireGround', 'На пол', 'requireGround'],
-  ['金属', 'Metallic', 'Металл', 'metallic'], ['动物', 'Animal', 'Животное', 'animal'],
-  ['掉落倍率', 'DropChance', 'Шанс дропа', 'dropChanceMultiplier'],
-  ['生成最小数', 'SpawnMin', 'Мин. спавн', 'spawnMinPerChunk'],
-  ['生成最大数', 'SpawnMax', 'Макс. спавн', 'spawnMaxPerChunk'],
+  ['血量(health)', 'Health', 'Здоровье', 'Health'],
+  ['名称(name)', 'Name', 'Имя', 'Name'],
+  ['描述(description)', 'Description', 'Описание', 'Description'],
+  ['地面放置(requireGround)', 'RequireGround', 'Требует опоры', 'RequireGround'],
+  ['金属(metallic)', 'Metallic', 'Металл', 'Metallic'],
+  ['动物(animal)', 'Animal', 'Животное', 'Animal'],
+  ['掉落倍率(dropChanceMultiplier)', 'Drop chance mult', 'Мн. дропа', 'DropChanceMultiplier'],
+  ['生成最小数(spawnMinPerChunk)', 'Spawn min per chunk', 'Мин. спавн', 'SpawnMinPerChunk'],
+  ['生成最大数(spawnMaxPerChunk)', 'Spawn max per chunk', 'Макс. спавн', 'SpawnMaxPerChunk'],
+  ['排序(sortingOrder)', 'Sorting order', 'Порядок отрисовки', 'SortingOrder'],
+  ['保证掉落数(guaranteedDropAmount)', 'Guaranteed drops', 'Гарант. дроп', 'GuaranteedDropAmount'],
+  ['生成层(spawnLayers)', 'Spawn layers', 'Слои спавна', 'SpawnLayers'],
+  ['每秒热量(heatPerSecond)', 'Heat per second', 'Тепло/сек', 'HeatPerSecond'],
+  ['热量半径(heatRadius)', 'Heat radius', 'Радиус жара', 'HeatRadius'],
+  ['最大体温(maxHeatBodyTemperature)', 'Max body heat', 'Макс. нагрев', 'MaxHeatBodyTemperature'],
+  ['刚体重力缩放(rigidbodyGravityScale)', 'Rigidbody gravity', 'Мн. гравитации', 'RigidbodyGravityScale'],
+  ['表面偏移(surfaceOffset)', 'Surface offset', 'Смещение от поверхности', 'SurfaceOffset'],
+  ['图层(int, layer)', 'Layer (int)', 'Слой (int)', 'Layer'],
+  ['脚步音效ID(blockFootstepSoundId)', 'Footstep sound id', 'ID звука шагов', 'BlockFootstepSoundId'],
+  ['添加刚体(addRigidbody2D)', 'Add Rigidbody2D', 'Добавить Rigidbody2D', 'AddRigidbody2D'],
+  ['无法被击中(cantHit)', 'Cant be hit', 'Нельзя ударить', 'CantHit'],
+  ['碰撞为触发器(colliderIsTrigger)', 'Collider is trigger', 'Триггер коллайдер', 'ColliderIsTrigger'],
+  ['复制发光层(copyGlowPlantLayer)', 'Copy glow layer', 'Копировать слой свечения', 'CopyGlowPlantLayer'],
+  ['忽略优化(ignoreBodyOptimize)', 'Ignore body optimize', 'Игнор. оптимизации', 'IgnoreBodyOptimize'],
+  ['随机翻转(randomFlip)', 'Random flip', 'Случ. отражение', 'RandomFlip'],
+  ['生成于地下(spawnInGround)', 'Spawn in ground', 'Спавн в земле', 'SpawnInGround'],
+  ['发光材质(useGlowPlantMaterial)', 'Glow plant material', 'Материал свечения', 'UseGlowPlantMaterial'],
+  ['受击音效ID(hitSoundReferenceId)', 'Hit sound id', 'ID звука удара', 'HitSoundReferenceId'],
+  ['渲染引用(renderReferenceId)', 'Render reference', 'Ссылка рендера', 'RenderReferenceId'],
+  ['精灵动画ID(spriteAnimationId)', 'Sprite anim id', 'ID анимации спрайта', 'SpriteAnimationId'],
+  ['放置面(placement:Floor/Wall/Ceiling)', 'Placement', 'Размещение', 'Placement'],
+  ['生成风格(genStyle:None/Standard/DropPod)', 'Generation style', 'Стиль генерации', 'GenerationStyle'],
+  ['层枚举(layerEnum:Default/Ground/...)', 'Layer enum', 'Слой (enum)', 'LayerEnum'],
+  ['刚体类型(rigidbodyBodyType:Static/Dynamic)', 'Rigidbody body type', 'Тип Rigidbody', 'RigidbodyBodyType'],
 ];
 
 const COLLIDER_OPTIONS: DdOption[] = [
@@ -4898,13 +5653,26 @@ const GEN_STYLE_OPTIONS: DdOption[] = [
 ];
 
 const TILE_PROP_OPTIONS: DdOption[] = [
-  ['血量', 'Health', 'Здоровье', 'health'], ['名称', 'Name', 'Имя', 'name'],
-  ['描述', 'Description', 'Описание', 'description'], ['金属', 'Metallic', 'Металл', 'metallic'],
-  ['毒性', 'Toxicity', 'Токсичность', 'toxicity'], ['滑', 'Slippery', 'Скользкий', 'slippery'],
-  ['睡眠质量', 'SleepQuality', 'Качество сна', 'sleepQuality'],
-  ['生成量', 'SpawnAmount', 'Кол-во спавна', 'spawnAmount'],
-  ['碰撞体', 'Collider', 'Коллайдер', 'collider'], ['生成风格', 'GenStyle', 'Стиль генерации', 'genStyle'],
+  ['血量(health)', 'Health', 'Здоровье', 'Health'],
+  ['名称(name)', 'Name', 'Имя', 'Name'],
+  ['描述(description)', 'Description', 'Описание', 'Description'],
+  ['金属(metallic)', 'Metallic', 'Металл', 'Metallic'],
+  ['毒性(toxicity)', 'Toxicity', 'Токсичность', 'Toxicity'],
+  ['打滑(slippery)', 'Slippery', 'Скользкий', 'Slippery'],
+  ['睡眠质量(sleepQuality:Bad/Good)', 'Sleep quality', 'Качество сна', 'SleepQuality'],
+  ['生成数量(spawnAmount)', 'Spawn amount', 'Кол-во спавна', 'SpawnAmount'],
+  ['碰撞类型(collider:Grid/Sprite/None)', 'Collider type', 'Тип коллайдера', 'ColliderType'],
+  ['生成风格(genStyle:Vein/...)', 'Generation style', 'Стиль генерации', 'GenerationStyle'],
+  ['无变化(noVariation)', 'No variation', 'Без вариаций', 'NoVariation'],
+  ['生成层(spawnLayers)', 'Spawn layers', 'Слои спавна', 'SpawnLayers'],
+  ['受击音效(hitSound)', 'Hit sound', 'Звук удара', 'HitSound'],
+  ['脚步音效(stepSound)', 'Step sound', 'Звук шага', 'StepSound'],
+  ['内部名(tileName)', 'Tile name', 'Внутреннее имя', 'TileName'],
 ];
+
+const BUILDING_GET_OPTIONS: DdOption[] = BUILDING_PROP_OPTIONS.filter((o) => !BUILDING_GET_SKIP.has(o[3]));
+const TILE_GET_OPTIONS: DdOption[] = TILE_PROP_OPTIONS.filter((o) => !TILE_GET_SKIP.has(o[3]));
+const ITEM_GET_OPTIONS: DdOption[] = PROP_OPTIONS.filter((o) => o[3] !== 'placeable');
 
 const LOCALE_TYPE_OPTIONS: DdOption[] = [
   ['物品', 'Item', 'Предмет', 'item'],
@@ -4978,10 +5746,115 @@ const NUMBER_CMP_OPTIONS: DdOption[] = [
   ['≤', '≤', '≤', '<='],
 ];
 
+// ── Multiplayer / 联机 (CUCoreLib.Networking.MultiplayerApi) ──
+const MP_STATE_OPTIONS: DdOption[] = [
+  ['联机可用(available)', 'Multiplayer available (available)', 'Мультиплеер доступен (available)', 'available'],
+  ['联机运行中(running)', 'Multiplayer running (running)', 'Мультиплеер запущен (running)', 'running'],
+  ['我是服务器(isServer)', 'I am server (isServer)', 'Я сервер (isServer)', 'isServer'],
+  ['我是客户端(isClient)', 'I am client (isClient)', 'Я клиент (isClient)', 'isClient'],
+  ['我是主机(isHost)', 'I am host (isHost)', 'Я хост (isHost)', 'isHost'],
+];
+const MP_BOOL_OPTIONS: DdOption[] = [
+  ['是(true)', 'Yes (true)', 'Да (true)', 'true'],
+  ['否(false)', 'No (false)', 'Нет (false)', 'false'],
+];
+
+csharpGenerator.forBlock['cu_mp_on_server_message'] = (block) =>
+  '//NET:Server:' + (block.getFieldValue('CHANNEL') || 'my.channel') + '\n';
+csharpGenerator.forBlock['cu_mp_on_client_message'] = (block) =>
+  '//NET:Client:' + (block.getFieldValue('CHANNEL') || 'my.channel') + '\n';
+
+csharpGenerator.forBlock['cu_mp_send_to_server'] = (block, gen) => {
+  const ch = q(block.getFieldValue('CHANNEL') || 'my.channel');
+  const p = gen.valueToCode(block, 'PAYLOAD', ORDER_ATOMIC) || 'null';
+  return `MultiplayerApi.SendToServer("${ch}", ${p});\n`;
+};
+csharpGenerator.forBlock['cu_mp_send_to_client'] = (block, gen) => {
+  const id = gen.valueToCode(block, 'CLIENT_ID', ORDER_ATOMIC) || '0';
+  const ch = q(block.getFieldValue('CHANNEL') || 'my.channel');
+  const p = gen.valueToCode(block, 'PAYLOAD', ORDER_ATOMIC) || 'null';
+  return `MultiplayerApi.SendToClient((uint)(${id}), "${ch}", ${p});\n`;
+};
+csharpGenerator.forBlock['cu_mp_broadcast'] = (block, gen) => {
+  const ch = q(block.getFieldValue('CHANNEL') || 'my.channel');
+  const p = gen.valueToCode(block, 'PAYLOAD', ORDER_ATOMIC) || 'null';
+  const host = block.getFieldValue('INCLUDE_HOST') === 'true';
+  return `MultiplayerApi.Broadcast("${ch}", ${p}, ${host});\n`;
+};
+csharpGenerator.forBlock['cu_mp_request_server'] = (block, gen) => {
+  const ch = q(block.getFieldValue('CHANNEL') || 'my.channel');
+  const p = gen.valueToCode(block, 'PAYLOAD', ORDER_ATOMIC) || 'null';
+  const body = gen.statementToCode(block, 'BODY') || '';
+  return `MultiplayerApi.RequestServer("${ch}", ${p}, payload => { ${body} });\n`;
+};
+
+const mpRead = (block: any, gen: any, kind: string): [string, number] => {
+  const p = gen.valueToCode(block, 'PAYLOAD', ORDER_ATOMIC) || 'payload';
+  const k = q(block.getFieldValue('KEY') || 'key');
+  if (kind === 'text') return [`((${p})?["${k}"]?.ToString() ?? "")`, ORDER_ATOMIC];
+  if (kind === 'num') return [`((${p})?["${k}"]?.ToObject<float?>() ?? 0f)`, ORDER_ATOMIC];
+  if (kind === 'bool') return [`((${p})?["${k}"]?.ToObject<bool?>() ?? false)`, ORDER_ATOMIC];
+  return [`((${p})?["${k}"] != null)`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_mp_payload_text'] = (block, gen) => mpRead(block, gen, 'text');
+csharpGenerator.forBlock['cu_mp_payload_num'] = (block, gen) => mpRead(block, gen, 'num');
+csharpGenerator.forBlock['cu_mp_payload_bool'] = (block, gen) => mpRead(block, gen, 'bool');
+csharpGenerator.forBlock['cu_mp_payload_has'] = (block, gen) => mpRead(block, gen, 'has');
+csharpGenerator.forBlock['cu_mp_payload_self'] = () => ['payload', ORDER_ATOMIC];
+
+const MP_STATE_PROPS: Record<string, string> = {
+  available: 'IsAvailable', running: 'IsRunning', isServer: 'IsServer', isClient: 'IsClient', isHost: 'IsHost',
+};
+csharpGenerator.forBlock['cu_mp_state'] = (block) =>
+  [`MultiplayerApi.${MP_STATE_PROPS[block.getFieldValue('STATE')] || 'IsAvailable'}`, ORDER_ATOMIC];
+
+csharpGenerator.forBlock['cu_mp_capture_snapshot'] = () => ['MultiplayerApi.CaptureSnapshot()', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_mp_apply_snapshot'] = (block, gen) => {
+  const s = gen.valueToCode(block, 'SNAPSHOT', ORDER_ATOMIC) || 'new JObject()';
+  return `MultiplayerApi.ApplySnapshot(${s});\n`;
+};
+csharpGenerator.forBlock['cu_mp_broadcast_snapshot'] = (block) =>
+  `MultiplayerApi.BroadcastSnapshot(${block.getFieldValue('INCLUDE_HOST') === 'true'});\n`;
+csharpGenerator.forBlock['cu_mp_request_initial_snapshot'] = () => `MultiplayerApi.RequestInitialSnapshot();\n`;
+csharpGenerator.forBlock['cu_mp_schedule_initial_snapshot'] = () => `MultiplayerApi.ScheduleInitialSnapshot();\n`;
+
+// JSON / data structure blocks (Newtonsoft JToken world, interoperates with
+// the multiplayer payload reads: an object block plugs straight into them)
+csharpGenerator.forBlock['cu_json_new_object'] = () => ['new JObject()', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_json_new_array'] = () => ['new JArray()', ORDER_ATOMIC];
+csharpGenerator.forBlock['cu_json_set'] = (block, gen) => {
+  const o = gen.valueToCode(block, 'OBJ', ORDER_ATOMIC) || 'new JObject()';
+  const k = q(block.getFieldValue('KEY') || 'key');
+  const v = gen.valueToCode(block, 'VALUE', ORDER_ATOMIC) || 'null';
+  return `(${o})["${k}"] = ${v};\n`;
+};
+csharpGenerator.forBlock['cu_json_get'] = (block, gen) => {
+  const o = gen.valueToCode(block, 'OBJ', ORDER_ATOMIC) || 'new JObject()';
+  const k = q(block.getFieldValue('KEY') || 'key');
+  return [`((${o})?["${k}"])`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_json_at'] = (block, gen) => {
+  const a = gen.valueToCode(block, 'ARR', ORDER_ATOMIC) || 'new JArray()';
+  const i = gen.valueToCode(block, 'INDEX', ORDER_ATOMIC) || '0';
+  // JArray indexes by int; Blockly numbers are floats (1f), so cast. The `?`
+  // keeps the read null-conditional and lets InferVar see a JToken expression.
+  return [`((${a})?[(int)(${i})])`, ORDER_ATOMIC];
+};
+csharpGenerator.forBlock['cu_json_push'] = (block, gen) => {
+  const a = gen.valueToCode(block, 'ARR', ORDER_ATOMIC) || 'new JArray()';
+  const v = gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || 'null';
+  return `(${a}).Add(${v});\n`;
+};
+csharpGenerator.forBlock['cu_json_length'] = (block, gen) => {
+  const s = gen.valueToCode(block, 'SRC', ORDER_ATOMIC) || 'new JObject()';
+  return [`((${s})?.Count ?? 0)`, ORDER_ATOMIC];
+};
+
 const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_set_item_category: { CATEGORY: CATEGORY_OPTIONS },
   cu_item_gun: { AMMO_TYPE: AMMO_TYPE_OPTIONS, FIRING_MODE: FIRING_MODE_OPTIONS, FEED_TYPE: FEED_TYPE_OPTIONS },
   cu_item_set_property: { PROP: PROP_OPTIONS },
+  cu_get_item_property: { PROP: ITEM_GET_OPTIONS },
   cu_item_set_tag: { TAG: TAG_OPTIONS },
   cu_item_use: { TARGET: TARGET_OPTIONS, ACTION: ACTION_OPTIONS },
   cu_item_consume: { TARGET: TARGET_OPTIONS },
@@ -4995,7 +5868,9 @@ const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_string_op: { OP: STRING_OP_OPTIONS },
   cu_logic_compare: { OP: LOGIC_OP_OPTIONS },
   cu_building_set_property: { PROP: BUILDING_PROP_OPTIONS },
+  cu_get_building_property: { PROP: BUILDING_GET_OPTIONS },
   cu_tile_set_property: { PROP: TILE_PROP_OPTIONS },
+  cu_get_tile_property: { PROP: TILE_GET_OPTIONS },
   cu_register_locale: { TYPE: LOCALE_TYPE_OPTIONS },
   cu_limb_index: { LIMB: LIMB_OPTIONS },
   cu_item_wearable: { WEAR_LIMB: WEAR_LIMB_OPTIONS },
@@ -5006,6 +5881,9 @@ const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
   cu_define_function: { RETURN_TYPE: RETURN_TYPE_OPTIONS },
   cu_item_magazine: { AMMO_TYPE: AMMO_TYPE_OPTIONS },
   cu_set_item_base_stats: { DECAY_ENABLED: DECAY_BOOL_OPTIONS },
+  cu_mp_state: { STATE: MP_STATE_OPTIONS },
+  cu_mp_broadcast: { INCLUDE_HOST: MP_BOOL_OPTIONS },
+  cu_mp_broadcast_snapshot: { INCLUDE_HOST: MP_BOOL_OPTIONS },
   cu_number_compare: { OP: NUMBER_CMP_OPTIONS },
   cu_set_player_property: { PROP: PLAYER_PROP_OPTIONS },
   cu_set_player_flag: { PROP: PLAYER_BOOL_OPTIONS },

@@ -15,3 +15,12 @@
 .be .blocklyFlyout {
   margin-top: var(--toolbar-h, 40px);
 }
+
+/* Category list outgrew the viewport: reserve the toolbar strip and scroll
+   the toolbox itself instead of clipping the bottom categories. */
+.be .blocklyToolbox {
+  height: calc(100% - var(--toolbar-h, 40px)) !important;
+  max-height: calc(100% - var(--toolbar-h, 40px)) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+}

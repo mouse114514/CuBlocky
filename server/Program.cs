@@ -3,8 +3,17 @@ using System.Text.Json;
 using CuBlocky.Server.Models;
 using CuBlocky.Server.Nodes;
 using CuBlocky.Server.Compiler;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Assets are raw WAV/MP3 files and routinely exceed Kestrel's 30,000,000-byte
+// default, which the browser experiences as a dropped connection ("Failed to
+// fetch") instead of a readable error. The multipart parser has its own 128 MB
+// cap on top, so both limits have to move together.
+const long maxUploadBytes = 512L * 1024 * 1024;
+builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = maxUploadBytes);
+builder.Services.Configure<FormOptions>(o => o.MultipartBodyLengthLimit = maxUploadBytes);
 
 var app = builder.Build();
 
@@ -668,8 +677,10 @@ app.MapDelete("/api/projects/{name}", (string name) =>
 });
 
 // ── Auto-open browser ──────────────────────────────────────────
+// Skip when CUBLOCKY_NO_BROWSER=1 (tests/background runs must not steal focus).
 app.Lifetime.ApplicationStarted.Register(() =>
 {
+    if (Environment.GetEnvironmentVariable("CUBLOCKY_NO_BROWSER") == "1") return;
     var url = app.Urls.FirstOrDefault() ?? "http://localhost:5000";
     try
     {

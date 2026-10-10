@@ -50,6 +50,8 @@ const CAT_ICONS: Record<string, string> = {
   CAT_ASSET: `/media/cat-icons/assets.png?v=${_t}`,
   CAT_UI: `/media/cat-icons/ui.png?v=${_t}`,
   CAT_LOCALE: '',
+  CAT_NET: '',
+  CAT_DATA: '',
 };
 
 const TOOLBOX = `
@@ -68,6 +70,9 @@ const TOOLBOX = `
     <block type="cu_when_laststand"></block>
     <block type="cu_when_enter_world"></block>
     <block type="cu_when_button_pressed"></block>
+    <sep></sep>
+    <block type="cu_when_save"></block>
+    <block type="cu_when_load"></block>
     <block type="cu_define_item_use">
       <value name="ITEM"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
     </block>
@@ -224,6 +229,7 @@ const TOOLBOX = `
       <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
       <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
+    <block type="cu_set_player_visible"></block>
     <sep></sep>
     <block type="cu_set_player_property">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
@@ -231,6 +237,7 @@ const TOOLBOX = `
     <block type="cu_set_player_flag">
       <value name="VALUE"><shadow type="cu_true"></shadow></value>
     </block>
+    <block type="cu_get_player_property"></block>
     <block type="cu_set_skill">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
     </block>
@@ -251,6 +258,9 @@ const TOOLBOX = `
     <block type="cu_set_limb_flag">
       <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
       <value name="VALUE"><shadow type="cu_false"></shadow></value>
+    </block>
+    <block type="cu_get_limb_property">
+      <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
     </block>
     <block type="cu_limb_break">
       <value name="LIMB"><shadow type="cu_limb_index"><field name="LIMB">1</field></shadow></value>
@@ -357,6 +367,9 @@ const TOOLBOX = `
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
     </block>
     <block type="cu_item_set_property">
+      <value name="TARGET_ITEM"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
+    </block>
+    <block type="cu_get_item_property">
       <value name="TARGET_ITEM"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
     </block>
     <block type="cu_item_set_tag">
@@ -498,6 +511,9 @@ const TOOLBOX = `
       <value name="HOLD"><shadow type="cu_number"><field name="NUM">0.75</field></shadow></value>
     </block>
     <block type="cu_end_minigame"></block>
+    <sep></sep>
+    <block type="cu_do_save"></block>
+    <block type="cu_do_load"></block>
   </category>
   <category name="%{BKY_CAT_VALUE}" colour="#59c059" icon="🔢">
     <block type="cu_number"></block>
@@ -669,11 +685,13 @@ const TOOLBOX = `
     <block type="cu_building_set_property">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">250</field></shadow></value>
     </block>
+    <block type="cu_get_building_property"></block>
   </category>
   <category name="%{BKY_CAT_TILE}" colour="#8d6e63" icon="🔲">
     <block type="cu_tile_set_property">
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">100</field></shadow></value>
     </block>
+    <block type="cu_get_tile_property"></block>
   </category>
   <category name="%{BKY_CAT_CREATURE}" colour="#ff6f00">
     <block type="cu_spawn_creature">
@@ -691,6 +709,7 @@ const TOOLBOX = `
     </block>
     <block type="cu_destroy_creature"></block>
     <block type="cu_play_creature_animation"></block>
+    <block type="cu_set_creature_visible"></block>
     <sep></sep>
     <block type="cu_creature_position"></block>
   </category>
@@ -762,6 +781,34 @@ const TOOLBOX = `
     <block type="cu_get_control_value"></block>
     <block type="cu_get_toggle_state"></block>
   </category>
+  <category name="%{BKY_CAT_NET}" colour="#00838f">
+    <block type="cu_mp_on_server_message"></block>
+    <block type="cu_mp_on_client_message"></block>
+    <block type="cu_mp_send_to_server"></block>
+    <block type="cu_mp_send_to_client"></block>
+    <block type="cu_mp_broadcast"></block>
+    <block type="cu_mp_request_server"></block>
+    <block type="cu_mp_state"></block>
+    <block type="cu_mp_payload_self"></block>
+    <block type="cu_mp_payload_text"></block>
+    <block type="cu_mp_payload_num"></block>
+    <block type="cu_mp_payload_bool"></block>
+    <block type="cu_mp_payload_has"></block>
+    <block type="cu_mp_capture_snapshot"></block>
+    <block type="cu_mp_apply_snapshot"></block>
+    <block type="cu_mp_broadcast_snapshot"></block>
+    <block type="cu_mp_request_initial_snapshot"></block>
+    <block type="cu_mp_schedule_initial_snapshot"></block>
+  </category>
+  <category name="%{BKY_CAT_DATA}" colour="#ad1457">
+    <block type="cu_json_new_object"></block>
+    <block type="cu_json_new_array"></block>
+    <block type="cu_json_set"></block>
+    <block type="cu_json_get"></block>
+    <block type="cu_json_at"></block>
+    <block type="cu_json_push"></block>
+    <block type="cu_json_length"></block>
+  </category>
 </xml>
 `;
 
@@ -771,6 +818,8 @@ const CAT_MSG_ZH: Record<string, string> = {
   CAT_BOOLEAN: '布尔', CAT_VAR: '变量', CAT_FUNC: '函数',
   CAT_BUILDING: '建筑', CAT_TILE: '地块', CAT_UI: '界面', CAT_LOCALE: '本地化',
   CAT_CREATURE: '生物', CAT_CONFIG: '设置', CAT_ASSET: '资源',
+  CAT_NET: '联机',
+  CAT_DATA: '数据',
 };
 const CAT_MSG_EN: Record<string, string> = {
   CAT_EVENT: 'Events', CAT_REGISTER: 'Register', CAT_BODY: 'Body', CAT_ITEM: 'Item',
@@ -778,6 +827,8 @@ const CAT_MSG_EN: Record<string, string> = {
   CAT_BOOLEAN: 'Boolean', CAT_VAR: 'Variable', CAT_FUNC: 'Function',
   CAT_BUILDING: 'Building', CAT_TILE: 'Tile', CAT_UI: 'UI', CAT_LOCALE: 'Locale',
   CAT_CREATURE: 'Creature', CAT_CONFIG: 'Settings', CAT_ASSET: 'Assets',
+  CAT_NET: 'Network',
+  CAT_DATA: 'Data',
 };
 
 export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, searchTerm }: Props) {

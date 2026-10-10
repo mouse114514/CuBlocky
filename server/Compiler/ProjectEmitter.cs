@@ -79,22 +79,33 @@ public static class ProjectEmitter
         var hasUI = bp.UiControls != null && bp.UiControls.Count > 0;
 
         // Extract register markers from event code
-        var (eventCode, registerItems, registerRecipes, registerBuildings, registerTiles, registerLocales, registerLiquids, registerCreatures, registerAnimations, statuses, functions) = ExtractRegisterMarkers(bp.EventHandlers!);
+        var (eventCode, registerItems, registerRecipes, registerBuildings, registerTiles, registerLocales, registerLiquids, registerCreatures, registerAnimations, statuses, functions, registerCalls) = ExtractRegisterMarkers(bp.EventHandlers!);
         var hasStatuses = statuses.Count > 0;
         var hasCreatureMgr = registerCreatures.Count > 0 || eventCode.Contains("CuCreatureManager.");
+        // Multiplayer blocks emit //NET: markers and MultiplayerApi calls; those need
+        // the Newtonsoft.Json reference (JToken payload types) in the generated csproj.
+        var hasNet = eventCode.Contains("//NET:") || eventCode.Contains("MultiplayerApi.");
+        // Data-structure blocks (new JObject/JArray, element reads) need it too.
+        // Function bodies land in EventHandlers.cs, item use actions in
+        // RegisterContent.cs - scan every place user code can appear.
+        var fnCode = string.Join("\n", functions.Select(f => f.Body ?? ""));
+        var useActions = string.Join("\n", bp.Items.Select(i => (i.UseAction ?? "") + "\n" + (i.UseLimbAction ?? "")));
+        var hasJson = LooksLikeJson(eventCode) || LooksLikeJson(fnCode) || LooksLikeJson(useActions)
+            // Save provider always touches JObject/JToken, save blocks or not.
+            || eventCode.Contains("//PATCH:OnSave") || eventCode.Contains("//PATCH:OnLoad");
 
         var gPath = gamePath ?? DefaultGamePath;
 
         var files = new Dictionary<string, string>
         {
             ["Plugin.cs"] = EmitPlugin(ns, guid, name, ver, desc, hasEvents, hasStatuses, hasUI),
-            ["RegisterContent.cs"] = CodeEmitter.EmitRegisterContent(bp, registerItems, registerRecipes, registerBuildings, registerTiles, registerLocales, registerLiquids, registerCreatures, registerAnimations),
-            [asmName + ".csproj"] = EmitCsproj(asmName, ns, gPath),
+            ["RegisterContent.cs"] = CodeEmitter.EmitRegisterContent(bp, registerItems, registerRecipes, registerBuildings, registerTiles, registerLocales, registerLiquids, registerCreatures, registerAnimations, registerCalls),
+            [asmName + ".csproj"] = EmitCsproj(asmName, ns, gPath, hasNet, hasJson),
             ["README.md"] = EmitReadme(name, ver),
         };
 
         if (hasEvents)
-            files["EventHandlers.cs"] = EmitEventHandlers(ns, eventCode, functions);
+            files["EventHandlers.cs"] = EmitEventHandlers(ns, eventCode, functions, guid);
 
         if (hasStatuses)
             files["Statuses.cs"] = CodeEmitter.EmitStatuses(bp, statuses);
@@ -108,7 +119,7 @@ public static class ProjectEmitter
         return files;
     }
 
-    private static (string eventCode, List<ItemEntry> items, List<RecipeEntry> recipes, List<BuildingEntry> buildings, List<TileEntry> tiles, List<LocaleEntry> locales, List<LiquidEntry> liquids, List<CreatureEntry> creatures, List<AnimationEntry> animations, List<StatusEntry> statuses, List<FunctionDef> functions) ExtractRegisterMarkers(string eventCode)
+    private static (string eventCode, List<ItemEntry> items, List<RecipeEntry> recipes, List<BuildingEntry> buildings, List<TileEntry> tiles, List<LocaleEntry> locales, List<LiquidEntry> liquids, List<CreatureEntry> creatures, List<AnimationEntry> animations, List<StatusEntry> statuses, List<FunctionDef> functions, List<string> registerCalls) ExtractRegisterMarkers(string eventCode)
     {
         var items = new List<ItemEntry>();
         var recipes = new List<RecipeEntry>();
@@ -120,6 +131,7 @@ public static class ProjectEmitter
         var animations = new List<AnimationEntry>();
         var statuses = new List<StatusEntry>();
         var functions = new List<FunctionDef>();
+        var registerCalls = new List<string>();
         var itemProps = new List<(string id, JsonElement json)>();
         var liquidFlags = new Dictionary<string, JsonElement>();
         var itemUseActions = new Dictionary<string, string>();
@@ -209,6 +221,20 @@ public static class ProjectEmitter
                 var json = line.Substring(18).Trim();
                 try { var st = JsonSerializer.Deserialize<StatusEntry>(json); if (st != null) statuses.Add(st); } catch { }
             }
+            else if (line.StartsWith("//REGISTER_CALL:"))
+            {
+                var json = line.Substring(16).Trim();
+                try
+                {
+                    var doc = JsonDocument.Parse(json);
+                    if (doc.RootElement.TryGetProperty("Code", out var codeEl))
+                    {
+                        var code = codeEl.GetString();
+                        if (!string.IsNullOrWhiteSpace(code)) registerCalls.Add(code);
+                    }
+                }
+                catch { }
+            }
             else if (line.StartsWith("//LIQUID_FLAGS:"))
             {
                 var json = line.Substring(15).Trim();
@@ -266,9 +292,18 @@ public static class ProjectEmitter
                     if (doc.RootElement.TryGetProperty("Id", out var idEl) && doc.RootElement.TryGetProperty("Condition", out var condEl))
                     {
                         var itemId = idEl.GetString();
-                        var cond = (float)condEl.GetDouble();
-                        var item = items.FirstOrDefault(i => i.Id == itemId);
-                        if (item != null) item.StartCondition = cond;
+                        // Number covers the modern emitter; the legacy emitter wrote a
+                        // C# float suffix ("0.5f"), which arrives here as a JSON string.
+                        float cond;
+                        if (condEl.ValueKind == JsonValueKind.Number) cond = (float)condEl.GetDouble();
+                        else if (condEl.ValueKind == JsonValueKind.String
+                            && float.TryParse(condEl.GetString()?.TrimEnd('f'), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var parsedCond)) cond = parsedCond;
+                        else cond = float.NaN;
+                        if (!float.IsNaN(cond))
+                        {
+                            var item = items.FirstOrDefault(i => i.Id == itemId);
+                            if (item != null) item.StartCondition = cond;
+                        }
                     }
                 } catch { }
             }
@@ -457,7 +492,7 @@ public static class ProjectEmitter
             if (json.TryGetProperty("SpawnFrequency", out var sEl)) { item.SpawnFrequency = int.TryParse(Raw(sEl), out var sVal) ? sVal : 1; item.IsAdvanced = true; }
         }
 
-        return (string.Join('\n', remainingLines), items, recipes, buildings, tiles, locales, liquids, creatures, animations, statuses, functions);
+        return (string.Join('\n', remainingLines), items, recipes, buildings, tiles, locales, liquids, creatures, animations, statuses, functions, registerCalls);
     }
 
     // Strip quotes from JSON string values; pass through numbers/booleans as-is.
@@ -510,6 +545,7 @@ namespace {ns}
                 foreach (var r in resources)
                     Logger.LogInfo($""[CuBlocky]   Resource: {{r}}"");
 
+                RegisterContent.Log = Logger;
                 RegisterContent.RegisterAll();
                 Logger.LogInfo(""[CuBlocky] RegisterAll done"");
 {patchLine}                Logger.LogInfo(""[CuBlocky] Harmony patches applied"");
@@ -529,7 +565,7 @@ namespace {ns}
 ";
     }
 
-    private static string EmitCsproj(string asmName, string ns, string gamePath)
+    private static string EmitCsproj(string asmName, string ns, string gamePath, bool hasNet = false, bool hasJson = false)
     {
         // The assembly name comes from the project name, which may contain '&'.
         var asm = asmName.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
@@ -537,6 +573,16 @@ namespace {ns}
         // net4.7.2 to match BepInEx 5 / Unity / Mono. CUCoreLib.dll resolved from
         // the game's BepInEx/plugins folder (CCL setup docs convention).
         var g = gamePath.Replace("\\", "\\\\");
+        // Multiplayer payload types and data blocks (JToken/JObject/JArray) live in
+        // Newtonsoft.Json, which ships in BepInEx/plugins next to CUCoreLib. Only
+        // referenced when used so projects without those blocks keep building on
+        // installs lacking the dll.
+        var newtonsoftRef = (hasNet || hasJson)
+            ? @"    <Reference Include=""Newtonsoft.Json"">
+      <HintPath>" + g + @"\BepInEx\plugins\Newtonsoft.Json.dll</HintPath>
+      <Private>false</Private>
+    </Reference>"
+            : "";
         return $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
@@ -573,6 +619,14 @@ namespace {ns}
       <HintPath>{g}\CasualtiesUnknown_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include=""UnityEngine.TilemapModule"">
+      <HintPath>{g}\CasualtiesUnknown_Data\Managed\UnityEngine.TilemapModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include=""UnityEngine.Physics2DModule"">
+      <HintPath>{g}\CasualtiesUnknown_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include=""UnityEngine.AudioModule"">
       <HintPath>{g}\CasualtiesUnknown_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
       <Private>false</Private>
@@ -589,6 +643,7 @@ namespace {ns}
       <HintPath>{g}\CasualtiesUnknown_Data\Managed\UnityEngine.UI.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    {newtonsoftRef}
   </ItemGroup>
 </Project>
 ";
@@ -631,8 +686,40 @@ Copy the built DLL from `bin/Release/` into
     {
         var expr = line.Substring(line.IndexOf('=') + 1).TrimEnd(';').Trim();
         if (m.Groups[2].Value == "+") return ("float", true);
+
+        // Property getter blocks emit an explicit (bool)/(string)/(int)/(float) cast
+        // as the very first token; test it before any substring rules so the declared
+        // local keeps the right CLR type instead of falling through to float.
+        if (expr.StartsWith("(bool)")) return ("bool", false);
+        if (expr.StartsWith("(string)")) return ("string", false);
+        if (expr.StartsWith("(int)")) return ("int", false);
+        if (expr.StartsWith("(float)")) return ("float", true);
+
+        // JSON / collection expressions must be tested before StringInit: their
+        // key literals (?["..."]) contain quotes and would otherwise be read as
+        // plain strings (wrong field type -> assignment fails to compile).
+        // Only direct literals map to JObject/JArray - a chained read such as
+        // ((new JObject())?["a"]) still yields a JToken further down.
+        if (expr.StartsWith("new JObject")) return ("JObject", false);
+        if (expr.StartsWith("new JArray")) return ("JArray", false);
+        if (System.Text.RegularExpressions.Regex.IsMatch(expr, @"^new\s+List<")) return ("List<string>", false);
+        if (expr.Contains("CaptureSnapshot()")) return ("JToken", false);
+        if (expr == "payload") return ("JToken", false);
+        if (expr.Contains(".ToObject<float?>")) return ("float", false);
+        if (expr.Contains(".ToObject<bool?>") || expr.Contains("?? false")) return ("bool", false);
+        if (expr.Contains(".ToString()")) return ("string", false);
+        if (expr.Contains("!= null")) return ("bool", false);   // has-field reads
+        if (System.Text.RegularExpressions.Regex.IsMatch(expr, @"\?\[")) return ("JToken", false); // element read
+        if (expr.Contains("MultiplayerApi.Is")) return ("bool", false); // multiplayer state blocks
+
         return StringInit.IsMatch(expr) ? ("string", false) : ("float", false);
     }
+
+    // True when generated user code touches the Newtonsoft JToken world: object or
+    // array literals, JToken variables, element reads (?["key"]), snapshots.
+    private static bool LooksLikeJson(string? code) =>
+        !string.IsNullOrEmpty(code) &&
+        (code.Contains("JObject") || code.Contains("JArray") || code.Contains("JToken") || code.Contains("?["));
 
     private static Dictionary<string, (string type, bool zeroInit)> CollectVars(string eventCode, List<FunctionDef> functions)
     {
@@ -680,8 +767,13 @@ Copy the built DLL from `bin/Release/` into
         return string.Join("\n", decls) + "\n" + bodyCode;
     }
 
-    private static string EmitEventHandlers(string ns, string eventCode, List<FunctionDef> functions)
+    private static string EmitEventHandlers(string ns, string eventCode, List<FunctionDef> functions, string modGuid)
     {
+        // Save lifecycle blocks: handlers fire around the provider payload exchange,
+        // the provider persists every user variable declared in this file.
+        var hasOnSave = eventCode.Contains("//PATCH:OnSave");
+        var hasOnLoad = eventCode.Contains("//PATCH:OnLoad");
+        var hasSave = hasOnSave || hasOnLoad;
         var sb = new StringBuilder();
         sb.AppendLine("// AUTO-GENERATED by CuBlocky. Event handlers.");
         sb.AppendLine("using System.Collections.Generic;");
@@ -691,6 +783,17 @@ Copy the built DLL from `bin/Release/` into
         sb.AppendLine("using CUCoreLib.Data;");
         sb.AppendLine("using CUCoreLib.Helpers;");
         sb.AppendLine("using CUCoreLib.Registries;");
+        if (eventCode.Contains("//NET:") || eventCode.Contains("MultiplayerApi."))
+            sb.AppendLine("using CUCoreLib.Networking;");
+        if (hasSave)
+            sb.AppendLine("using CUCoreLib.Saving;");
+        // JObject/JArray/JToken (data blocks, payload reads) need Newtonsoft.Json;
+        // function bodies are emitted into this same file, so scan them too.
+        var fnCodeForJson = "";
+        foreach (var f in functions) fnCodeForJson += f.Body ?? "";
+        if (eventCode.Contains("//NET:") || eventCode.Contains("MultiplayerApi.")
+            || LooksLikeJson(eventCode) || LooksLikeJson(fnCodeForJson) || hasSave)
+            sb.AppendLine("using Newtonsoft.Json.Linq;");
         sb.AppendLine();
         sb.AppendLine($"namespace {ns}");
         sb.AppendLine("{");
@@ -743,9 +846,34 @@ Copy the built DLL from `bin/Release/` into
             }
         }
 
+        // Multiplayer: subscribe every //NET: handler once, inside Init().
+        var netRegCount = 0;
+        foreach (var raw in lines)
+        {
+            var line = raw.TrimEnd('\r');
+            if (!line.StartsWith("//NET:")) continue;
+            var idx = netRegCount++;
+            var meta = line.Substring(6);   // "//NET:" is 6 chars, not 8 like "//PATCH:"
+            var ci = meta.IndexOf(':');
+            if (ci <= 0) continue;
+            var kind = meta.Substring(0, ci);
+            var channel = meta.Substring(ci + 1);
+            var handlerName = $"HandleNet_{SafeIdent(channel)}_{idx}";
+            var safeCh = channel.Replace("\\", "\\\\").Replace("\"", "\\\"");
+            if (kind == "Server")
+                sb.AppendLine($"            MultiplayerApi.RegisterServerHandler(\"{safeCh}\", {handlerName});");
+            else
+                sb.AppendLine($"            MultiplayerApi.RegisterClientHandler(\"{safeCh}\", {handlerName});");
+        }
+
+        // Save provider registration: fires once at plugin Awake, before any save/load.
+        if (hasSave)
+            sb.AppendLine($"            SaveRegistry.RegisterGlobalProvider(\"{modGuid}.cublocky.vars\", new CuBlockySaveProvider());");
+
         sb.AppendLine("        }");
         sb.AppendLine();
-        sb.AppendLine("        private static Body GetPlayer() => PlayerCamera.main.body;");
+        sb.AppendLine("        private static Body GetPlayer() => SafeBody();");
+        sb.AppendLine("        private static Body SafeBody() => PlayerCamera.main?.body;");
         sb.AppendLine();
 
         // Every variable the blocks assign to, once, at class level.
@@ -780,6 +908,14 @@ Copy the built DLL from `bin/Release/` into
         }
 
         // Second pass: emit patch and event handler methods
+        var netCount = 0;
+        var netIndex = 0;
+        var netIsServer = false;
+        var netChannel = "";
+        var onSaveSeq = 0;
+        var onLoadSeq = 0;
+        var onSaveHandlers = new List<string>();
+        var onLoadHandlers = new List<string>();
         foreach (var raw in lines)
         {
             var line = raw.TrimEnd('\r');
@@ -804,9 +940,25 @@ Copy the built DLL from `bin/Release/` into
                 }
                 currentBody.Clear();
             }
+            else if (line.StartsWith("//NET:"))
+            {
+                var meta = line.Substring(6);   // "//NET:" is 6 chars
+                var ci = meta.IndexOf(':');
+                var kind = ci > 0 ? meta.Substring(0, ci) : "";
+                var channel = ci > 0 ? meta.Substring(ci + 1) : "";
+                netIsServer = kind == "Server";
+                netChannel = channel;
+                netIndex = netCount++;
+                currentMethod = $"NET_{netIndex}";
+                currentBody.Clear();
+            }
             else if (line == "//ENDPATCH")
             {
-                if (!string.IsNullOrEmpty(currentMethod) && currentBody.Length > 0)
+                // Multiplayer handlers are always registered in Init(), and the save
+                // provider always calls its handlers, so emit those methods even when
+                // the user left the event block's stack empty.
+                if (!string.IsNullOrEmpty(currentMethod) && (currentBody.Length > 0 || currentMethod.StartsWith("NET_")
+                    || currentMethod == "OnSave" || currentMethod == "OnLoad"))
                 {
                     var bodyCode = currentBody.ToString();
 
@@ -837,7 +989,8 @@ Copy the built DLL from `bin/Release/` into
                         sb.AppendLine($"        private static void {handlerName}()");
                         sb.AppendLine("        {");
                         sb.AppendLine($"            Log.LogInfo($\"[CuBlocky] {handlerName} fired\");");
-                        sb.AppendLine("            var body = PlayerCamera.main.body;");
+                        sb.AppendLine("            var body = SafeBody();");
+                        sb.AppendLine($"            if (body == null) {{ Log.LogWarning(\"[CuBlocky] {handlerName} skipped: no player body\"); return; }}");
                         bodyCode = DeclareLocals(bodyCode, hoisted);
                         foreach (var bline in bodyCode.Split('\n'))
                         {
@@ -845,6 +998,83 @@ Copy the built DLL from `bin/Release/` into
                             if (!string.IsNullOrWhiteSpace(btrim))
                                 sb.AppendLine("            " + btrim);
                         }
+                        sb.AppendLine("        }");
+                        sb.AppendLine();
+                    }
+                    else if (currentMethod.StartsWith("NET_"))
+                    {
+                        // Multiplayer handler: payload in, optional response out.
+                        // Body ops may touch the local player, which is absent on a
+                        // dedicated server, so the whole handler runs inside try/catch.
+                        var handlerName = $"HandleNet_{SafeIdent(netChannel)}_{netIndex}";
+                        bodyCode = DeclareLocals(bodyCode, hoisted);
+                        sb.AppendLine(netIsServer
+                            ? $"        private static JToken {handlerName}(JToken payload)"
+                            : $"        private static void {handlerName}(JToken payload)");
+                        sb.AppendLine("        {");
+                        sb.AppendLine($"            Log.LogInfo($\"[CuBlocky] {handlerName} fired\");");
+                        sb.AppendLine("            try");
+                        sb.AppendLine("            {");
+                        sb.AppendLine("                var body = SafeBody();");
+                        if (netIsServer)
+                            sb.AppendLine("                if (body == null) return null;");
+                        else
+                            sb.AppendLine("                if (body == null) return;");
+                        foreach (var bline in bodyCode.Split('\n'))
+                        {
+                            var btrim = bline.TrimEnd('\r');
+                            if (string.IsNullOrWhiteSpace(btrim)) continue;
+                            sb.AppendLine("                " + btrim);
+                        }
+                        if (netIsServer) sb.AppendLine("                return null;");
+                        sb.AppendLine("            }");
+                        sb.AppendLine("            catch (System.Exception _ex)");
+                        sb.AppendLine("            {");
+                        sb.AppendLine($"                Log.LogError($\"[CuBlocky] {handlerName} FAILED: {{_ex.Message}}\");");
+                        if (netIsServer) sb.AppendLine("                return null;");
+                        sb.AppendLine("            }");
+                        sb.AppendLine("        }");
+                        sb.AppendLine();
+                    }
+                    else if (currentMethod == "OnSave" || currentMethod == "OnLoad")
+                    {
+                        // Save lifecycle handler: not a Harmony patch - the save
+                        // provider below calls it around the payload exchange. Runs
+                        // inside try/catch + re-entrancy guard so a user block can
+                        // neither break the game save nor recurse through
+                        // cu_do_save/cu_do_load.
+                        var kind = currentMethod;
+                        var isSave = kind == "OnSave";
+                        var seq = isSave ? onSaveSeq++ : onLoadSeq++;
+                        if (seq == 0)
+                            sb.AppendLine($"        private static bool _in{kind};");
+                        var handlerName = $"Handle{kind}_{seq}";
+                        if (isSave) onSaveHandlers.Add(handlerName); else onLoadHandlers.Add(handlerName);
+                        bodyCode = DeclareLocals(bodyCode, hoisted);
+                        sb.AppendLine($"        private static void {handlerName}()");
+                        sb.AppendLine("        {");
+                        sb.AppendLine($"            if (_in{kind}) return;");
+                        sb.AppendLine($"            _in{kind} = true;");
+                        sb.AppendLine("            try");
+                        sb.AppendLine("            {");
+                        sb.AppendLine($"                Log.LogInfo($\"[CuBlocky] {handlerName} fired\");");
+                        sb.AppendLine("                var body = SafeBody();");
+                        sb.AppendLine("                if (body == null) return;");
+                        foreach (var bline in bodyCode.Split('\n'))
+                        {
+                            var btrim = bline.TrimEnd('\r');
+                            if (string.IsNullOrWhiteSpace(btrim)) continue;
+                            sb.AppendLine("                " + btrim);
+                        }
+                        sb.AppendLine("            }");
+                        sb.AppendLine("            catch (System.Exception _ex)");
+                        sb.AppendLine("            {");
+                        sb.AppendLine($"                Log.LogError($\"[CuBlocky] {handlerName} FAILED: {{_ex.Message}}\");");
+                        sb.AppendLine("            }");
+                        sb.AppendLine("            finally");
+                        sb.AppendLine("            {");
+                        sb.AppendLine($"                _in{kind} = false;");
+                        sb.AppendLine("            }");
                         sb.AppendLine("        }");
                         sb.AppendLine();
                     }
@@ -943,6 +1173,80 @@ Copy the built DLL from `bin/Release/` into
             {
                 currentBody.AppendLine(line);
             }
+        }
+
+        // Custom save provider: persists every user variable declared in this file
+        // and fires the OnSave/OnLoad handlers around the payload exchange. Nested
+        // class, so it reads/writes the private static fields directly.
+        if (hasSave)
+        {
+            sb.AppendLine("        private sealed class CuBlockySaveProvider : ICustomSaveProvider");
+            sb.AppendLine("        {");
+            sb.AppendLine("            public int GetVersion() => 1;");
+            sb.AppendLine();
+            sb.AppendLine("            public JToken Capture()");
+            sb.AppendLine("            {");
+            foreach (var h in onSaveHandlers) sb.AppendLine($"                {h}();");
+            sb.AppendLine("                var o = new JObject();");
+            foreach (var kv in userVars)
+            {
+                var t = kv.Value.type;
+                if (t == "List<string>")
+                    sb.AppendLine($"                o[\"{kv.Key}\"] = {kv.Key} != null ? (JToken)new JArray({kv.Key}) : JValue.CreateNull();");
+                else if (t == "float" || t == "int" || t == "bool")
+                    sb.AppendLine($"                o[\"{kv.Key}\"] = {kv.Key};");
+                else
+                    sb.AppendLine($"                o[\"{kv.Key}\"] = (JToken){kv.Key} ?? JValue.CreateNull();");
+            }
+            sb.AppendLine("                return o;");
+            sb.AppendLine("            }");
+            sb.AppendLine();
+            sb.AppendLine("            public void Restore(JToken payload, int version, SaveRestoreContext context)");
+            sb.AppendLine("            {");
+            sb.AppendLine("                try");
+            sb.AppendLine("                {");
+            sb.AppendLine("                    var o = payload as JObject;");
+            sb.AppendLine("                    if (o != null)");
+            sb.AppendLine("                    {");
+                        if (userVars.Count > 0) sb.AppendLine("                        JToken t;");
+            foreach (var kv in userVars)
+            {
+                var n = kv.Key;
+                var t = kv.Value.type;
+                string stmt;
+                if (t == "float")
+                    stmt = $"t = o[\"{n}\"]; if (t != null && (t.Type == JTokenType.Float || t.Type == JTokenType.Integer)) {n} = (float)t;";
+                else if (t == "int")
+                    stmt = $"t = o[\"{n}\"]; if (t != null && t.Type == JTokenType.Integer) {n} = (int)t;";
+                else if (t == "bool")
+                    stmt = $"t = o[\"{n}\"]; if (t != null && t.Type == JTokenType.Boolean) {n} = (bool)t;";
+                else if (t == "string")
+                    stmt = $"t = o[\"{n}\"]; if (t != null && t.Type == JTokenType.String) {n} = (string)t;";
+                else if (t == "JObject")
+                    stmt = $"t = o[\"{n}\"]; if (t != null && t.Type == JTokenType.Object) {n} = (JObject)t;";
+                else if (t == "JArray")
+                    stmt = $"t = o[\"{n}\"]; if (t != null && t.Type == JTokenType.Array) {n} = (JArray)t;";
+                else if (t == "JToken")
+                    stmt = $"t = o[\"{n}\"]; if (t != null) {n} = t;";
+                else if (t == "List<string>")
+                    stmt = $"t = o[\"{n}\"]; if (t != null && t.Type == JTokenType.Array) {{ {n} = new List<string>(); foreach (var cuIt in t) {n}.Add((string)cuIt); }}";
+                else
+                {
+                    sb.AppendLine($"                        // unsupported var type '{t}' for {n}, not restored");
+                    continue;
+                }
+                sb.AppendLine("                        " + stmt);
+            }
+            sb.AppendLine("                    }");
+            sb.AppendLine("                }");
+            sb.AppendLine("                catch (System.Exception _ex)");
+            sb.AppendLine("                {");
+            sb.AppendLine("                    Log.LogError(\"[CuBlocky] save restore FAILED: \" + _ex.Message);");
+            sb.AppendLine("                }");
+            foreach (var h in onLoadHandlers) sb.AppendLine($"                {h}();");
+            sb.AppendLine("            }");
+            sb.AppendLine("        }");
+            sb.AppendLine();
         }
 
         sb.AppendLine("    }");
