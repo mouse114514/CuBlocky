@@ -115,9 +115,26 @@ const C = {
   NET:     '#00838f',
   DATA:    '#ad1457',
   SAVE:    '#795548',
+  POSTFX:  '#6a1b9a',
 };
 
 type DdOption = [string, string, string, string]; // [zhLabel, enLabel, ruLabel, value]
+
+const FLIP_MODE_OPTIONS: DdOption[] = [
+  ['关闭', 'Off', 'Выкл', '0'], ['水平', 'Horizontal', 'Горизонтально', '1'],
+  ['垂直', 'Vertical', 'Вертикально', '2'], ['双轴', 'Both', 'Оба', '3'],
+];
+
+const CUT_DIR_OPTIONS: DdOption[] = [
+  ['横切', 'Horizontal cuts', 'Горизонтальные разрезы', '0'],
+  ['竖切', 'Vertical cuts', 'Вертикальные разрезы', '1'],
+];
+
+const CUT_PATTERN_OPTIONS: DdOption[] = [
+  ['交替', 'Alternating', 'Чередование', '0'],
+  ['波浪', 'Wave', 'Волна', '1'],
+  ['随机', 'Random', 'Случайно', '2'],
+];
 
 const VANILLA_ITEMS: DdOption[] = [
   ['绷带', 'Bandage', 'Bandage', 'bandage'], ['医用绷带', 'Medical Gauze', 'Medical Gauze', 'analgesicgauze'],
@@ -2785,6 +2802,73 @@ const BLOCK_JSON: any[] = [
     colour: C.DATA,
   },
 
+  // ═══ Post-FX (screen post-processing) ═══════════════════════════
+  {
+    type: 'cu_screen_tint', message0: '%{BKY_CU_SCREEN_TINT}',
+    args0: [
+      { type: 'input_value', name: 'R', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'G', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'B', check: 'Number', align: 'RIGHT' },
+    ],
+    inputsInline: true, previousStatement: null, nextStatement: null, colour: C.POSTFX,
+  },
+  {
+    type: 'cu_screen_hue', message0: '%{BKY_CU_SCREEN_HUE}',
+    args0: [{ type: 'input_value', name: 'DEG', check: 'Number', align: 'RIGHT' }],
+    inputsInline: true, previousStatement: null, nextStatement: null, colour: C.POSTFX,
+  },
+  {
+    type: 'cu_screen_saturation', message0: '%{BKY_CU_SCREEN_SATURATION}',
+    args0: [{ type: 'input_value', name: 'VAL', check: 'Number', align: 'RIGHT' }],
+    inputsInline: true, previousStatement: null, nextStatement: null, colour: C.POSTFX,
+  },
+  {
+    type: 'cu_screen_contrast', message0: '%{BKY_CU_SCREEN_CONTRAST}',
+    args0: [{ type: 'input_value', name: 'VAL', check: 'Number', align: 'RIGHT' }],
+    inputsInline: true, previousStatement: null, nextStatement: null, colour: C.POSTFX,
+  },
+  {
+    type: 'cu_screen_vignette', message0: '%{BKY_CU_SCREEN_VIGNETTE}',
+    args0: [{ type: 'input_value', name: 'VAL', check: 'Number', align: 'RIGHT' }],
+    inputsInline: true, previousStatement: null, nextStatement: null, colour: C.POSTFX,
+  },
+  {
+    type: 'cu_screen_cut_offset', message0: '%{BKY_CU_SCREEN_CUT_OFFSET}',
+    args0: [
+      { type: 'field_dropdown', name: 'DIR', options: CUT_DIR_OPTIONS, SERIALIZABLE: true },
+      { type: 'input_value', name: 'CUTS', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'DIST', check: 'Number', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'PATTERN', options: CUT_PATTERN_OPTIONS, SERIALIZABLE: true },
+    ],
+    inputsInline: true, previousStatement: null, nextStatement: null, colour: C.POSTFX,
+  },
+  {
+    type: 'cu_screen_shake', message0: '%{BKY_CU_SCREEN_SHAKE}',
+    args0: [{ type: 'input_value', name: 'VAL', check: 'Number', align: 'RIGHT' }],
+    inputsInline: true, previousStatement: null, nextStatement: null, colour: C.POSTFX,
+  },
+  {
+    type: 'cu_screen_flip', message0: '%{BKY_CU_SCREEN_FLIP}',
+    args0: [
+      { type: 'field_dropdown', name: 'FLIP', options: FLIP_MODE_OPTIONS, SERIALIZABLE: true },
+    ],
+    inputsInline: true, previousStatement: null, nextStatement: null, colour: C.POSTFX,
+  },
+  {
+    type: 'cu_screen_flash', message0: '%{BKY_CU_SCREEN_FLASH}',
+    args0: [
+      { type: 'input_value', name: 'R', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'G', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'B', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'SEC', check: 'Number', align: 'RIGHT' },
+    ],
+    inputsInline: true, previousStatement: null, nextStatement: null, colour: C.POSTFX,
+  },
+  {
+    type: 'cu_screen_fx_clear', message0: '%{BKY_CU_SCREEN_FX_CLEAR}',
+    inputsInline: true, previousStatement: null, nextStatement: null, colour: C.POSTFX,
+  },
+
 ];
 
 // ── Messages ──
@@ -2882,6 +2966,16 @@ const MSG_ZH: Record<string, string> = {
   CU_PLAY_CREATURE_ANIMATION: '播放生物 %1 动画 %2',
   CU_SET_PLAYER_VISIBLE: '设置玩家可见 %1',
   CU_SET_CREATURE_VISIBLE: '设置生物 %1 可见 %2',
+  CU_SCREEN_TINT: '屏幕染色 R %1 G %2 B %3',
+  CU_SCREEN_HUE: '屏幕色相 %1 度',
+  CU_SCREEN_SATURATION: '屏幕饱和度 %1',
+  CU_SCREEN_CONTRAST: '屏幕对比度 %1',
+  CU_SCREEN_VIGNETTE: '屏幕暗角 %1',
+  CU_SCREEN_CUT_OFFSET: '屏幕切割错位 方向 %1 切数 %2 距离 %3% 图案 %4',
+  CU_SCREEN_SHAKE: '屏幕抖动 %1%',
+  CU_SCREEN_FLIP: '屏幕翻转 %1',
+  CU_SCREEN_FLASH: '屏幕闪屏 R %1 G %2 B %3 持续 %4 秒',
+  CU_SCREEN_FX_CLEAR: '清除全部屏幕效果',
   CU_CREATURE_POSITION: '生物 %1 的位置列表',
   CU_PLAYER_HEALTH: '躯干皮肤健康值',
   CU_PLAYER_MAX_HEALTH: '皮肤健康上限',
@@ -3172,6 +3266,16 @@ const MSG_EN: Record<string, string> = {
   CU_PLAY_CREATURE_ANIMATION: 'play creature %1 animation %2',
   CU_SET_PLAYER_VISIBLE: 'set player visible %1',
   CU_SET_CREATURE_VISIBLE: 'set creature %1 visible %2',
+  CU_SCREEN_TINT: 'screen tint R %1 G %2 B %3',
+  CU_SCREEN_HUE: 'screen hue %1 deg',
+  CU_SCREEN_SATURATION: 'screen saturation %1',
+  CU_SCREEN_CONTRAST: 'screen contrast %1',
+  CU_SCREEN_VIGNETTE: 'screen vignette %1',
+  CU_SCREEN_CUT_OFFSET: 'screen cut offset dir %1 cuts %2 dist %3% pattern %4',
+  CU_SCREEN_SHAKE: 'screen shake %1%',
+  CU_SCREEN_FLIP: 'screen flip %1',
+  CU_SCREEN_FLASH: 'screen flash R %1 G %2 B %3 for %4 s',
+  CU_SCREEN_FX_CLEAR: 'clear all screen effects',
   CU_CREATURE_POSITION: 'position list of creature %1',
   CU_PLAYER_HEALTH: 'torso skin health',
   CU_PLAYER_MAX_HEALTH: 'max skin health',
@@ -3462,6 +3566,16 @@ const MSG_RU: Record<string, string> = {
   CU_PLAY_CREATURE_ANIMATION: 'проиграть существу %1 анимацию %2',
   CU_SET_PLAYER_VISIBLE: 'видимость игрока: %1',
   CU_SET_CREATURE_VISIBLE: 'видимость существа %1: %2',
+  CU_SCREEN_TINT: 'экран: цвет R %1 G %2 B %3',
+  CU_SCREEN_HUE: 'экран: оттенок %1°',
+  CU_SCREEN_SATURATION: 'экран: насыщенность %1',
+  CU_SCREEN_CONTRAST: 'экран: контраст %1',
+  CU_SCREEN_VIGNETTE: 'экран: виньетка %1',
+  CU_SCREEN_CUT_OFFSET: 'экран: срез со сдвигом направление %1 срезов %2 дистанция %3% узор %4',
+  CU_SCREEN_SHAKE: 'экран: тряска %1%',
+  CU_SCREEN_FLIP: 'экран: отражение %1',
+  CU_SCREEN_FLASH: 'экран: вспышка R %1 G %2 B %3, %4 с',
+  CU_SCREEN_FX_CLEAR: 'снять все эффекты экрана',
   CU_CREATURE_POSITION: 'список позиций существа %1',
   CU_PLAYER_HEALTH: 'здоровье кожи туловища',
   CU_PLAYER_MAX_HEALTH: 'макс. здоровье кожи',
@@ -5013,6 +5127,53 @@ csharpGenerator.forBlock['cu_item_magazine'] = (block, gen) => {
 };
 
 // ═══ Function generators ════════════════════════════════════════
+// ═══ Post-FX generators ═══════════════════════════════════════════
+csharpGenerator.forBlock['cu_screen_tint'] = (block, gen) => {
+  const r = floatSuffix(gen.valueToCode(block, 'R', ORDER_ATOMIC) || '1');
+  const g = floatSuffix(gen.valueToCode(block, 'G', ORDER_ATOMIC) || '1');
+  const b = floatSuffix(gen.valueToCode(block, 'B', ORDER_ATOMIC) || '1');
+  return `ScreenFx.SetTint(${r}, ${g}, ${b});\n`;
+};
+csharpGenerator.forBlock['cu_screen_hue'] = (block, gen) => {
+  const d = floatSuffix(gen.valueToCode(block, 'DEG', ORDER_ATOMIC) || '0');
+  return `ScreenFx.SetHue(${d});\n`;
+};
+csharpGenerator.forBlock['cu_screen_saturation'] = (block, gen) => {
+  const v = floatSuffix(gen.valueToCode(block, 'VAL', ORDER_ATOMIC) || '0');
+  return `ScreenFx.SetSaturation(${v});\n`;
+};
+csharpGenerator.forBlock['cu_screen_contrast'] = (block, gen) => {
+  const v = floatSuffix(gen.valueToCode(block, 'VAL', ORDER_ATOMIC) || '0');
+  return `ScreenFx.SetContrast(${v});\n`;
+};
+csharpGenerator.forBlock['cu_screen_vignette'] = (block, gen) => {
+  const v = floatSuffix(gen.valueToCode(block, 'VAL', ORDER_ATOMIC) || '0');
+  return `ScreenFx.SetVignette(${v});\n`;
+};
+csharpGenerator.forBlock['cu_screen_cut_offset'] = (block, gen) => {
+  const dir = block.getFieldValue('DIR') === '1' ? '1' : '0';
+  const cuts = toInt(gen.valueToCode(block, 'CUTS', ORDER_ATOMIC) || '2');
+  const dist = floatSuffix(gen.valueToCode(block, 'DIST', ORDER_ATOMIC) || '10');
+  const pattern = block.getFieldValue('PATTERN') || '0';
+  return `ScreenFx.SetCutOffset((${dist}) / 100f, ${cuts}, ${dir}, ${pattern});\n`;
+};
+csharpGenerator.forBlock['cu_screen_shake'] = (block, gen) => {
+  const v = floatSuffix(gen.valueToCode(block, 'VAL', ORDER_ATOMIC) || '0');
+  return `ScreenFx.SetShake((${v}) / 100f);\n`;
+};
+csharpGenerator.forBlock['cu_screen_flip'] = (block) => {
+  const mode = block.getFieldValue('FLIP') || '0';
+  return `ScreenFx.SetFlip(${mode});\n`;
+};
+csharpGenerator.forBlock['cu_screen_flash'] = (block, gen) => {
+  const r = floatSuffix(gen.valueToCode(block, 'R', ORDER_ATOMIC) || '1');
+  const g = floatSuffix(gen.valueToCode(block, 'G', ORDER_ATOMIC) || '1');
+  const b = floatSuffix(gen.valueToCode(block, 'B', ORDER_ATOMIC) || '1');
+  const sec = floatSuffix(gen.valueToCode(block, 'SEC', ORDER_ATOMIC) || '0.2');
+  return `ScreenFx.Flash(${r}, ${g}, ${b}, ${sec});\n`;
+};
+csharpGenerator.forBlock['cu_screen_fx_clear'] = () => 'ScreenFx.Clear();\n';
+
 csharpGenerator.forBlock['cu_define_function'] = (block, gen) => {
   const name = block.getFieldValue('NAME') || 'myFunc';
   const returnType = block.getFieldValue('RETURN_TYPE') || 'void';
@@ -5851,6 +6012,8 @@ csharpGenerator.forBlock['cu_json_length'] = (block, gen) => {
 };
 
 const DROPDOWN_I18N: Record<string, Record<string, DdOption[]>> = {
+  cu_screen_flip: { FLIP: FLIP_MODE_OPTIONS },
+  cu_screen_cut_offset: { DIR: CUT_DIR_OPTIONS, PATTERN: CUT_PATTERN_OPTIONS },
   cu_set_item_category: { CATEGORY: CATEGORY_OPTIONS },
   cu_item_gun: { AMMO_TYPE: AMMO_TYPE_OPTIONS, FIRING_MODE: FIRING_MODE_OPTIONS, FEED_TYPE: FEED_TYPE_OPTIONS },
   cu_item_set_property: { PROP: PROP_OPTIONS },

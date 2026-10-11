@@ -781,6 +781,40 @@ const TOOLBOX = `
     <block type="cu_get_control_value"></block>
     <block type="cu_get_toggle_state"></block>
   </category>
+  <category name="%{BKY_CAT_POSTFX}" colour="#6a1b9a">
+    <block type="cu_screen_tint">
+      <value name="R"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="G"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="B"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+    </block>
+    <block type="cu_screen_hue">
+      <value name="DEG"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_screen_saturation">
+      <value name="VAL"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_screen_contrast">
+      <value name="VAL"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_screen_vignette">
+      <value name="VAL"><shadow type="cu_number"><field name="NUM">0.3</field></shadow></value>
+    </block>
+    <block type="cu_screen_cut_offset">
+      <value name="CUTS"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
+      <value name="DIST"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
+    </block>
+    <block type="cu_screen_shake">
+      <value name="VAL"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
+    </block>
+    <block type="cu_screen_flip"></block>
+    <block type="cu_screen_flash">
+      <value name="R"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="G"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="B"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+      <value name="SEC"><shadow type="cu_number"><field name="NUM">0.2</field></shadow></value>
+    </block>
+    <block type="cu_screen_fx_clear"></block>
+  </category>
   <category name="%{BKY_CAT_NET}" colour="#00838f">
     <block type="cu_mp_on_server_message"></block>
     <block type="cu_mp_on_client_message"></block>
@@ -820,6 +854,7 @@ const CAT_MSG_ZH: Record<string, string> = {
   CAT_CREATURE: '生物', CAT_CONFIG: '设置', CAT_ASSET: '资源',
   CAT_NET: '联机',
   CAT_DATA: '数据',
+  CAT_POSTFX: '后处理',
 };
 const CAT_MSG_EN: Record<string, string> = {
   CAT_EVENT: 'Events', CAT_REGISTER: 'Register', CAT_BODY: 'Body', CAT_ITEM: 'Item',
@@ -829,6 +864,7 @@ const CAT_MSG_EN: Record<string, string> = {
   CAT_CREATURE: 'Creature', CAT_CONFIG: 'Settings', CAT_ASSET: 'Assets',
   CAT_NET: 'Network',
   CAT_DATA: 'Data',
+  CAT_POSTFX: 'Post-FX',
 };
 
 export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, searchTerm }: Props) {

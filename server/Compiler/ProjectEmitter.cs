@@ -93,6 +93,9 @@ public static class ProjectEmitter
         var hasJson = LooksLikeJson(eventCode) || LooksLikeJson(fnCode) || LooksLikeJson(useActions)
             // Save provider always touches JObject/JToken, save blocks or not.
             || eventCode.Contains("//PATCH:OnSave") || eventCode.Contains("//PATCH:OnLoad");
+        // Post-FX blocks emit ScreenFx.* calls; those need the URP volume/buffer
+        // assemblies referenced by the generated csproj.
+        var hasScreenFx = (eventCode + fnCode + useActions).Contains("ScreenFx.");
 
         var gPath = gamePath ?? DefaultGamePath;
 
@@ -100,7 +103,7 @@ public static class ProjectEmitter
         {
             ["Plugin.cs"] = EmitPlugin(ns, guid, name, ver, desc, hasEvents, hasStatuses, hasUI),
             ["RegisterContent.cs"] = CodeEmitter.EmitRegisterContent(bp, registerItems, registerRecipes, registerBuildings, registerTiles, registerLocales, registerLiquids, registerCreatures, registerAnimations, registerCalls),
-            [asmName + ".csproj"] = EmitCsproj(asmName, ns, gPath, hasNet, hasJson),
+            [asmName + ".csproj"] = EmitCsproj(asmName, ns, gPath, hasNet, hasJson, hasScreenFx),
             ["README.md"] = EmitReadme(name, ver),
         };
 
@@ -115,6 +118,9 @@ public static class ProjectEmitter
 
         if (hasCreatureMgr)
             files["CuCreatureManager.cs"] = CodeEmitter.EmitCreatureManager(ns);
+
+        if (hasScreenFx)
+            files["ScreenFx.cs"] = CodeEmitter.EmitScreenFx(ns);
 
         return files;
     }
@@ -565,7 +571,7 @@ namespace {ns}
 ";
     }
 
-    private static string EmitCsproj(string asmName, string ns, string gamePath, bool hasNet = false, bool hasJson = false)
+    private static string EmitCsproj(string asmName, string ns, string gamePath, bool hasNet = false, bool hasJson = false, bool hasScreenFx = false)
     {
         // The assembly name comes from the project name, which may contain '&'.
         var asm = asmName.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
@@ -580,6 +586,18 @@ namespace {ns}
         var newtonsoftRef = (hasNet || hasJson)
             ? @"    <Reference Include=""Newtonsoft.Json"">
       <HintPath>" + g + @"\BepInEx\plugins\Newtonsoft.Json.dll</HintPath>
+      <Private>false</Private>
+    </Reference>"
+            : "";
+        // ScreenFx.cs uses the URP Volume framework and Camera extensions; the
+        // render-pipeline assemblies ship with the game's Managed folder.
+        var urpRef = hasScreenFx
+            ? @"    <Reference Include=""Unity.RenderPipelines.Core.Runtime"">
+      <HintPath>" + g + @"\CasualtiesUnknown_Data\Managed\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include=""Unity.RenderPipelines.Universal.Runtime"">
+      <HintPath>" + g + @"\CasualtiesUnknown_Data\Managed\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
       <Private>false</Private>
     </Reference>"
             : "";
@@ -644,6 +662,7 @@ namespace {ns}
       <Private>false</Private>
     </Reference>
     {newtonsoftRef}
+    {urpRef}
   </ItemGroup>
 </Project>
 ";
