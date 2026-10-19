@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import * as Blockly from 'blockly/core';
 import 'blockly/blocks';
-import { defineBlocks, setMessages, csharpGenerator } from '../blocklySetup';
+import { defineBlocks, setMessages, csharpGenerator, shouldSkipRegenEvent } from '../blocklySetup';
 import { useI18n } from '../i18n';
 import './BlockEditor.css';
 
@@ -799,20 +799,6 @@ const TOOLBOX = `
     <block type="cu_screen_vignette">
       <value name="VAL"><shadow type="cu_number"><field name="NUM">0.3</field></shadow></value>
     </block>
-    <block type="cu_screen_cut_offset">
-      <value name="CUTS"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
-      <value name="DIST"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
-    </block>
-    <block type="cu_screen_shake">
-      <value name="VAL"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
-    </block>
-    <block type="cu_screen_flip"></block>
-    <block type="cu_screen_flash">
-      <value name="R"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
-      <value name="G"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
-      <value name="B"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
-      <value name="SEC"><shadow type="cu_number"><field name="NUM">0.2</field></shadow></value>
-    </block>
     <block type="cu_screen_fx_clear"></block>
   </category>
   <category name="%{BKY_CAT_NET}" colour="#00838f">
@@ -877,8 +863,9 @@ export function BlockEditor({ onCodeChange, onBlocksChange, onWorkspaceReady, se
   const blockNameMapRef = useRef<Record<string, string>>({});
   const catNameMapRef = useRef<Record<string, string>>({});
 
-  const updateCode = useCallback(() => {
+  const updateCode = useCallback((e?: any) => {
     if (skipUpdate.current) { skipUpdate.current = false; return; }
+    if (shouldSkipRegenEvent(e)) return;
     const ws = wsRef.current;
     if (!ws) return;
     try {

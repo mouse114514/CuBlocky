@@ -29,3 +29,4 @@ publish/
 
 # Release packages
 *.zip
+*.tar.gz
