@@ -207,17 +207,6 @@ app.MapPost("/api/build", async (HttpRequest req) =>
         : (bp.Mod?.Name ?? "");
     var asmName = ProjectEmitter.SafeProjectName(rawName);
 
-    // The configured path may be stale (e.g. the game left the demo branch and
-    // the player never had the demo installed). Fall back to another install of
-    // the game on the same drive instead of failing every assembly reference.
-    var resolvedGamePath = FindValidGameDir(config.GamePath);
-    if (resolvedGamePath != null && !string.Equals(resolvedGamePath, config.GamePath, StringComparison.OrdinalIgnoreCase))
-    {
-        Console.WriteLine($"[Build] game path corrected: {config.GamePath} -> {resolvedGamePath}");
-        config.GamePath = resolvedGamePath;
-        config.Save();
-    }
-
     var files = ProjectEmitter.EmitProject(bp, config.GamePath, asmName);
     var buildDir = Path.Combine(Directory.GetCurrentDirectory(), "builds", asmName);
 
@@ -490,11 +479,9 @@ app.MapPost("/api/build", async (HttpRequest req) =>
         }).ToList();
 
         // A missing game assembly shows up as dozens of CS0246 "type not found"
-        // errors that look like source problems. Lead with the real cause.
-        var refsHint = !success && missingRefs.Count > 0
-            ? "Game path is missing required files (set it in Settings):\n"
-              + string.Join("\n", missingRefs) + "\n\n"
-            : "";
+        // errors that look like source problems. Lead with a categorized cause
+        // list so the user can tell a wrong game path from an actual code error.
+        var refsHint = !success ? DescribeBuildFailure(missingRefs, config.GamePath) : "";
 
         var msg = success
             ? "Build succeeded!"
@@ -720,36 +707,44 @@ app.Lifetime.ApplicationStarted.Register(() =>
 
 app.Run();
 
-// Resolve a usable game install: prefer the configured path, otherwise look at
-// sibling folders (release vs demo) and any "Casualties Unknown*" install next
-// to it. Returns null when nothing usable is found.
-static string? FindValidGameDir(string configured)
+// Categorize a failed build: a missing game assembly turns into dozens of
+// CS0246 "type not found" errors that look like source bugs, so the real cause
+// is listed first. The server has no UI language, so the summary is bilingual.
+static string DescribeBuildFailure(List<string> missingRefs, string gamePath)
 {
-    static bool HasGameFiles(string dir) =>
-        !string.IsNullOrWhiteSpace(dir) &&
-        File.Exists(Path.Combine(dir, "CasualtiesUnknown_Data", "Managed", "Assembly-CSharp.dll"));
+    var sb = new StringBuilder();
+    sb.AppendLine("【构建失败原因定位 / Diagnosis】");
 
-    if (HasGameFiles(configured)) return configured;
+    if (!Directory.Exists(gamePath))
+        sb.AppendLine($"- 游戏目录不存在 / Game folder not found: {gamePath}\n"
+                    + "  请在\"设置\"中改成正确的游戏安装目录 / set the correct game path in Settings");
 
-    var parent = Path.GetDirectoryName(configured);
-    if (string.IsNullOrEmpty(parent) || !Directory.Exists(parent)) return null;
-
-    var candidates = new List<string>
+    var game = new List<string>();
+    var bepinex = new List<string>();
+    var cucore = new List<string>();
+    foreach (var m in missingRefs)
     {
-        Path.Combine(parent, "Casualties Unknown"),
-        Path.Combine(parent, "Casualties Unknown Demo"),
-    };
-    try
-    {
-        foreach (var dir in Directory.GetDirectories(parent))
-            if (Path.GetFileName(dir).StartsWith("Casualties Unknown", StringComparison.OrdinalIgnoreCase))
-                candidates.Add(dir);
+        if (m.Contains("CUCoreLib")) cucore.Add(m);
+        else if (m.Contains("CasualtiesUnknown_Data")) game.Add(m);
+        else if (m.StartsWith("BepInEx")) bepinex.Add(m);
+        // "game root: ..." is covered by the directory check above.
     }
-    catch { }
 
-    foreach (var c in candidates)
-        if (HasGameFiles(c)) return c;
-    return null;
+    if (game.Count > 0)
+        sb.AppendLine("- 缺少游戏程序集（游戏未安装或路径错误）/ Missing game assemblies (game not installed or wrong path):\n"
+                    + string.Join("\n", game.ConvertAll(x => "    " + x)));
+    if (bepinex.Count > 0)
+        sb.AppendLine("- 缺少 BepInEx 或版本不完整（请把 BepInEx 装进该游戏目录）/ Missing or incomplete BepInEx (install it into this game folder):\n"
+                    + string.Join("\n", bepinex.ConvertAll(x => "    " + x)));
+    if (cucore.Count > 0)
+        sb.AppendLine("- 缺少 CUCoreLib（放入 BepInEx/plugins）/ Missing CUCoreLib (put it in BepInEx/plugins):\n"
+                    + string.Join("\n", cucore.ConvertAll(x => "    " + x)));
+
+    if (missingRefs.Count == 0)
+        sb.AppendLine("- 引用文件齐全，失败来自生成代码或编译环境 / All references found; the failure comes from the generated code or the compiler environment. See the output below.");
+
+    sb.AppendLine();
+    return sb.ToString();
 }
 
 // Decode redirected compiler output: strict UTF-8 first, then the Windows OEM
