@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using CuBlocky.Server.Models;
 using CuBlocky.Server.Nodes;
@@ -205,6 +207,17 @@ app.MapPost("/api/build", async (HttpRequest req) =>
         : (bp.Mod?.Name ?? "");
     var asmName = ProjectEmitter.SafeProjectName(rawName);
 
+    // The configured path may be stale (e.g. the game left the demo branch and
+    // the player never had the demo installed). Fall back to another install of
+    // the game on the same drive instead of failing every assembly reference.
+    var resolvedGamePath = FindValidGameDir(config.GamePath);
+    if (resolvedGamePath != null && !string.Equals(resolvedGamePath, config.GamePath, StringComparison.OrdinalIgnoreCase))
+    {
+        Console.WriteLine($"[Build] game path corrected: {config.GamePath} -> {resolvedGamePath}");
+        config.GamePath = resolvedGamePath;
+        config.Save();
+    }
+
     var files = ProjectEmitter.EmitProject(bp, config.GamePath, asmName);
     var buildDir = Path.Combine(Directory.GetCurrentDirectory(), "builds", asmName);
 
@@ -387,9 +400,15 @@ app.MapPost("/api/build", async (HttpRequest req) =>
             CreateNoWindow = true,
         };
         using var proc = Process.Start(psi)!;
-        var stdout = await proc.StandardOutput.ReadToEndAsync();
-        var stderr = await proc.StandardError.ReadToEndAsync();
+        // msbuild writes in the OEM code page on non-English Windows and in UTF-8
+        // on other setups; decode both instead of showing mojibake to the user.
+        // Read both pipes concurrently: a full stdout buffer would otherwise block
+        // the child while we wait for stderr.
+        var stdoutTask = ReadProcessTextAsync(proc.StandardOutput.BaseStream);
+        var stderrTask = ReadProcessTextAsync(proc.StandardError.BaseStream);
         await proc.WaitForExitAsync();
+        var stdout = await stdoutTask;
+        var stderr = await stderrTask;
 
         var dllPath = Path.Combine(buildDir, "bin", "Release", asmName + ".dll");
         var success = proc.ExitCode == 0 && File.Exists(dllPath);
@@ -449,14 +468,17 @@ app.MapPost("/api/build", async (HttpRequest req) =>
             ("BepInEx/plugins (deploy target)", "BepInEx\\plugins", true),
         };
         var referenceChecks = new List<object>();
+        var missingRefs = new List<string>();
         foreach (var r in refs)
         {
             var p = r.Rel == "" ? config.GamePath : Path.Combine(config.GamePath, r.Rel);
+            var exists = r.Dir ? Directory.Exists(p) : File.Exists(p);
+            if (!exists) missingRefs.Add(r.Name + ": " + p);
             referenceChecks.Add(new
             {
                 check = r.Name,
                 path = p,
-                exists = r.Dir ? Directory.Exists(p) : File.Exists(p),
+                exists,
             });
         }
 
@@ -467,9 +489,16 @@ app.MapPost("/api/build", async (HttpRequest req) =>
             bytes = files[k].Length,
         }).ToList();
 
+        // A missing game assembly shows up as dozens of CS0246 "type not found"
+        // errors that look like source problems. Lead with the real cause.
+        var refsHint = !success && missingRefs.Count > 0
+            ? "Game path is missing required files (set it in Settings):\n"
+              + string.Join("\n", missingRefs) + "\n\n"
+            : "";
+
         var msg = success
             ? "Build succeeded!"
-            : "Build failed (exit " + proc.ExitCode + "):\n" + rawOutput;
+            : refsHint + "Build failed (exit " + proc.ExitCode + "):\n" + rawOutput;
 
         return Results.Json(new
         {
@@ -690,3 +719,57 @@ app.Lifetime.ApplicationStarted.Register(() =>
 });
 
 app.Run();
+
+// Resolve a usable game install: prefer the configured path, otherwise look at
+// sibling folders (release vs demo) and any "Casualties Unknown*" install next
+// to it. Returns null when nothing usable is found.
+static string? FindValidGameDir(string configured)
+{
+    static bool HasGameFiles(string dir) =>
+        !string.IsNullOrWhiteSpace(dir) &&
+        File.Exists(Path.Combine(dir, "CasualtiesUnknown_Data", "Managed", "Assembly-CSharp.dll"));
+
+    if (HasGameFiles(configured)) return configured;
+
+    var parent = Path.GetDirectoryName(configured);
+    if (string.IsNullOrEmpty(parent) || !Directory.Exists(parent)) return null;
+
+    var candidates = new List<string>
+    {
+        Path.Combine(parent, "Casualties Unknown"),
+        Path.Combine(parent, "Casualties Unknown Demo"),
+    };
+    try
+    {
+        foreach (var dir in Directory.GetDirectories(parent))
+            if (Path.GetFileName(dir).StartsWith("Casualties Unknown", StringComparison.OrdinalIgnoreCase))
+                candidates.Add(dir);
+    }
+    catch { }
+
+    foreach (var c in candidates)
+        if (HasGameFiles(c)) return c;
+    return null;
+}
+
+// Decode redirected compiler output: strict UTF-8 first, then the Windows OEM
+// code page, then a lossless single-byte fallback. msbuild writes the OEM code
+// page when the UI language is non-English, which used to surface as mojibake.
+static async Task<string> ReadProcessTextAsync(Stream stream)
+{
+    using var ms = new MemoryStream();
+    await stream.CopyToAsync(ms);
+    var bytes = ms.ToArray();
+    if (bytes.Length == 0) return "";
+    try { return new UTF8Encoding(false, true).GetString(bytes); }
+    catch (DecoderFallbackException) { }
+    try
+    {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        return Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage).GetString(bytes);
+    }
+    catch
+    {
+        return Encoding.Latin1.GetString(bytes);
+    }
+}
