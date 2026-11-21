@@ -10,7 +10,7 @@ namespace CuBlocky.Server.Compiler;
 // M1: Plugin.cs + RegisterContent.cs + .csproj + README. M5: zip download.
 public static class ProjectEmitter
 {
-    private const string DefaultGamePath = @"C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo";
+    private const string DefaultGamePath = @"C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown";
     private const int MaxNameLen = 60;
     // Characters Windows refuses in file names. 0x00–0x1F and 0x7F are control chars.
     private static readonly char[] IllegalNameChars = { '<', '>', ':', '"', '/', '\\', '|', '?', '*' };

@@ -200,6 +200,7 @@ public class RecipeEntry
     public int ResultAmount { get; set; } = 1;
     public float ResultCondition { get; set; } = 1f;
     public bool IsLiquidResult { get; set; } = false;
+    public bool IsRepair { get; set; } = false;
     public List<RecipeIngredient> Ingredients { get; set; } = new();
 }
 
@@ -211,6 +212,7 @@ public class RecipeIngredient
     public bool IsLiquid { get; set; } = false;
     public bool DestroyItem { get; set; } = true;
     public float MinimumCondition { get; set; } = 0.9f;
+    public bool NoMaxCondition { get; set; } = false;
 }
 
 // ── Assets ─────────────────────────────────────────────────────────

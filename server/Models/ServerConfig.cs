@@ -4,7 +4,7 @@ namespace CuBlocky.Server.Models;
 
 public class ServerConfig
 {
-    public string GamePath { get; set; } = @"C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo";
+    public string GamePath { get; set; } = @"C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown";
 
     public int PartSizeMb { get; set; } = 9;
 

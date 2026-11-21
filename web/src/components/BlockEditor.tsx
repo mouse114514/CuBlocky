@@ -524,6 +524,14 @@ const TOOLBOX = `
     <block type="cu_sound_custom"></block>
     <block type="cu_var_get"></block>
     <sep></sep>
+    <block type="cu_recipe_liquid">
+      <value name="AMOUNT"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+    </block>
+    <block type="cu_recipe_tool">
+      <value name="MIN_CONDITION"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+      <value name="NO_MAX"><shadow type="cu_false"></shadow></value>
+    </block>
+    <sep></sep>
     <block type="cu_happiness"></block>
     <block type="cu_temperature"></block>
     <block type="cu_hunger"></block>
