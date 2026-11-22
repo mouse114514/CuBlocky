@@ -251,86 +251,6 @@ const VANILLA_ITEMS: DdOption[] = [
   ['等离子切割器', 'Plasma Cutter', 'Plasma Cutter', 'plasmacutter'],
 ];
 
-// Liquid ids registered in Liquids.Registry. Labels come from the game's own
-// locale (localeName) so names match what the player sees in game.
-const VANILLA_LIQUIDS: DdOption[] = [
-  ['酒精瓶', 'Bottle of alcohol', 'Bottle of alcohol', 'alcohol'],
-  ['异种血液', 'Alien blood', 'Alien blood', 'alienblood'],
-  ['胺碘酮瓶', 'Amiodarone bottle', 'Amiodarone bottle', 'amiodarone'],
-  ['抗生素药瓶', 'Antibiotics bottle', 'Antibiotics bottle', 'antibiotics'],
-  ['抗抑郁药瓶', 'Antidepressant bottle', 'Antidepressant bottle', 'antidepressants'],
-  ['抗辐射剂药瓶', 'Anti-rad bottle', 'Anti-rad bottle', 'antirad'],
-  ['抗血清注射器', 'Antiserum syringe', 'Antiserum syringe', 'antiserum'],
-  ['抗毒血清', 'Antivenom', 'Antivenom', 'antivenom'],
-  ['苹果汁盒', 'Apple juice carton', 'Apple juice carton', 'applejuice'],
-  ['生化流体', 'Bio-chem fluid', 'Bio-chem fluid', 'biochem'],
-  ['漂白剂瓶', 'Bleach bottle', 'Bleach bottle', 'bleach'],
-  ['血液', 'Blood', 'Blood', 'blood'],
-  ['增脑剂瓶', 'Braingrow bottle', 'Braingrow bottle', 'braingrow'],
-  ['碳酸水', 'Carbonated water', 'Carbonated water', 'carbonatedwater'],
-  ['头孢曲松注射器', 'Ceftriaxone syringe', 'Ceftriaxone syringe', 'ceftriaxone'],
-  ['谷物片', 'Cereal', 'Cereal', 'cereal'],
-  ['氯仿', 'Chloroform', 'Chloroform', 'chloroform'],
-  ['巧克力奶瓶', 'Chocolate milk bottle', 'Chocolate milk bottle', 'chocolatemilk'],
-  ['咖啡杯', 'Coffee cup', 'Coffee cup', 'coffee'],
-  ['污水', 'Dirty water', 'Dirty water', 'dirtywater'],
-  ['消毒剂瓶', 'Antiseptic bottle', 'Antiseptic bottle', 'disinfectant'],
-  ['能量饮料罐', 'Energy drink can', 'Energy drink can', 'energydrink'],
-  ['肾上腺素', 'Epinephrine', 'Epinephrine', 'epinephrine'],
-  ['脂肪', 'Fat', 'Fat', 'fat'],
-  ['芬太尼注射器', 'Fentanyl syringe', 'Fentanyl syringe', 'fentanyl'],
-  ['地下水', 'Groundwater', 'Groundwater', 'groundwater'],
-  ['海洛因注射器', 'Heroin syringe', 'Heroin syringe', 'heroin'],
-  ['医用级兴奋剂', 'Medical-grade stimulant', 'Medical-grade stimulant', 'highgradestimulant'],
-  ['辣酱', 'Hot sauce', 'Hot sauce', 'hotsauce'],
-  ['冰激凌', 'Ice cream', 'Ice cream', 'icecream'],
-  ['冰茶', 'Iced tea', 'Iced tea', 'icetea'],
-  ['角蛋白增强剂瓶', 'Keratin booster', 'Keratin booster', 'keratinbooster'],
-  ['番茄酱瓶', 'Ketchup bottle', 'Ketchup bottle', 'ketchup'],
-  ['柠檬水罐', 'Lemonade jar', 'Lemonade jar', 'lemonade'],
-  ['局部麻醉剂', 'Local anesthetic', 'Local anesthetic', 'localanesthetic'],
-  ['杂牌兴奋剂', 'Off-brand stimulant', 'Off-brand stimulant', 'lowgradestimulant'],
-  ['L.R.D.血清', 'L.R.D. Serum', 'L.R.D. Serum', 'lrdserum'],
-  ['荧光藻', 'Lumalgae', 'Lumalgae', 'lumalgae'],
-  ['汞', 'Mercury', 'Mercury', 'mercury'],
-  ['烈性兴奋剂', 'Hard stimulant', 'Hard stimulant', 'midgradestimulant'],
-  ['牛奶盒', 'Milk carton', 'Milk carton', 'milk'],
-  ['精神抹除剂瓶', 'Mindwipe', 'Mindwipe', 'mindwipe'],
-  ['霉菌', 'Mold', 'Mold', 'mold'],
-  ['吗啡注射器', 'Morphine syringe', 'Morphine syringe', 'morphine'],
-  ['纳洛酮注射器', 'Naloxone syringe', 'Naloxone syringe', 'naloxone'],
-  ['纳曲酮药瓶', 'Naltrexone bottle', 'Naltrexone bottle', 'naltrexone'],
-  ['原油', 'Oil', 'Oil', 'oil'],
-  ['橄榄油', 'Olive oil', 'Olive oil', 'oliveoil'],
-  ['鸦片注射器', 'Opium syringe', 'Opium syringe', 'opium'],
-  ['橙汁', 'Orange juice', 'Orange juice', 'orangejuice'],
-  ['氧脉素', 'Oxyline', 'Oxyline', 'oxyline'],
-  ['止痛药瓶', 'Painkiller bottle', 'Painkiller bottle', 'painkillers'],
-  ['奶粉', 'Powdered milk', 'Powdered milk', 'powderedmilk'],
-  ['促凝剂', 'Procoagulant', 'Procoagulant', 'procoagulant'],
-  ['粗制果汁', 'Produce juice', 'Produce juice', 'producejuice'],
-  ['辐射水', 'Irradiated water', 'Irradiated water', 'radwater'],
-  ['红色血液', 'Red blood', 'Red blood', 'redblood'],
-  ['猩红垢泥', 'Red sludge', 'Red sludge', 'redsludge'],
-  ['精制果汁', 'Refined juice', 'Refined juice', 'refinedjuice'],
-  ['镇痛膏', 'Relief cream', 'Relief cream', 'reliefcream'],
-  ['小型静脉输液袋', 'Small IV bag', 'Small IV bag', 'ringersolution'],
-  ['静脉输液袋', 'IV bag', 'IV bag', 'saline'],
-  ['树汁', 'Tree sap', 'Tree sap', 'sap'],
-  ['安眠药盒', 'Sleeping pills packet', 'Sleeping pills packet', 'sleepingpills'],
-  ['肥皂', 'Soap', 'Soap', 'soap'],
-  ['汽水', 'Soda', 'Soda', 'soda'],
-  ['硝普钠瓶', 'Sodium nitroprusside bottle', 'Sodium nitroprusside bottle', 'sodiumnitroprusside'],
-  ['汤碗', 'Soup bowl', 'Soup bowl', 'soup'],
-  ['运动饮料', 'Sports drink', 'Sports drink', 'sportsdrink'],
-  ['链激酶注射器', 'Streptokinase syringe', 'Streptokinase syringe', 'streptokinase'],
-  ['柠檬水', 'Lemonade', 'Lemonade', 'urine'],
-  ['血管加压素瓶', 'Vasopressin bottle', 'Vasopressin bottle', 'vasopressin'],
-  ['过滤水', 'Clean water', 'Clean water', 'water'],
-  ['伤口粘合胶瓶', 'Wound glue', 'Wound glue', 'woundglue'],
-  ['酸奶', 'Yogurt', 'Yogurt', 'yogurt'],
-];
-
 // Crafting qualities (tags promoted to qualities by CUCoreLib) usable as recipe
 // ingredients: a "tool" ingredient is a quality with destroyItem=false, so the
 // item only has to sit in the inventory.
@@ -761,29 +681,20 @@ const BLOCK_JSON: any[] = [
     ],
     colour: C.ITEM, previousStatement: null, nextStatement: null, inputsInline: true,
   },
-  // Recipe ingredient: a liquid (pick from the liquid registry, amount in mL).
-  // Place it inside the recipe's ingredient list.
+  // Recipe ingredient: any item carrying a crafting property (quality). This is
+  // how vanilla checks everything crafting-related, from cutting tools to
+  // opiate-containing medicine.
   {
-    type: 'cu_recipe_liquid',
-    message0: '%{BKY_CU_RECIPE_LIQUID}',
-    args0: [
-      { type: 'field_searchable_dropdown', name: 'LIQUID', options: VANILLA_LIQUIDS, lang: 'zh' },
-      { type: 'input_value', name: 'AMOUNT', check: 'Number', align: 'RIGHT' },
-    ],
-    colour: C.VALUE, output: 'Ingredient', inputsInline: false,
-  },
-  // Recipe ingredient: a crafting quality used as a tool (cutting, heatsource,
-  // ...). "keep" + min condition 0 means it only has to be in the inventory.
-  {
-    type: 'cu_recipe_tool',
-    message0: '%{BKY_CU_RECIPE_TOOL}',
+    type: 'cu_recipe_quality',
+    message0: '%{BKY_CU_RECIPE_QUALITY}',
     args0: [
       { type: 'field_searchable_dropdown', name: 'QUALITY', options: CRAFT_QUALITY_OPTIONS, lang: 'zh' },
+      { type: 'input_value', name: 'LEVEL', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'MIN_CONDITION', check: 'Number', align: 'RIGHT' },
       { type: 'field_dropdown', name: 'CONSUME', options: [
         ['%{BKY_CU_ING_CONSUME}', 'true'],
         ['%{BKY_CU_ING_KEEP}', 'false'],
       ]},
-      { type: 'input_value', name: 'MIN_CONDITION', check: 'Number', align: 'RIGHT' },
       { type: 'input_value', name: 'NO_MAX', check: 'Boolean' },
     ],
     colour: C.VALUE, output: 'Ingredient', inputsInline: false,
@@ -3001,8 +2912,7 @@ const MSG_ZH: Record<string, string> = {
   CU_ITEM_SET_TAG: '设置物品 %1 标签为 %2',
   CU_ITEM_SET_START_CONDITION: '设置物品 %1 初始耐久为 %2',
   CU_REGISTER_RECIPE: '配方 %1 → %2 ×%3 耐久%4 材料耐久%5 修理%6 智力%7',
-  CU_RECIPE_LIQUID: '液体原料 %1 需要毫升 %2',
-  CU_RECIPE_TOOL: '工具/品质原料 %1 %2 最低耐久 %3 仅受损 %4',
+  CU_RECIPE_QUALITY: '性质原料 %1 等级 %2 最低耐久 %3 %4 仅受损 %5',
   CU_ING_CONSUME: '消耗',
   CU_ING_KEEP: '不消耗',
   CU_EAT: '吃 饥饿 %1 体重增益 %2',
@@ -3305,8 +3215,7 @@ const MSG_EN: Record<string, string> = {
   CU_ITEM_SET_TAG: 'set item %1 tag to %2',
   CU_ITEM_SET_START_CONDITION: 'set item %1 start condition to %2',
   CU_REGISTER_RECIPE: 'recipe %1 → %2 ×%3 cond%4 ing cond%5 repair%6 int%7',
-  CU_RECIPE_LIQUID: 'liquid ingredient %1 amount mL %2',
-  CU_RECIPE_TOOL: 'tool/quality ingredient %1 %2 min cond %3 damaged-only %4',
+  CU_RECIPE_QUALITY: 'property ingredient %1 level %2 min cond %3 %4 damaged-only %5',
   CU_ING_CONSUME: 'consume',
   CU_ING_KEEP: 'keep',
   CU_EAT: 'eat hunger %1 weight gain %2',
@@ -3605,8 +3514,7 @@ const MSG_RU: Record<string, string> = {
   CU_ITEM_SET_TAG: 'установить предмету %1 тег %2',
   CU_ITEM_SET_START_CONDITION: 'установить начальное состояние %1 = %2',
   CU_REGISTER_RECIPE: 'рецепт %1 → %2 ×%3 прочн%4 прочн materials%5 ремонт%6 инт%7',
-  CU_RECIPE_LIQUID: 'жидкий ингредиент %1 нужно мл %2',
-  CU_RECIPE_TOOL: 'ингредиент-инструмент %1 %2 мин. прочность %3 только повреждённый %4',
+  CU_RECIPE_QUALITY: 'ингредиент-свойство %1 уровень %2 мин. прочность %3 %4 только повреждённый %5',
   CU_ING_CONSUME: 'расходовать',
   CU_ING_KEEP: 'оставить',
   CU_EAT: 'есть голод %1 прибавка веса %2',
@@ -4354,23 +4262,17 @@ function extractRecipeIngredients(
   while (listBlock.getInput('ADD' + i)) {
     const itemBlock = listBlock.getInputTargetBlock('ADD' + i);
     if (itemBlock) {
-      if (itemBlock.type === 'cu_recipe_liquid') {
-        const id = ((itemBlock.getFieldValue('LIQUID') as string) || '').trim();
-        // MinimumCondition carries the required amount in mL (RecipeItem.GetMatchingItem);
-        // Amount is unused for specific liquids.
-        const ml = recipeNum(gen.valueToCode(itemBlock, 'AMOUNT', ORDER_ATOMIC), 1);
-        if (id) {
-          out.push({ Mode: 'specific', Id: id, Amount: 1, IsLiquid: true, DestroyItem: true, MinimumCondition: ml, NoMaxCondition: false });
-        }
-      } else if (itemBlock.type === 'cu_recipe_tool') {
+      if (itemBlock.type === 'cu_recipe_quality') {
         const id = ((itemBlock.getFieldValue('QUALITY') as string) || '').trim();
-        // Quality/tool: matched via CraftingQuality(id, amount). destroyItem=false
-        // with MinimumCondition 0 keeps the tool in the inventory undamaged.
+        // Property: matched via CraftingQuality(id, level), so any item carrying
+        // that property qualifies. destroyItem=false with minimum condition 0
+        // means "only has to be in the inventory, and is not damaged".
+        const level = recipeNum(gen.valueToCode(itemBlock, 'LEVEL', ORDER_ATOMIC), 1);
         const minCond = recipeNum(gen.valueToCode(itemBlock, 'MIN_CONDITION', ORDER_ATOMIC), 0);
         const consume = (itemBlock.getFieldValue('CONSUME') as string) !== 'false';
         const noMax = (gen.valueToCode(itemBlock, 'NO_MAX', ORDER_ATOMIC) || 'false').trim() === 'true';
         if (id) {
-          out.push({ Mode: 'quality', Id: id, Amount: 1, IsLiquid: false, DestroyItem: consume, MinimumCondition: minCond, NoMaxCondition: noMax });
+          out.push({ Mode: 'quality', Id: id, Amount: level, IsLiquid: false, DestroyItem: consume, MinimumCondition: minCond, NoMaxCondition: noMax });
         }
       } else {
         const id = extractSingleItemId(itemBlock);
@@ -4387,8 +4289,7 @@ function extractRecipeIngredients(
   return out;
 }
 
-csharpGenerator.forBlock['cu_recipe_liquid'] = () => '"ingredient"';
-csharpGenerator.forBlock['cu_recipe_tool'] = () => '"ingredient"';
+csharpGenerator.forBlock['cu_recipe_quality'] = () => '"ingredient"';
 
 function extractSingleItemId(block: Blockly.Block): string | null {
   if (block.type === 'cu_item_custom' || block.type === 'cu_item_vanilla') {
