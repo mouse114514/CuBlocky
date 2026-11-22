@@ -689,13 +689,7 @@ const BLOCK_JSON: any[] = [
     message0: '%{BKY_CU_RECIPE_QUALITY}',
     args0: [
       { type: 'field_searchable_dropdown', name: 'QUALITY', options: CRAFT_QUALITY_OPTIONS, lang: 'zh' },
-      { type: 'input_value', name: 'LEVEL', check: 'Number', align: 'RIGHT' },
-      { type: 'input_value', name: 'MIN_CONDITION', check: 'Number', align: 'RIGHT' },
-      { type: 'field_dropdown', name: 'CONSUME', options: [
-        ['%{BKY_CU_ING_CONSUME}', 'true'],
-        ['%{BKY_CU_ING_KEEP}', 'false'],
-      ]},
-      { type: 'input_value', name: 'NO_MAX', check: 'Boolean' },
+      { type: 'input_value', name: 'AMOUNT', check: 'Number', align: 'RIGHT' },
     ],
     colour: C.VALUE, output: 'Ingredient', inputsInline: false,
   },
@@ -711,6 +705,10 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'INGREDIENT_CONDITION', check: 'Number' },
       { type: 'input_value', name: 'IS_REPAIR', check: 'Boolean' },
       { type: 'input_value', name: 'INT', check: 'Number' },
+      { type: 'field_dropdown', name: 'CONSUME', options: [
+        ['%{BKY_CU_ING_CONSUME}', 'true'],
+        ['%{BKY_CU_ING_KEEP}', 'false'],
+      ]},
     ],
     colour: C.REGISTER, inputsInline: false,
   },
@@ -2911,8 +2909,8 @@ const MSG_ZH: Record<string, string> = {
   CU_GET_ITEM_PROPERTY: '读取物品 %1 的 %2',
   CU_ITEM_SET_TAG: '设置物品 %1 标签为 %2',
   CU_ITEM_SET_START_CONDITION: '设置物品 %1 初始耐久为 %2',
-  CU_REGISTER_RECIPE: '配方 %1 → %2 ×%3 耐久%4 材料耐久%5 修理%6 智力%7',
-  CU_RECIPE_QUALITY: '性质原料 %1 等级 %2 最低耐久 %3 %4 仅受损 %5',
+  CU_REGISTER_RECIPE: '配方 %1 → %2 ×%3 耐久%4 材料耐久%5 修理%6 智力%7 材料%8',
+  CU_RECIPE_QUALITY: '性质原料 %1 数量 %2',
   CU_ING_CONSUME: '消耗',
   CU_ING_KEEP: '不消耗',
   CU_EAT: '吃 饥饿 %1 体重增益 %2',
@@ -3214,8 +3212,8 @@ const MSG_EN: Record<string, string> = {
   CU_GET_ITEM_PROPERTY: 'read item %1 %2',
   CU_ITEM_SET_TAG: 'set item %1 tag to %2',
   CU_ITEM_SET_START_CONDITION: 'set item %1 start condition to %2',
-  CU_REGISTER_RECIPE: 'recipe %1 → %2 ×%3 cond%4 ing cond%5 repair%6 int%7',
-  CU_RECIPE_QUALITY: 'property ingredient %1 level %2 min cond %3 %4 damaged-only %5',
+  CU_REGISTER_RECIPE: 'recipe %1 → %2 ×%3 cond%4 ing cond%5 repair%6 int%7 materials%8',
+  CU_RECIPE_QUALITY: 'property ingredient %1 amount %2',
   CU_ING_CONSUME: 'consume',
   CU_ING_KEEP: 'keep',
   CU_EAT: 'eat hunger %1 weight gain %2',
@@ -3513,8 +3511,8 @@ const MSG_RU: Record<string, string> = {
   CU_GET_ITEM_PROPERTY: 'чтение предмета %1 %2',
   CU_ITEM_SET_TAG: 'установить предмету %1 тег %2',
   CU_ITEM_SET_START_CONDITION: 'установить начальное состояние %1 = %2',
-  CU_REGISTER_RECIPE: 'рецепт %1 → %2 ×%3 прочн%4 прочн materials%5 ремонт%6 инт%7',
-  CU_RECIPE_QUALITY: 'ингредиент-свойство %1 уровень %2 мин. прочность %3 %4 только повреждённый %5',
+  CU_REGISTER_RECIPE: 'рецепт %1 → %2 ×%3 прочн%4 прочн materials%5 ремонт%6 инт%7 материалы%8',
+  CU_RECIPE_QUALITY: 'ингредиент-свойство %1 кол-во %2',
   CU_ING_CONSUME: 'расходовать',
   CU_ING_KEEP: 'оставить',
   CU_EAT: 'есть голод %1 прибавка веса %2',
@@ -4238,9 +4236,10 @@ csharpGenerator.forBlock['cu_item_set_start_condition'] = (block, gen) => {
   return `//ITEM_START_CONDITION:{"Id":"${id.replace(/"/g, '\\"')}","Condition":${condJson}}\n`;
 };
 // Helper: walk a lists_create_with block and extract recipe ingredients.
-// Plain item blocks mean "specific item"; a cu_recipe_ingredient block means a
-// specific liquid (id + required mL) or a quality/tool (id + amount), which is
-// how vanilla recipes express fluids and reusable tools.
+// Plain item blocks mean "specific item"; a cu_recipe_quality block means "any
+// item carrying this property, at least this amount" - the same mechanism the
+// game uses for tools (cutting) and for medicine (opiate). Whether ingredients
+// are consumed is a recipe-level setting (`consume`).
 type RecipeIngredientJson = {
   Mode: string; Id: string; Amount: number; IsLiquid: boolean;
   DestroyItem: boolean; MinimumCondition: number; NoMaxCondition: boolean;
@@ -4254,7 +4253,8 @@ function recipeNum(code: string, fallback: number): number {
 function extractRecipeIngredients(
   listBlock: Blockly.Block | null,
   gen: Blockly.Generator,
-  defaultCondition: number
+  defaultCondition: number,
+  consume: boolean
 ): RecipeIngredientJson[] {
   const out: RecipeIngredientJson[] = [];
   if (!listBlock) return out;
@@ -4264,22 +4264,20 @@ function extractRecipeIngredients(
     if (itemBlock) {
       if (itemBlock.type === 'cu_recipe_quality') {
         const id = ((itemBlock.getFieldValue('QUALITY') as string) || '').trim();
-        // Property: matched via CraftingQuality(id, level), so any item carrying
-        // that property qualifies. destroyItem=false with minimum condition 0
-        // means "only has to be in the inventory, and is not damaged".
-        const level = recipeNum(gen.valueToCode(itemBlock, 'LEVEL', ORDER_ATOMIC), 1);
-        const minCond = recipeNum(gen.valueToCode(itemBlock, 'MIN_CONDITION', ORDER_ATOMIC), 0);
-        const consume = (itemBlock.getFieldValue('CONSUME') as string) !== 'false';
-        const noMax = (gen.valueToCode(itemBlock, 'NO_MAX', ORDER_ATOMIC) || 'false').trim() === 'true';
+        // Property: CraftingQuality(id, amount) is the required amount of that
+        // property. The game checks the item has at least that much, then either
+        // destroys the item or wears condition by amount / itemQualityAmount
+        // (RecipeItem.UseItem). minimumCondition stays 0 for these slots.
+        const amount = recipeNum(gen.valueToCode(itemBlock, 'AMOUNT', ORDER_ATOMIC), 1);
         if (id) {
-          out.push({ Mode: 'quality', Id: id, Amount: level, IsLiquid: false, DestroyItem: consume, MinimumCondition: minCond, NoMaxCondition: noMax });
+          out.push({ Mode: 'quality', Id: id, Amount: amount, IsLiquid: false, DestroyItem: consume, MinimumCondition: 0, NoMaxCondition: false });
         }
       } else {
         const id = extractSingleItemId(itemBlock);
         if (id) {
           out.push({
             Mode: 'specific', Id: id, Amount: 1, IsLiquid: false,
-            DestroyItem: true, MinimumCondition: defaultCondition, NoMaxCondition: false,
+            DestroyItem: consume, MinimumCondition: defaultCondition, NoMaxCondition: false,
           });
         }
       }
@@ -4308,10 +4306,12 @@ csharpGenerator.forBlock['cu_register_recipe'] = (block, gen) => {
   const ingCond = gen.valueToCode(block, 'INGREDIENT_CONDITION', ORDER_ATOMIC) || '0.9';
   const repair = gen.valueToCode(block, 'IS_REPAIR', ORDER_ATOMIC) || 'false';
   const intReq = gen.valueToCode(block, 'INT', ORDER_ATOMIC) || '2';
+  // Whether ingredients are consumed belongs to the recipe, not to each value.
+  const consume = (block.getFieldValue('CONSUME') as string) !== 'false';
 
   // Walk the connected INPUTS list to extract real ingredient data
   const listBlock = block.getInputTargetBlock('INPUTS');
-  const ingredients = extractRecipeIngredients(listBlock, gen, parseFloat(ingCond) || 0.9);
+  const ingredients = extractRecipeIngredients(listBlock, gen, parseFloat(ingCond) || 0.9, consume);
 
   const json = JSON.stringify({
     ResultId: out.replace(/^"|"$/g, ''),
