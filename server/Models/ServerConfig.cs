@@ -8,11 +8,11 @@ public class ServerConfig
 
     public int PartSizeMb { get; set; } = 9;
 
-    // Stored in config.json next to the executable, so it survives browser
-    // clears and reinstalls. Read back by GET /api/config.
+    // Stored in the persistent data folder (%LOCALAPPDATA%\CuBlocky\config.json),
+    // so it survives browser clears and release updates. Read by GET /api/config.
     public string GitHubToken { get; set; } = "";
 
-    private static string ConfigPath => Path.Combine(AppContext.BaseDirectory, "config.json");
+    private static string ConfigPath => CuPaths.ConfigPath;
 
     private static ServerConfig? _instance;
 

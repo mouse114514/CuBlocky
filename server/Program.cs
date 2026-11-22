@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using CuBlocky.Server;
 using CuBlocky.Server.Models;
 using CuBlocky.Server.Nodes;
 using CuBlocky.Server.Compiler;
@@ -56,7 +57,8 @@ var jsonOpts = new JsonSerializerOptions
     PropertyNameCaseInsensitive = true,
 };
 
-var projectsDir = Path.Combine(Directory.GetCurrentDirectory(), "projects");
+CuPaths.MigrateFromExecutableFolder();
+var projectsDir = CuPaths.ProjectsDir;
 Directory.CreateDirectory(projectsDir);
 
 var config = ServerConfig.Load();
@@ -85,7 +87,7 @@ HashSet<string> AssetExtensions = new(StringComparer.OrdinalIgnoreCase)
 // Helper: get project asset directory
 static string GetProjectAssetsDir(string projectName)
 {
-    var dir = Path.Combine(Directory.GetCurrentDirectory(), "projects", projectName, "assets");
+    var dir = Path.Combine(CuPaths.ProjectsDir, projectName, "assets");
     Directory.CreateDirectory(dir);
     return dir;
 }
@@ -208,7 +210,7 @@ app.MapPost("/api/build", async (HttpRequest req) =>
     var asmName = ProjectEmitter.SafeProjectName(rawName);
 
     var files = ProjectEmitter.EmitProject(bp, config.GamePath, asmName);
-    var buildDir = Path.Combine(Directory.GetCurrentDirectory(), "builds", asmName);
+    var buildDir = Path.Combine(CuPaths.BuildsDir, asmName);
 
     // Project name is also the source for the assets folder.
     var projectName = asmName;
@@ -513,7 +515,7 @@ app.MapPost("/api/deploy", async (HttpRequest req) =>
         return Results.BadRequest("dllPath missing or file not found");
 
     // Only DLLs this server built may be deployed.
-    var root = Directory.GetCurrentDirectory();
+    var root = CuPaths.BuildsDir;
     var full = Path.GetFullPath(dllPath);
     if (!full.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
         return Results.BadRequest("dllPath must be inside the CuBlocky server directory");
