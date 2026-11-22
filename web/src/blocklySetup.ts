@@ -902,6 +902,16 @@ const BLOCK_JSON: any[] = [
     message1: '%1', args1: [{ type: 'input_statement', name: 'SUBSTACK' }],
     colour: C.FLOW, previousStatement: null, nextStatement: null, inputsInline: true,
   },
+  {
+    type: 'cu_for_each',
+    message0: '%{BKY_CU_FOR_EACH}',
+    args0: [
+      { type: 'input_value', name: 'LIST', check: 'Array' },
+      { type: 'field_input', name: 'VAR', text: 'item' },
+    ],
+    message1: '%1', args1: [{ type: 'input_statement', name: 'SUBSTACK' }],
+    colour: C.FLOW, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
 
   // ═══ Value reporters (lime green) ════════════════════════════
   { type: 'cu_number', message0: '%1', args0: [{ type: 'field_number', name: 'NUM', value: 0, precision: 0.1 }], output: 'Number', colour: C.VALUE },
@@ -1375,6 +1385,159 @@ const BLOCK_JSON: any[] = [
       { type: 'field_input', name: 'CREATURE_ID', text: 'myCreature' },
     ],
     output: 'Array', colour: C.CREATURE,
+  },
+
+  // ═══ Entity selectors (value) ════════════════════════════════
+  {
+    type: 'cu_entity_all',
+    message0: '%{BKY_CU_ENTITY_ALL}',
+    args0: [
+      { type: 'field_dropdown', name: 'SCOPE', options: [
+        ['%{BKY_CU_ENTITY_ANIMALS}', 'animals'],
+        ['%{BKY_CU_ENTITY_ANY}', 'all'],
+      ]},
+      { type: 'field_dropdown', name: 'PLAYER', options: [
+        ['%{BKY_CU_ENTITY_NO_PLAYER}', 'noplayer'],
+        ['%{BKY_CU_ENTITY_WITH_PLAYER}', 'player'],
+      ]},
+    ],
+    output: 'Array', colour: C.CREATURE,
+  },
+  {
+    type: 'cu_entity_nearest',
+    message0: '%{BKY_CU_ENTITY_NEAREST}',
+    args0: [
+      { type: 'field_dropdown', name: 'SCOPE', options: [
+        ['%{BKY_CU_ENTITY_ANIMALS}', 'animals'],
+        ['%{BKY_CU_ENTITY_ANY}', 'all'],
+      ]},
+      { type: 'field_dropdown', name: 'PLAYER', options: [
+        ['%{BKY_CU_ENTITY_NO_PLAYER}', 'noplayer'],
+        ['%{BKY_CU_ENTITY_WITH_PLAYER}', 'player'],
+      ]},
+      { type: 'input_value', name: 'RADIUS', check: 'Number', align: 'RIGHT' },
+    ],
+    output: 'String', colour: C.CREATURE,
+  },
+  {
+    type: 'cu_entity_in_range',
+    message0: '%{BKY_CU_ENTITY_IN_RANGE}',
+    args0: [
+      { type: 'input_value', name: 'RADIUS', check: 'Number', align: 'RIGHT' },
+      { type: 'field_dropdown', name: 'SCOPE', options: [
+        ['%{BKY_CU_ENTITY_ANIMALS}', 'animals'],
+        ['%{BKY_CU_ENTITY_ANY}', 'all'],
+      ]},
+      { type: 'field_dropdown', name: 'PLAYER', options: [
+        ['%{BKY_CU_ENTITY_NO_PLAYER}', 'noplayer'],
+        ['%{BKY_CU_ENTITY_WITH_PLAYER}', 'player'],
+      ]},
+    ],
+    output: 'Array', colour: C.CREATURE,
+  },
+  {
+    type: 'cu_entity_by_type',
+    message0: '%{BKY_CU_ENTITY_BY_TYPE}',
+    args0: [{ type: 'field_input', name: 'TYPE', text: 'shadecrawler' }],
+    output: 'Array', colour: C.CREATURE,
+  },
+  {
+    type: 'cu_entity_property',
+    message0: '%{BKY_CU_ENTITY_PROPERTY}',
+    args0: [
+      { type: 'input_value', name: 'ENTITY', check: ['String', 'Entity'] },
+      { type: 'field_dropdown', name: 'PROP', options: [
+        ['%{BKY_CU_ENTITY_HEALTH}', 'health'],
+        ['%{BKY_CU_ENTITY_X}', 'x'],
+        ['%{BKY_CU_ENTITY_Y}', 'y'],
+        ['%{BKY_CU_ENTITY_NAME}', 'name'],
+        ['%{BKY_CU_ENTITY_ID}', 'id'],
+        ['%{BKY_CU_ENTITY_ALIVE}', 'alive'],
+      ]},
+    ],
+    output: null, colour: C.CREATURE, inputsInline: true,
+  },
+
+  // ═══ Entity actions (statement) ══════════════════════════════
+  {
+    type: 'cu_entity_damage',
+    message0: '%{BKY_CU_ENTITY_DAMAGE}',
+    args0: [
+      { type: 'input_value', name: 'ENTITY', check: ['String', 'Entity'] },
+      { type: 'input_value', name: 'AMOUNT', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_entity_heal',
+    message0: '%{BKY_CU_ENTITY_HEAL}',
+    args0: [
+      { type: 'input_value', name: 'ENTITY', check: ['String', 'Entity'] },
+      { type: 'input_value', name: 'AMOUNT', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_entity_kill',
+    message0: '%{BKY_CU_ENTITY_KILL}',
+    args0: [{ type: 'input_value', name: 'ENTITY', check: ['String', 'Entity'] }],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_entity_teleport',
+    message0: '%{BKY_CU_ENTITY_TELEPORT}',
+    args0: [
+      { type: 'input_value', name: 'ENTITY', check: ['String', 'Entity'] },
+      { type: 'input_value', name: 'X', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'Y', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_entity_velocity',
+    message0: '%{BKY_CU_ENTITY_VELOCITY}',
+    args0: [
+      { type: 'input_value', name: 'ENTITY', check: ['String', 'Entity'] },
+      { type: 'input_value', name: 'X', check: 'Number', align: 'RIGHT' },
+      { type: 'input_value', name: 'Y', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_entity_stun',
+    message0: '%{BKY_CU_ENTITY_STUN}',
+    args0: [
+      { type: 'input_value', name: 'ENTITY', check: ['String', 'Entity'] },
+      { type: 'input_value', name: 'SECONDS', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_entity_visible',
+    message0: '%{BKY_CU_ENTITY_VISIBLE}',
+    args0: [
+      { type: 'input_value', name: 'ENTITY', check: ['String', 'Entity'] },
+      { type: 'input_value', name: 'VISIBLE', check: 'Boolean' },
+    ],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_entity_scale',
+    message0: '%{BKY_CU_ENTITY_SCALE}',
+    args0: [
+      { type: 'input_value', name: 'ENTITY', check: ['String', 'Entity'] },
+      { type: 'input_value', name: 'SCALE', check: 'Number', align: 'RIGHT' },
+    ],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
+  },
+  {
+    type: 'cu_entity_drop_item',
+    message0: '%{BKY_CU_ENTITY_DROP_ITEM}',
+    args0: [
+      { type: 'input_value', name: 'ENTITY', check: ['String', 'Entity'] },
+      { type: 'input_value', name: 'ITEM', check: 'Item' },
+    ],
+    colour: C.CREATURE, previousStatement: null, nextStatement: null, inputsInline: true,
   },
 
   // ═══ Player state getters (green-ish) ════════════════════════
@@ -2999,6 +3162,29 @@ const MSG_ZH: Record<string, string> = {
   CU_SCREEN_VIGNETTE: '屏幕暗角 %1',
   CU_SCREEN_FX_CLEAR: '清除全部屏幕效果',
   CU_CREATURE_POSITION: '生物 %1 的位置列表',
+  CU_FOR_EACH: '遍历列表 %1 每一项 %2',
+  CU_ENTITY_ALL: '全部实体 %1 %2',
+  CU_ENTITY_NEAREST: '最近实体 %1 %2 半径 %3',
+  CU_ENTITY_IN_RANGE: '半径 %1 内实体 %2 %3',
+  CU_ENTITY_BY_TYPE: '类型 %1 的实体',
+  CU_ENTITY_PROPERTY: '实体 %1 的 %2',
+  CU_ENTITY_DAMAGE: '实体 %1 受伤 %2',
+  CU_ENTITY_HEAL: '实体 %1 治疗 %2',
+  CU_ENTITY_KILL: '杀死实体 %1',
+  CU_ENTITY_TELEPORT: '传送实体 %1 到 %2 , %3',
+  CU_ENTITY_VELOCITY: '设置实体 %1 速度 %2 , %3',
+  CU_ENTITY_STUN: '眩晕实体 %1 %2 秒',
+  CU_ENTITY_VISIBLE: '设置实体 %1 可见 %2',
+  CU_ENTITY_SCALE: '设置实体 %1 缩放 %2',
+  CU_ENTITY_DROP_ITEM: '实体 %1 掉落 %2',
+  CU_ENTITY_ANIMALS: '仅生物',
+  CU_ENTITY_ANY: '所有实体',
+  CU_ENTITY_NO_PLAYER: '不含玩家',
+  CU_ENTITY_WITH_PLAYER: '含玩家',
+  CU_ENTITY_HEALTH: '血量',
+  CU_ENTITY_NAME: '名字',
+  CU_ENTITY_ID: '类型 id',
+  CU_ENTITY_ALIVE: '是否存活',
   CU_PLAYER_HEALTH: '躯干皮肤健康值',
   CU_PLAYER_MAX_HEALTH: '皮肤健康上限',
   CU_PLAYER_STAMINA: '体力值',
@@ -3299,6 +3485,29 @@ const MSG_EN: Record<string, string> = {
   CU_SCREEN_VIGNETTE: 'screen vignette %1',
   CU_SCREEN_FX_CLEAR: 'clear all screen effects',
   CU_CREATURE_POSITION: 'position list of creature %1',
+  CU_FOR_EACH: 'for each %2 in list %1',
+  CU_ENTITY_ALL: 'all entities %1 %2',
+  CU_ENTITY_NEAREST: 'nearest entity %1 %2 within %3',
+  CU_ENTITY_IN_RANGE: 'entities within %1 %2 %3',
+  CU_ENTITY_BY_TYPE: 'entities of type %1',
+  CU_ENTITY_PROPERTY: 'entity %1 %2',
+  CU_ENTITY_DAMAGE: 'damage entity %1 by %2',
+  CU_ENTITY_HEAL: 'heal entity %1 by %2',
+  CU_ENTITY_KILL: 'kill entity %1',
+  CU_ENTITY_TELEPORT: 'teleport entity %1 to %2 , %3',
+  CU_ENTITY_VELOCITY: 'set entity %1 velocity %2 , %3',
+  CU_ENTITY_STUN: 'stun entity %1 for %2 s',
+  CU_ENTITY_VISIBLE: 'set entity %1 visible %2',
+  CU_ENTITY_SCALE: 'set entity %1 scale %2',
+  CU_ENTITY_DROP_ITEM: 'entity %1 drops %2',
+  CU_ENTITY_ANIMALS: 'animals only',
+  CU_ENTITY_ANY: 'any entity',
+  CU_ENTITY_NO_PLAYER: 'without player',
+  CU_ENTITY_WITH_PLAYER: 'with player',
+  CU_ENTITY_HEALTH: 'health',
+  CU_ENTITY_NAME: 'name',
+  CU_ENTITY_ID: 'type id',
+  CU_ENTITY_ALIVE: 'alive',
   CU_PLAYER_HEALTH: 'torso skin health',
   CU_PLAYER_MAX_HEALTH: 'max skin health',
   CU_PLAYER_STAMINA: 'stamina',
@@ -3599,6 +3808,29 @@ const MSG_RU: Record<string, string> = {
   CU_SCREEN_VIGNETTE: 'экран: виньетка %1',
   CU_SCREEN_FX_CLEAR: 'снять все эффекты экрана',
   CU_CREATURE_POSITION: 'список позиций существа %1',
+  CU_FOR_EACH: 'для каждого %2 в списке %1',
+  CU_ENTITY_ALL: 'все сущности %1 %2',
+  CU_ENTITY_NEAREST: 'ближайшая сущность %1 %2 в радиусе %3',
+  CU_ENTITY_IN_RANGE: 'сущности в радиусе %1 %2 %3',
+  CU_ENTITY_BY_TYPE: 'сущности типа %1',
+  CU_ENTITY_PROPERTY: 'сущность %1 %2',
+  CU_ENTITY_DAMAGE: 'нанести урон сущности %1 на %2',
+  CU_ENTITY_HEAL: 'вылечить сущность %1 на %2',
+  CU_ENTITY_KILL: 'убить сущность %1',
+  CU_ENTITY_TELEPORT: 'телепортировать сущность %1 в %2 , %3',
+  CU_ENTITY_VELOCITY: 'задать скорость сущности %1 %2 , %3',
+  CU_ENTITY_STUN: 'оглушить сущность %1 на %2 с',
+  CU_ENTITY_VISIBLE: 'сущность %1 видима %2',
+  CU_ENTITY_SCALE: 'масштаб сущности %1 %2',
+  CU_ENTITY_DROP_ITEM: 'сущность %1 выронит %2',
+  CU_ENTITY_ANIMALS: 'только животные',
+  CU_ENTITY_ANY: 'любые сущности',
+  CU_ENTITY_NO_PLAYER: 'без игрока',
+  CU_ENTITY_WITH_PLAYER: 'с игроком',
+  CU_ENTITY_HEALTH: 'здоровье',
+  CU_ENTITY_NAME: 'имя',
+  CU_ENTITY_ID: 'id типа',
+  CU_ENTITY_ALIVE: 'жив',
   CU_PLAYER_HEALTH: 'здоровье кожи туловища',
   CU_PLAYER_MAX_HEALTH: 'макс. здоровье кожи',
   CU_PLAYER_STAMINA: 'выносливость',
@@ -4493,6 +4725,15 @@ csharpGenerator.forBlock['cu_for_loop'] = (block, gen) => {
   return `for (int ${v} = ${from}; ${v} <= ${to}; ${v}++) {\n${s}}\n`;
 };
 
+csharpGenerator.forBlock['cu_for_each'] = (block, gen) => {
+  const list = gen.valueToCode(block, 'LIST', ORDER_ATOMIC) || 'new List<string>()';
+  // Expose the current element through the normal variable store (the same
+  // "get variable" block reads it), so selectors work with foreach loops.
+  const v = safeVar(block.getFieldValue('VAR') || 'item');
+  const s = gen.statementToCode(block, 'SUBSTACK');
+  return `foreach (var __cuEach in ${list}) {\n${v} = (string)__cuEach;\n${s}}\n`;
+};
+
 // Helper: add 'f' suffix only for simple number literals, not for expressions
 function float(v: string): string {
   if (/^-?\d+(\.\d+)?$/.test(v.trim())) return v + 'f';
@@ -4757,6 +4998,78 @@ csharpGenerator.forBlock['cu_set_creature_visible'] = (block) => {
 csharpGenerator.forBlock['cu_creature_position'] = (block) => {
   const id = (block.getFieldValue('CREATURE_ID') || 'myCreature').replace(/"/g, '\\"');
   return [`CuCreatureManager.GetPositionList("${id}").ConvertAll(v => v.ToString(System.Globalization.CultureInfo.InvariantCulture))`, ORDER_ATOMIC];
+};
+
+// ── Entity selectors / actions ──────────────────────────────────
+// Selectors return an instance-id handle (string) or a List<string> of handles;
+// both map onto the existing list/value blocks.
+const entityScope = (b: Blockly.Block) => b.getFieldValue('SCOPE') === 'animals' ? 'true' : 'false';
+const entityPlayer = (b: Blockly.Block) => b.getFieldValue('PLAYER') === 'player' ? 'true' : 'false';
+const entityHandle = (block: Blockly.Block, gen: Blockly.Generator) =>
+  gen.valueToCode(block, 'ENTITY', ORDER_ATOMIC) || '""';
+
+csharpGenerator.forBlock['cu_entity_all'] = (block) =>
+  [`new List<string>(CuEntityApi.All(${entityScope(block)}, ${entityPlayer(block)}))`, ORDER_ATOMIC];
+
+csharpGenerator.forBlock['cu_entity_nearest'] = (block, gen) => {
+  const r = gen.valueToCode(block, 'RADIUS', ORDER_ATOMIC) || '10';
+  return [`(string)CuEntityApi.Nearest(${float(r)}, ${entityScope(block)}, ${entityPlayer(block)})`, ORDER_ATOMIC];
+};
+
+csharpGenerator.forBlock['cu_entity_in_range'] = (block, gen) => {
+  const r = gen.valueToCode(block, 'RADIUS', ORDER_ATOMIC) || '10';
+  return [`new List<string>(CuEntityApi.InRange(${float(r)}, ${entityScope(block)}, ${entityPlayer(block)}))`, ORDER_ATOMIC];
+};
+
+csharpGenerator.forBlock['cu_entity_by_type'] = (block) => {
+  const t = (block.getFieldValue('TYPE') || '').replace(/"/g, '\\"');
+  return [`new List<string>(CuEntityApi.ByType("${t}"))`, ORDER_ATOMIC];
+};
+
+csharpGenerator.forBlock['cu_entity_property'] = (block, gen) => {
+  const h = entityHandle(block, gen);
+  switch (block.getFieldValue('PROP')) {
+    case 'health': return [`(float)CuEntityApi.Health(${h})`, ORDER_ATOMIC];
+    case 'x': return [`(float)CuEntityApi.PosX(${h})`, ORDER_ATOMIC];
+    case 'y': return [`(float)CuEntityApi.PosY(${h})`, ORDER_ATOMIC];
+    case 'name': return [`(string)CuEntityApi.EntityName(${h})`, ORDER_ATOMIC];
+    case 'id': return [`(string)CuEntityApi.EntityId(${h})`, ORDER_ATOMIC];
+    default: return [`(bool)CuEntityApi.IsAlive(${h})`, ORDER_ATOMIC];
+  }
+};
+
+const entityNum = (block: Blockly.Block, gen: Blockly.Generator, name: string, fallback: string) =>
+  float(gen.valueToCode(block, name, ORDER_ATOMIC) || fallback);
+
+csharpGenerator.forBlock['cu_entity_damage'] = (block, gen) =>
+  `CuEntityApi.Damage(${entityHandle(block, gen)}, ${entityNum(block, gen, 'AMOUNT', '10')});\n`;
+
+csharpGenerator.forBlock['cu_entity_heal'] = (block, gen) =>
+  `CuEntityApi.Heal(${entityHandle(block, gen)}, ${entityNum(block, gen, 'AMOUNT', '10')});\n`;
+
+csharpGenerator.forBlock['cu_entity_kill'] = (block, gen) =>
+  `CuEntityApi.Kill(${entityHandle(block, gen)});\n`;
+
+csharpGenerator.forBlock['cu_entity_teleport'] = (block, gen) =>
+  `CuEntityApi.Teleport(${entityHandle(block, gen)}, ${entityNum(block, gen, 'X', '0')}, ${entityNum(block, gen, 'Y', '0')});\n`;
+
+csharpGenerator.forBlock['cu_entity_velocity'] = (block, gen) =>
+  `CuEntityApi.SetVelocity(${entityHandle(block, gen)}, ${entityNum(block, gen, 'X', '0')}, ${entityNum(block, gen, 'Y', '0')});\n`;
+
+csharpGenerator.forBlock['cu_entity_stun'] = (block, gen) =>
+  `CuEntityApi.Stun(${entityHandle(block, gen)}, ${entityNum(block, gen, 'SECONDS', '2')});\n`;
+
+csharpGenerator.forBlock['cu_entity_visible'] = (block, gen) => {
+  const v = gen.valueToCode(block, 'VISIBLE', ORDER_ATOMIC) || 'true';
+  return `CuEntityApi.SetVisible(${entityHandle(block, gen)}, ${bool(v)});\n`;
+};
+
+csharpGenerator.forBlock['cu_entity_scale'] = (block, gen) =>
+  `CuEntityApi.SetScale(${entityHandle(block, gen)}, ${entityNum(block, gen, 'SCALE', '1')});\n`;
+
+csharpGenerator.forBlock['cu_entity_drop_item'] = (block, gen) => {
+  const item = gen.valueToCode(block, 'ITEM', ORDER_ATOMIC) || '"bandage"';
+  return `CuEntityApi.DropItem(${entityHandle(block, gen)}, ${item});\n`;
 };
 
 // Player state getters

@@ -119,6 +119,10 @@ public static class ProjectEmitter
         if (hasCreatureMgr)
             files["CuCreatureManager.cs"] = CodeEmitter.EmitCreatureManager(ns);
 
+        // Entity selector/action blocks emit CuEntityApi calls in any user code slot.
+        if (eventCode.Contains("CuEntityApi.") || fnCode.Contains("CuEntityApi.") || useActions.Contains("CuEntityApi."))
+            files["CuEntityApi.cs"] = CodeEmitter.EmitEntityApi(ns);
+
         if (hasScreenFx)
             files["ScreenFx.cs"] = CodeEmitter.EmitScreenFx(ns);
 

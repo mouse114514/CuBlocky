@@ -479,6 +479,7 @@ const TOOLBOX = `
       <value name="FROM"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
       <value name="TO"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
     </block>
+    <block type="cu_for_each"></block>
     <sep></sep>
     <block type="cu_delay">
       <value name="SECONDS"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
@@ -715,6 +716,44 @@ const TOOLBOX = `
     <block type="cu_set_creature_visible"></block>
     <sep></sep>
     <block type="cu_creature_position"></block>
+    <sep></sep>
+    <block type="cu_entity_all"></block>
+    <block type="cu_entity_nearest">
+      <value name="RADIUS"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
+    </block>
+    <block type="cu_entity_in_range">
+      <value name="RADIUS"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
+    </block>
+    <block type="cu_entity_by_type"></block>
+    <block type="cu_entity_property"></block>
+    <sep></sep>
+    <block type="cu_entity_damage">
+      <value name="AMOUNT"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
+    </block>
+    <block type="cu_entity_heal">
+      <value name="AMOUNT"><shadow type="cu_number"><field name="NUM">10</field></shadow></value>
+    </block>
+    <block type="cu_entity_kill"></block>
+    <block type="cu_entity_teleport">
+      <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+      <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_entity_velocity">
+      <value name="X"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+      <value name="Y"><shadow type="cu_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="cu_entity_stun">
+      <value name="SECONDS"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
+    </block>
+    <block type="cu_entity_visible">
+      <value name="VISIBLE"><shadow type="cu_true"></shadow></value>
+    </block>
+    <block type="cu_entity_scale">
+      <value name="SCALE"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
+    </block>
+    <block type="cu_entity_drop_item">
+      <value name="ITEM"><shadow type="cu_item_vanilla"><field name="ID">bandage</field></shadow></value>
+    </block>
   </category>
   <category name="%{BKY_CAT_CONFIG}" colour="#3f51b5">
     <block type="cu_register_mod_option"></block>
