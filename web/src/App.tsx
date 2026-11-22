@@ -308,6 +308,7 @@ export function App() {
       {buildResult && (
         <div className="modal-overlay">
           <div className="modal">
+            <button className="modal-close" onClick={() => setBuildResult(null)} title="Close">×</button>
             <h3>{buildResult.success ? t('app.buildOk') : t('app.buildFail')}</h3>
             {buildResult.success ? (
               <>

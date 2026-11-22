@@ -3,7 +3,9 @@ import type { ItemEntry } from '../types';
 import { useI18n } from '../i18n';
 import { BlockEditor } from './BlockEditor';
 
-const CATEGORIES = ['food', 'tool', 'weapon', 'medicine', 'nospawn', 'trash'];
+// Category strings the game itself uses (Item.cs), so filters and loot pools
+// recognise custom items.
+const CATEGORIES = ['food', 'medical', 'drug', 'tool', 'container', 'utility', 'water', 'trash', 'unobtainable', 'custom', 'nospawn'];
 
 interface Props {
   item: ItemEntry;

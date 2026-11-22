@@ -81,9 +81,15 @@ code{background:#0d1b2a;padding:1px 4px;border-radius:3px;font-size:12px}
   display:flex;align-items:center;justify-content:center;z-index:999;
 }
 .modal{
+  position:relative;
   background:#fff;border-radius:12px;padding:24px 28px;min-width:420px;max-width:600px;
   box-shadow:0 8px 32px rgba(0,0,0,0.25);
 }
+.modal-close{
+  position:absolute;top:8px;right:10px;width:28px;height:28px;border:0;border-radius:8px;
+  background:transparent;color:#888;font-size:22px;line-height:1;cursor:pointer;
+}
+.modal-close:hover{background:#f0f0f0;color:#333}
 .modal h3{margin:0 0 12px;font-size:16px;color:#222}
 .modal-label{font-size:11px;color:#888;margin:8px 0 2px}
 .modal-hint{font-size:11px;color:#aaa;margin:0 0 6px}

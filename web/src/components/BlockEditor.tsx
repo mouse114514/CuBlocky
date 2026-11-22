@@ -124,7 +124,6 @@ const TOOLBOX = `
       <value name="ID"><shadow type="cu_item_custom"><field name="ID">myItem</field></shadow></value>
       <value name="WEIGHT"><shadow type="cu_number"><field name="NUM">0.4</field></shadow></value>
       <value name="VALUE"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>
-      <value name="DECAY"><shadow type="logic_boolean"><field name="BOOL">FALSE</field></shadow></value>
       <value name="DECAY_MINUTES"><shadow type="cu_number"><field name="NUM">180</field></shadow></value>
       <value name="RECOGNITION"><shadow type="cu_number"><field name="NUM">2</field></shadow></value>
       <value name="SPAWN_FREQ"><shadow type="cu_number"><field name="NUM">1</field></shadow></value>

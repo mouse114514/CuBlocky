@@ -38,7 +38,7 @@ public class ItemEntry
     public float Weight { get; set; } = 0.4f;
     public int Value { get; set; } = 1;
     public string Tags { get; set; } = "";
-    public float DecayMinutes { get; set; } = 180f;
+    public float DecayMinutes { get; set; } = 0f;
     public int Recognition { get; set; } = 2;
     public bool Usable { get; set; } = false;
     public bool UsableOnLimb { get; set; } = false;

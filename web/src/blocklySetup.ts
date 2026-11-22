@@ -689,6 +689,10 @@ const BLOCK_JSON: any[] = [
     message0: '%{BKY_CU_RECIPE_QUALITY}',
     args0: [
       { type: 'field_searchable_dropdown', name: 'QUALITY', options: CRAFT_QUALITY_OPTIONS, lang: 'zh' },
+      { type: 'field_dropdown', name: 'KIND', options: [
+        ['%{BKY_CU_ING_ITEM}', 'item'],
+        ['%{BKY_CU_ING_LIQUID}', 'liquid'],
+      ]},
       { type: 'input_value', name: 'AMOUNT', check: 'Number', align: 'RIGHT' },
     ],
     colour: C.VALUE, output: 'Ingredient', inputsInline: false,
@@ -708,6 +712,13 @@ const BLOCK_JSON: any[] = [
       { type: 'field_dropdown', name: 'CONSUME', options: [
         ['%{BKY_CU_ING_CONSUME}', 'true'],
         ['%{BKY_CU_ING_KEEP}', 'false'],
+      ]},
+      { type: 'field_dropdown', name: 'CATEGORY', options: [
+        ['工具 Tools', 'Tools'],
+        ['材料 Materials', 'Materials'],
+        ['医疗 Medicine', 'Medicine'],
+        ['设施 Utilities', 'Utilities'],
+        ['食物 Food', 'Food'],
       ]},
     ],
     colour: C.REGISTER, inputsInline: false,
@@ -1866,9 +1877,11 @@ const BLOCK_JSON: any[] = [
     args0: [
       { type: 'input_value', name: 'ID', check: 'Item' },
       { type: 'field_dropdown', name: 'CATEGORY', options: [
-        ['nospawn','nospawn'],['weapon','weapon'],['tool','tool'],
-        ['medical','medical'],['food','food'],['material','material'],
-        ['armor','armor'],['container','container'],['misc','misc'],
+        // Values must match the category strings the game assigns in Item.cs.
+        ['食物 food','food'],['医疗 medical','medical'],['药品 drug','drug'],
+        ['工具 tool','tool'],['容器 container','container'],['设施 utility','utility'],
+        ['水 water','water'],['垃圾 trash','trash'],['无法获得 unobtainable','unobtainable'],
+        ['自定义 custom','custom'],['不刷新 nospawn','nospawn'],
       ]},
     ],
     colour: C.REGISTER, inputsInline: false,
@@ -1880,7 +1893,7 @@ const BLOCK_JSON: any[] = [
       { type: 'input_value', name: 'ID', check: 'Item' },
       { type: 'input_value', name: 'WEIGHT', check: 'Number' },
       { type: 'input_value', name: 'VALUE', check: 'Number' },
-      { type: 'field_dropdown', name: 'DECAY_ENABLED', options: [['真','TRUE'],['假','FALSE']] },
+      { type: 'field_dropdown', name: 'DECAY_ENABLED', options: [['假 no decay','FALSE'],['真 decay','TRUE']] },
       { type: 'input_value', name: 'DECAY_MINUTES', check: 'Number' },
       { type: 'input_value', name: 'RECOGNITION', check: 'Number' },
       { type: 'input_value', name: 'SPAWN_FREQ', check: 'Number' },
@@ -2909,8 +2922,9 @@ const MSG_ZH: Record<string, string> = {
   CU_GET_ITEM_PROPERTY: '读取物品 %1 的 %2',
   CU_ITEM_SET_TAG: '设置物品 %1 标签为 %2',
   CU_ITEM_SET_START_CONDITION: '设置物品 %1 初始耐久为 %2',
-  CU_REGISTER_RECIPE: '配方 %1 → %2 ×%3 耐久%4 材料耐久%5 修理%6 智力%7 材料%8',
-  CU_RECIPE_QUALITY: '性质原料 %1 数量 %2',
+  CU_REGISTER_RECIPE: '配方 %1 → %2 ×%3 耐久%4 材料耐久%5 修理%6 智力%7 材料%8 分类%9',
+  CU_RECIPE_QUALITY: '性质原料 %1 %2 数量 %3',
+  CU_ING_ITEM: '物品',
   CU_ING_CONSUME: '消耗',
   CU_ING_KEEP: '不消耗',
   CU_EAT: '吃 饥饿 %1 体重增益 %2',
@@ -3212,8 +3226,9 @@ const MSG_EN: Record<string, string> = {
   CU_GET_ITEM_PROPERTY: 'read item %1 %2',
   CU_ITEM_SET_TAG: 'set item %1 tag to %2',
   CU_ITEM_SET_START_CONDITION: 'set item %1 start condition to %2',
-  CU_REGISTER_RECIPE: 'recipe %1 → %2 ×%3 cond%4 ing cond%5 repair%6 int%7 materials%8',
-  CU_RECIPE_QUALITY: 'property ingredient %1 amount %2',
+  CU_REGISTER_RECIPE: 'recipe %1 → %2 ×%3 cond%4 ing cond%5 repair%6 int%7 materials%8 category%9',
+  CU_RECIPE_QUALITY: 'property ingredient %1 %2 amount %3',
+  CU_ING_ITEM: 'item',
   CU_ING_CONSUME: 'consume',
   CU_ING_KEEP: 'keep',
   CU_EAT: 'eat hunger %1 weight gain %2',
@@ -3511,8 +3526,9 @@ const MSG_RU: Record<string, string> = {
   CU_GET_ITEM_PROPERTY: 'чтение предмета %1 %2',
   CU_ITEM_SET_TAG: 'установить предмету %1 тег %2',
   CU_ITEM_SET_START_CONDITION: 'установить начальное состояние %1 = %2',
-  CU_REGISTER_RECIPE: 'рецепт %1 → %2 ×%3 прочн%4 прочн materials%5 ремонт%6 инт%7 материалы%8',
-  CU_RECIPE_QUALITY: 'ингредиент-свойство %1 кол-во %2',
+  CU_REGISTER_RECIPE: 'рецепт %1 → %2 ×%3 прочн%4 прочн materials%5 ремонт%6 инт%7 материалы%8 категория%9',
+  CU_RECIPE_QUALITY: 'ингредиент-свойство %1 %2 кол-во %3',
+  CU_ING_ITEM: 'предмет',
   CU_ING_CONSUME: 'расходовать',
   CU_ING_KEEP: 'оставить',
   CU_EAT: 'есть голод %1 прибавка веса %2',
@@ -3792,10 +3808,14 @@ export function defineBlocks(lang: string = 'zh') {
   if (blocks && blocks.lists_create_with) {
     blocks.lists_create_with.inputsInline = true;
     const lcd: any = blocks.lists_create_with;
-    if (!lcd.__cuItemCheck && typeof lcd.init === 'function') {
-      const origInit = lcd.init;
-      lcd.init = function (this: any) {
-        origInit.call(this);
+    // Keep the element check identical for every slot, including slots added by
+    // the mutator or restored from a saved workspace. Applying it only once in
+    // init() left later slots untyped, so the first slots rejected item blocks
+    // while the appended ones accepted them.
+    if (!lcd.__cuItemCheck && typeof lcd.updateShape_ === 'function') {
+      const origUpdateShape = lcd.updateShape_;
+      lcd.updateShape_ = function (this: any) {
+        origUpdateShape.call(this);
         for (const inp of this.inputList || []) {
           if (inp && typeof inp.name === 'string' && inp.name.indexOf('ADD') === 0 && inp.setCheck) {
             inp.setCheck(['String', 'Sound', 'Item', 'Ingredient']);
@@ -4269,8 +4289,11 @@ function extractRecipeIngredients(
         // destroys the item or wears condition by amount / itemQualityAmount
         // (RecipeItem.UseItem). minimumCondition stays 0 for these slots.
         const amount = recipeNum(gen.valueToCode(itemBlock, 'AMOUNT', ORDER_ATOMIC), 1);
+        // Liquid quality: the amount is mL of any liquid carrying the property
+        // (e.g. 20mL of something with the disinfectant property).
+        const isLiquid = (itemBlock.getFieldValue('KIND') as string) === 'liquid';
         if (id) {
-          out.push({ Mode: 'quality', Id: id, Amount: amount, IsLiquid: false, DestroyItem: consume, MinimumCondition: 0, NoMaxCondition: false });
+          out.push({ Mode: 'quality', Id: id, Amount: amount, IsLiquid: isLiquid, DestroyItem: consume, MinimumCondition: 0, NoMaxCondition: false });
         }
       } else {
         const id = extractSingleItemId(itemBlock);
@@ -4315,7 +4338,7 @@ csharpGenerator.forBlock['cu_register_recipe'] = (block, gen) => {
 
   const json = JSON.stringify({
     ResultId: out.replace(/^"|"$/g, ''),
-    Category: 'Tools',
+    Category: (block.getFieldValue('CATEGORY') as string) || 'Tools',
     IntRequirement: parseInt(intReq) || 2,
     ResultAmount: parseInt(amt),
     ResultCondition: cond === '-1' ? 1 : parseFloat(cond),
