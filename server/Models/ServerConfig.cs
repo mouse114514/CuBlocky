@@ -2,6 +2,14 @@ using System.Text.Json;
 
 namespace CuBlocky.Server.Models;
 
+public class ConfigUpdate
+{
+    public string? GamePath { get; set; }
+    public int? PartSizeMb { get; set; }
+    public string? GitHubToken { get; set; }
+    public bool? ShowSplash { get; set; }
+}
+
 public class ServerConfig
 {
     public string GamePath { get; set; } = @"C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown";
@@ -11,6 +19,10 @@ public class ServerConfig
     // Stored in the persistent data folder (%LOCALAPPDATA%\CuBlocky\config.json),
     // so it survives browser clears and release updates. Read by GET /api/config.
     public string GitHubToken { get; set; } = "";
+
+    // UI preference kept with the rest of the settings so it migrates together
+    // with the data folder instead of living only in browser storage.
+    public bool ShowSplash { get; set; } = true;
 
     private static string ConfigPath => CuPaths.ConfigPath;
 

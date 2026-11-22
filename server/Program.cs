@@ -66,15 +66,32 @@ var config = ServerConfig.Load();
 // ── Config API ──────────────────────────────────────────────────────
 app.MapGet("/api/config", () => Results.Json(config));
 
+// Partial update: the settings dialog only sends the game path, so absent
+// fields must keep their current value instead of wiping stored preferences.
 app.MapPut("/api/config", async (HttpRequest req) =>
 {
-    var body = await JsonSerializer.DeserializeAsync<ServerConfig>(req.Body, jsonOpts);
+    var body = await JsonSerializer.DeserializeAsync<ConfigUpdate>(req.Body, jsonOpts);
     if (body == null) return Results.BadRequest("invalid config");
-    config.GamePath = body.GamePath;
-    if (body.PartSizeMb > 0) config.PartSizeMb = body.PartSizeMb;
-    config.GitHubToken = body.GitHubToken ?? "";
+    if (body.GamePath != null) config.GamePath = body.GamePath;
+    if (body.PartSizeMb is > 0) config.PartSizeMb = body.PartSizeMb.Value;
+    if (body.GitHubToken != null) config.GitHubToken = body.GitHubToken;
+    if (body.ShowSplash != null) config.ShowSplash = body.ShowSplash.Value;
     config.Save();
     return Results.Ok(config);
+});
+
+// Version + data folder, so screenshots show which build the user runs and
+// where their projects are stored.
+app.MapGet("/api/version", () =>
+{
+    var asm = typeof(ServerConfig).Assembly;
+    var ver = asm.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+        .OfType<System.Reflection.AssemblyInformationalVersionAttribute>()
+        .FirstOrDefault()?.InformationalVersion
+        ?? asm.GetName().Version?.ToString() ?? "0.0.0";
+    var plus = ver.IndexOf('+');
+    if (plus >= 0) ver = ver.Substring(0, plus);
+    return Results.Json(new { version = ver, dataDir = CuPaths.DataDir });
 });
 
 // Extensions the asset manager accepts: images plus the audio codecs CUCoreLib can decode.

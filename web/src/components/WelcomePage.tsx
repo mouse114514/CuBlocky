@@ -6,7 +6,7 @@ import GradientBg from './GradientBg';
 import { LangPicker } from './LangPicker';
 import Marketplace from './Marketplace';
 import { TOKEN_URL, setStoredToken } from '../market';
-import { getConfig, updateConfig, type ServerConfig } from '../api';
+import { getConfig, getVersion, updateConfig, type ServerConfig } from '../api';
 import SPLASH_TEXTS from '../splashTexts';
 
 function pickSplash(lang: Lang): string {
@@ -51,6 +51,16 @@ export default function WelcomePage({ onOpenProject }: Props) {
   const [showSplash, setShowSplash] = useState(() => {
     return localStorage.getItem('cublocky-splash') !== 'off';
   });
+  const [serverInfo, setServerInfo] = useState<{ version: string; dataDir: string } | null>(null);
+
+  // The stored preference wins over browser storage, so it survives updates and
+  // browser data clears.
+  useEffect(() => {
+    getConfig()
+      .then(cfg => { if (typeof cfg.showSplash === 'boolean') setShowSplash(cfg.showSplash); })
+      .catch(() => {});
+    getVersion().then(setServerInfo).catch(() => {});
+  }, []);
 
   const refreshSplash = () => setSplashText(pickSplash(lang));
 
@@ -89,7 +99,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
     try {
       const tok = tokText.trim();
       setStoredToken(tok);
-      await updateConfig({ gamePath, githubToken: tok });
+      await updateConfig({ gamePath, githubToken: tok, showSplash });
       setShowSettings(false);
     } catch { /* ignore */ }
   };
@@ -275,6 +285,9 @@ export default function WelcomePage({ onOpenProject }: Props) {
           <button onClick={loadProjects}>{t('app.openProject')}</button>
           <button onClick={() => setShowMarket(true)}>{t('market.title')}</button>
         </div>
+        <p className="wp-sub" style={{ marginTop: 18, fontSize: 12, opacity: 0.6 }}>
+          CuBlocky {serverInfo?.version ?? '—'}
+        </p>
       </div>
 
       {showNew && (
@@ -424,7 +437,7 @@ export default function WelcomePage({ onOpenProject }: Props) {
               className="modal-input"
               value={gamePath}
               onChange={(e) => setGamePath(e.target.value)}
-              placeholder="C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo"
+              placeholder="C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown"
             />
             <div className="wp-setting-row">
               <div className="wp-toggle-label">
@@ -449,6 +462,10 @@ export default function WelcomePage({ onOpenProject }: Props) {
                 {showSplash ? 'ON' : 'OFF'}
               </button>
             </div>
+            <p className="modal-label">{t('app.version')}</p>
+            <p className="modal-path">CuBlocky {serverInfo?.version ?? '—'}</p>
+            <p className="modal-label">{t('app.dataDir')}</p>
+            <p className="modal-path">{serverInfo?.dataDir ?? '—'}</p>
             <div className="modal-actions">
               <button onClick={() => setShowSettings(false)}>{t('app.close')}</button>
               <button className="build-btn" onClick={saveSettings}>{t('app.saveSettings')}</button>

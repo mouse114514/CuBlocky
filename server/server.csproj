@@ -10,6 +10,10 @@
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <EnableDefaultContentItems>true</EnableDefaultContentItems>
+    <!-- One exe to hand out; wwwroot still ships beside it as plain files. -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
 
   <!-- Frontend (web/) builds into server/wwwroot via vite.config.ts outDir -->

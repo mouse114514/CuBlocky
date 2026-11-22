@@ -7,16 +7,18 @@ import { UIEditor } from './components/UIEditor';
 import WelcomePage from './components/WelcomePage';
 import { ToolbarGuide } from './components/ToolbarGuide';
 import AssetManager from './components/AssetManager';
-import { download, buildProject, saveProject, getConfig, updateConfig, deployDll, type BuildResult, type ServerConfig } from './api';
+import { download, buildProject, saveProject, getConfig, getVersion, updateConfig, deployDll, type BuildResult, type ServerConfig, type ServerInfo } from './api';
 import * as Blockly from 'blockly/core';
 import { csharpGenerator, createSpriteBlock, createSoundBlock, extractFunctions } from './blocklySetup';
 
 // Everything a modder should paste when reporting a build failure: the compiler
 // output, the exact generated lines it points at, the resolved game path, and
 // which of the required game assemblies the server could not find.
-function debugPayload(r: BuildResult): string {
+function debugPayload(r: BuildResult, info?: ServerInfo | null): string {
   const lines: string[] = [];
   lines.push('[CuBlocky build report]');
+  lines.push('version:  ' + (info?.version ?? '(unknown)'));
+  if (info?.dataDir) lines.push('dataDir:  ' + info.dataDir);
   lines.push('gamePath: ' + (r.gamePath ?? '(not set)'));
   lines.push('buildDir: ' + (r.buildDir ?? ''));
   lines.push('dllPath:  ' + (r.dllPath ?? ''));
@@ -96,6 +98,7 @@ export function App() {
   const [blockSearch, setBlockSearch] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const [gamePath, setGamePath] = useState('');
+  const [serverInfo, setServerInfo] = useState<ServerInfo | null>(null);
   const [view, setView] = useState<'blocks' | 'ui'>('blocks');
   const wsRef = useRef<Blockly.WorkspaceSvg | null>(null);
   const bpRef = useRef(bp);
@@ -136,6 +139,7 @@ export function App() {
   // Load server config on mount
   useEffect(() => {
     getConfig().then(cfg => setGamePath(cfg.gamePath)).catch(() => {});
+    getVersion().then(setServerInfo).catch(() => {});
   }, []);
 
   const saveSettings = async () => {
@@ -320,7 +324,7 @@ export function App() {
             ) : (
               <div className="modal-path-wrap">
                 <button className={`copy-btn${errCopied ? ' copied' : ''}`} onClick={async () => {
-                  try { await navigator.clipboard.writeText(debugPayload(buildResult)); } catch { return; }
+                  try { await navigator.clipboard.writeText(debugPayload(buildResult, serverInfo)); } catch { return; }
                   setErrCopied(true); setTimeout(() => setErrCopied(false), 1200);
                 }} title="Copy">
                   {errCopied ? <CheckIcon /> : <CopyIcon />}
@@ -401,8 +405,12 @@ export function App() {
               className="modal-input"
               value={gamePath}
               onChange={(e) => setGamePath(e.target.value)}
-              placeholder="C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown Demo"
+              placeholder="C:\Program Files (x86)\Steam\steamapps\common\Casualties Unknown"
             />
+            <p className="modal-label">{t('app.version')}</p>
+            <p className="modal-path">CuBlocky {serverInfo?.version ?? '—'}</p>
+            <p className="modal-label">{t('app.dataDir')}</p>
+            <p className="modal-path">{serverInfo?.dataDir ?? '—'}</p>
             <div className="modal-actions">
               <button onClick={() => setShowSettings(false)}>{t('app.close')}</button>
               <button className="build-btn" onClick={saveSettings}>{t('app.saveSettings')}</button>

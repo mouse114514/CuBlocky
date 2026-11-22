@@ -122,12 +122,24 @@ export interface ServerConfig {
   gamePath: string;
   partSizeMb?: number;
   githubToken?: string;
+  showSplash?: boolean;
 }
 
 export async function getConfig(): Promise<ServerConfig> {
   const res = await fetch('/api/config');
   if (!res.ok) throw new Error('get config failed');
   return await res.json() as ServerConfig;
+}
+
+export interface ServerInfo {
+  version: string;
+  dataDir: string;
+}
+
+export async function getVersion(): Promise<ServerInfo> {
+  const res = await fetch('/api/version');
+  if (!res.ok) throw new Error('get version failed');
+  return await res.json() as ServerInfo;
 }
 
 export async function updateConfig(cfg: ServerConfig): Promise<ServerConfig> {
